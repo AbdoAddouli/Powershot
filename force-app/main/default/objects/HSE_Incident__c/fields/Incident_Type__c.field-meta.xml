@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Incident_Type__c</fullName>
+    <label>Incident Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Spill</fullName>
+                <default>false</default>
+                <label>Spill</label>
+            </value>
+            <value>
+                <fullName>Injury</fullName>
+                <default>false</default>
+                <label>Injury</label>
+            </value>
+            <value>
+                <fullName>Vehicle</fullName>
+                <default>false</default>
+                <label>Vehicle</label>
+            </value>
+            <value>
+                <fullName>Fire</fullName>
+                <default>false</default>
+                <label>Fire</label>
+            </value>
+            <value>
+                <fullName>Explosion</fullName>
+                <default>false</default>
+                <label>Explosion</label>
+            </value>
+            <value>
+                <fullName>Safety Near Miss</fullName>
+                <default>false</default>
+                <label>Safety Near Miss</label>
+            </value>
+            <value>
+                <fullName>Environmental</fullName>
+                <default>false</default>
+                <label>Environmental</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

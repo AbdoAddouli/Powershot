@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Regulatory_Permit__c</fullName>
+    <label>Regulatory Permit</label>
+    <referenceTo>Regulatory_Permit__c</referenceTo>
+    <relationshipLabel>Compliance Reports</relationshipLabel>
+    <relationshipName>Compliance_Reports</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

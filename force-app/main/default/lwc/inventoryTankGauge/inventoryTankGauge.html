@@ -1,0 +1,50 @@
+<template>
+    <lightning-card title="Tank Inventory Gauge" icon-name="custom:custom87">
+        <div class="slds-m-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-text-color_inverse">
+                    <p>Error loading tank inventory.</p>
+                </div>
+            </template>
+            <template if:false={hasError}>
+                <template if:true={hasTanks}>
+                    <template for:each={tanks} for:item="tank">
+                        <div key={tank.Id} class="slds-m-bottom_medium slds-box slds-box_x-small">
+                            <div class="slds-grid slds-wrap slds-m-bottom_small">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <p class="slds-text-heading_small">{tank.Name}</p>
+                                    <p class="slds-text-body_small slds-text-color_weak">{tank.Product__c}</p>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2 slds-text-align_right">
+                                    <p class={tank.gaugeClass}>{tank.fillPct}% Full</p>
+                                    <p class="slds-text-body_small slds-text-color_weak">{tank.volumeFormatted} / {tank.capacityFormatted} bbls</p>
+                                </div>
+                            </div>
+                            <div class="gauge-track">
+                                <div class="gauge-fill {tank.levelClass}" style="width: {tank.fillPct}%"></div>
+                            </div>
+                            <div class="slds-grid slds-wrap slds-m-top_xx-small">
+                                <div class="slds-col slds-size_1-of-3">
+                                    <p class="slds-text-body_small slds-text-color_weak">Available: {tank.availableFormatted}</p>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                                    <p class="slds-text-body_small slds-text-color_weak">Tank {tank.Tank_Number__c}</p>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                    <p class="slds-text-body_small slds-text-color_weak">{tank.Status__c}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <template if:false={hasTanks}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <lightning-icon icon-name="custom:custom87" size="large"></lightning-icon>
+                        <h3 class="slds-illustration__header slds-text-heading_medium">No Tanks</h3>
+                        <p class="slds-illustration__body slds-text-body_regular">No tank inventory records found.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

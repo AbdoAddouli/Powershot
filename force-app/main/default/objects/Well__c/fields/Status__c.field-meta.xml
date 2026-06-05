@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <label>Status</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Drilling</fullName>
+                <default>false</default>
+                <label>Drilling</label>
+            </value>
+            <value>
+                <fullName>Producing</fullName>
+                <default>false</default>
+                <label>Producing</label>
+            </value>
+            <value>
+                <fullName>Plugged</fullName>
+                <default>false</default>
+                <label>Plugged</label>
+            </value>
+            <value>
+                <fullName>Abandoned</fullName>
+                <default>false</default>
+                <label>Abandoned</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

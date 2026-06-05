@@ -1,0 +1,59 @@
+<template>
+    <lightning-card title="Production Allocation Report" icon-name="standard:report">
+        <div class="slds-m-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-text-color_inverse">
+                    <p>Error loading allocation data.</p>
+                </div>
+            </template>
+            <template if:false={hasError}>
+                <template if:true={hasData}>
+                    <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_default">
+                                <p class="slds-text-heading_medium">{summary.totalOil}</p>
+                                <p class="slds-text-body_small">Oil (bbls)</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_info slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{summary.totalGas}</p>
+                                <p class="slds-text-body_small">Gas (MCF)</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_success slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{summary.totalRevenue}</p>
+                                <p class="slds-text-body_small">Total Revenue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-m-bottom_small">
+                        <lightning-combobox
+                            name="months"
+                            label="Reporting Period"
+                            value={monthsBack}
+                            options={monthOptions}
+                            onchange={handleMonthsChange}>
+                        </lightning-combobox>
+                    </div>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={allocations}
+                        columns={columns}
+                        hide-checkbox-column="true"
+                        default-sort-direction="desc"
+                        sorted-by="Period_End__c">
+                    </lightning-datatable>
+                </template>
+                <template if:false={hasData}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <lightning-icon icon-name="standard:report" size="large"></lightning-icon>
+                        <h3 class="slds-illustration__header slds-text-heading_medium">No Allocation Data</h3>
+                        <p class="slds-illustration__body slds-text-body_regular">No production allocation records found for this well.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

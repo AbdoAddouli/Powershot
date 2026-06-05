@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Unit__c</fullName>
+    <label>Unit</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>bbls</fullName>
+                <default>false</default>
+                <label>bbls</label>
+            </value>
+            <value>
+                <fullName>gallons</fullName>
+                <default>false</default>
+                <label>gallons</label>
+            </value>
+            <value>
+                <fullName>MCF</fullName>
+                <default>false</default>
+                <label>MCF</label>
+            </value>
+            <value>
+                <fullName>liters</fullName>
+                <default>false</default>
+                <label>liters</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

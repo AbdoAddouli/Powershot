@@ -1,0 +1,66 @@
+<template>
+    <lightning-card title="Compliance Calendar" icon-name="standard:calibration">
+        <div class="slds-m-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-text-color_inverse">
+                    <p>Error loading compliance deadlines.</p>
+                </div>
+            </template>
+            <template if:false={hasError}>
+                <template if:true={hasData}>
+                    <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_default">
+                                <p class="slds-text-heading_medium">{summary.total}</p>
+                                <p class="slds-text-body_small">Total Permits</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_success slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{summary.upcoming}</p>
+                                <p class="slds-text-body_small">Upcoming</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_error slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{summary.overdue}</p>
+                                <p class="slds-text-body_small">Overdue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-m-bottom_small slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-radio-group
+                                name="view-mode"
+                                label="View"
+                                options="{[
+                                    {label: 'All', value: 'all'},
+                                    {label: 'Upcoming', value: 'upcoming'},
+                                    {label: 'Overdue', value: 'overdue'}
+                                ]}"
+                                value={viewMode}
+                                onchange={handleViewModeChange}
+                                type="button">
+                            </lightning-radio-group>
+                        </div>
+                    </div>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={displayDeadlines}
+                        columns={columns}
+                        hide-checkbox-column="true"
+                        default-sort-direction="asc"
+                        sorted-by="Expiration_Date__c">
+                    </lightning-datatable>
+                </template>
+                <template if:false={hasData}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <lightning-icon icon-name="standard:calibration" size="large"></lightning-icon>
+                        <h3 class="slds-illustration__header slds-text-heading_medium">No Compliance Dates</h3>
+                        <p class="slds-illustration__body slds-text-body_regular">No regulatory permits or deadlines found.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

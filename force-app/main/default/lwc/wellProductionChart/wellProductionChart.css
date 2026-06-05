@@ -1,0 +1,26 @@
+.gauge-track {
+    background: rgb(201, 199, 197);
+    border-radius: 4px;
+    height: 12px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.gauge-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.gauge-fill-oil {
+    background: linear-gradient(90deg, #2e844a, #3ba755);
+}
+
+.gauge-fill-gas {
+    background: linear-gradient(90deg, #706e6b, #9e9c99);
+}
+
+.gauge-fill-water {
+    background: linear-gradient(90deg, #1b96ff, #47b4ff);
+}

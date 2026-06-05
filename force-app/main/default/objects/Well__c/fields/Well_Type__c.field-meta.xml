@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Well_Type__c</fullName>
+    <label>Well Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Oil</fullName>
+                <default>false</default>
+                <label>Oil</label>
+            </value>
+            <value>
+                <fullName>Gas</fullName>
+                <default>false</default>
+                <label>Gas</label>
+            </value>
+            <value>
+                <fullName>Injection</fullName>
+                <default>false</default>
+                <label>Injection</label>
+            </value>
+            <value>
+                <fullName>Water Disposal</fullName>
+                <default>false</default>
+                <label>Water Disposal</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

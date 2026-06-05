@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Units_List__c</fullName>
+    <label>Units List</label>
+    <required>false</required>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Crude</fullName>
+                <default>false</default>
+                <label>Crude</label>
+            </value>
+            <value>
+                <fullName>Vacuum</fullName>
+                <default>false</default>
+                <label>Vacuum</label>
+            </value>
+            <value>
+                <fullName>FCC</fullName>
+                <default>false</default>
+                <label>FCC</label>
+            </value>
+            <value>
+                <fullName>Hydrocracker</fullName>
+                <default>false</default>
+                <label>Hydrocracker</label>
+            </value>
+            <value>
+                <fullName>Reformer</fullName>
+                <default>false</default>
+                <label>Reformer</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

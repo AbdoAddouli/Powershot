@@ -1,0 +1,111 @@
+<template>
+    <lightning-card title="Permit to Work Board" icon-name="standard:approval">
+        <div class="slds-m-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-box slds-theme_error slds-text-align_center">
+                    <p>Error loading permits. Please try again.</p>
+                </div>
+            </template>
+            <template if:false={hasError}>
+                <template if:true={hasData}>
+                    <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_info slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{cardCounts.requested}</p>
+                                <p class="slds-text-body_small">Requested</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_warning slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{cardCounts.issued}</p>
+                                <p class="slds-text-body_small">Issued</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_success slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{cardCounts.completed}</p>
+                                <p class="slds-text-body_small">Completed</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_default">
+                                <p class="slds-text-heading_medium">{cardCounts.cancelled}</p>
+                                <p class="slds-text-body_small">Cancelled</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters_small">
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small board-column">
+                                <h3 class="slds-text-heading_small slds-text-align_center slds-m-bottom_small slds-theme_info slds-text-color_inverse slds-p-vertical_xx-small">Requested</h3>
+                                <template for:each={requestedPermits} for:item="permit">
+                                    <div key={permit.Id} class="slds-box slds-box_x-small slds-m-bottom_xx-small board-card" data-id={permit.Id} onclick={handlePermitClick}>
+                                        <p class="slds-text-heading_x-small">{permit.Name}</p>
+                                        <p class="slds-text-body_small">{permit.Permit_Type__c}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak">{permit.Holder__c}</p>
+                                        <lightning-button variant="brand" label="Issue" data-id={permit.Id} onclick={handleAdvanceStatus} class="slds-m-top_xx-small"></lightning-button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small board-column">
+                                <h3 class="slds-text-heading_small slds-text-align_center slds-m-bottom_small slds-theme_warning slds-text-color_inverse slds-p-vertical_xx-small">Issued</h3>
+                                <template for:each={issuedPermits} for:item="permit">
+                                    <div key={permit.Id} class="slds-box slds-box_x-small slds-m-bottom_xx-small board-card" data-id={permit.Id} onclick={handlePermitClick}>
+                                        <p class="slds-text-heading_x-small">{permit.Name}</p>
+                                        <p class="slds-text-body_small">{permit.Permit_Type__c}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak">{permit.Holder__c}</p>
+                                        <lightning-button variant="brand" label="Complete" data-id={permit.Id} onclick={handleAdvanceStatus} class="slds-m-top_xx-small"></lightning-button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small board-column">
+                                <h3 class="slds-text-heading_small slds-text-align_center slds-m-bottom_small slds-theme_success slds-text-color_inverse slds-p-vertical_xx-small">Completed</h3>
+                                <template for:each={completedPermits} for:item="permit">
+                                    <div key={permit.Id} class="slds-box slds-box_x-small slds-m-bottom_xx-small board-card" data-id={permit.Id} onclick={handlePermitClick}>
+                                        <p class="slds-text-heading_x-small">{permit.Name}</p>
+                                        <p class="slds-text-body_small">{permit.Permit_Type__c}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak">{permit.Holder__c}</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <template if:true={showDetailPanel}>
+                        <section class="slds-m-top_medium slds-box slds-box_x-small">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_1-of-1 slds-text-align_right">
+                                    <lightning-button-icon icon-name="utility:close" variant="bare" onclick={handleCloseDetail}></lightning-button-icon>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <p><strong>Permit:</strong> {selectedPermit.Name}</p>
+                                    <p><strong>Type:</strong> {selectedPermit.Permit_Type__c}</p>
+                                    <p><strong>Status:</strong> {selectedPermit.Status__c}</p>
+                                    <p><strong>Holder:</strong> {selectedPermit.Holder__c}</p>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <p><strong>Start:</strong> {selectedPermit.Start_DateTime__c}</p>
+                                    <p><strong>End:</strong> {selectedPermit.End_DateTime__c}</p>
+                                    <p><strong>Location:</strong> {selectedPermit.Location__c}</p>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                                    <p>{selectedPermit.Description__c}</p>
+                                </div>
+                            </div>
+                        </section>
+                    </template>
+                </template>
+                <template if:false={hasData}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <lightning-icon icon-name="standard:approval" size="large"></lightning-icon>
+                        <h3 class="slds-illustration__header slds-text-heading_medium">No Permits</h3>
+                        <p class="slds-illustration__body slds-text-body_regular">No permit-to-work records found.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

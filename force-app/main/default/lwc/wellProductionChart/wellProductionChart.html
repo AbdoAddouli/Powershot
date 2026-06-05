@@ -1,0 +1,65 @@
+<template>
+    <lightning-card title="Well Production Chart" icon-name="custom:custom86">
+        <div class="slds-m-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-box slds-theme_error slds-text-align_center">
+                    <p>Error loading production data. Please try again.</p>
+                </div>
+            </template>
+            <template if:false={hasError}>
+                <template if:true={hasData}>
+                    <div class="slds-grid slds-wrap slds-gutters_small slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_success slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{productionStats.oilTotal}</p>
+                                <p class="slds-text-body_small">Oil (bbls)</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_info slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{productionStats.gasTotal}</p>
+                                <p class="slds-text-body_small">Gas (MCF)</p>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_inverse slds-text-color_inverse">
+                                <p class="slds-text-heading_medium">{productionStats.waterTotal}</p>
+                                <p class="slds-text-body_small">Water (bbls)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={data}
+                        columns={columns}
+                        hide-checkbox-column="true"
+                        default-sort-direction="desc"
+                        sorted-direction="desc"
+                        sorted-by="Production_Date__c">
+                    </lightning-datatable>
+                    <template for:each={chartData} for:item="point">
+                        <div key={point.date} class="slds-m-top_x-small">
+                            <div class="slds-text-body_small slds-m-bottom_xx-small">{point.date}</div>
+                            <div class="gauge-track">
+                                <div class="gauge-fill gauge-fill-oil" style="width: {(point.oil / productionStats.oilTotal * 100)}%"></div>
+                            </div>
+                            <div class="gauge-track">
+                                <div class="gauge-fill gauge-fill-gas" style="width: {(point.gas / productionStats.gasTotal * 100)}%"></div>
+                            </div>
+                            <div class="gauge-track">
+                                <div class="gauge-fill gauge-fill-water" style="width: {(point.water / productionStats.waterTotal * 100)}%"></div>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <template if:false={hasData}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <lightning-icon icon-name="standard:report" size="large"></lightning-icon>
+                        <h3 class="slds-illustration__header slds-text-heading_medium">No Production Data</h3>
+                        <p class="slds-illustration__body slds-text-body_regular">No production records found for this well.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,15 @@
+.board-column {
+    background: rgb(243, 242, 242);
+    min-height: 200px;
+}
+
+.board-card {
+    background: white;
+    border: 1px solid rgb(216, 214, 212);
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+}
+
+.board-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,25 @@
+.gauge-track {
+    background: rgb(216, 214, 212);
+    border-radius: 6px;
+    height: 24px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.gauge-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.8s ease;
+}
+
+.gauge-fill-low {
+    background: linear-gradient(90deg, #2e844a, #3ba755);
+}
+
+.gauge-fill-mid {
+    background: linear-gradient(90deg, #d7a228, #f3c14b);
+}
+
+.gauge-fill-high {
+    background: linear-gradient(90deg, #ba0517, #d92b1e);
+}

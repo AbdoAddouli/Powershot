@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Permit_to_Work__c</fullName>
+    <label>Permit to Work</label>
+    <referenceTo>Permit_to_Work__c</referenceTo>
+    <relationshipName>WorkOrder_Permit_to_Work</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

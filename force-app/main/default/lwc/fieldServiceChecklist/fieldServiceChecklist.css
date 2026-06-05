@@ -1,0 +1,7 @@
+.checklist-item {
+    transition: background-color 0.2s ease;
+}
+
+.checklist-item:hover {
+    background-color: rgb(243, 242, 242);
+}

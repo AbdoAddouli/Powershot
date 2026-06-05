@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Issuer__c</fullName>
+    <label>Issuer</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Issued Permits</relationshipLabel>
+    <relationshipName>Issued_Permits</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

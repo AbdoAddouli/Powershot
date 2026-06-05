@@ -1,0 +1,71 @@
+<template>
+    <lightning-card title="Field Service Checklist" icon-name="standard:task">
+        <div class="slds-m-around_medium">
+            <template if:true={hasError}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-text-color_inverse">
+                    <p>Error loading checklist.</p>
+                </div>
+            </template>
+            <template if:false={hasError}>
+                <template if:true={hasItems}>
+                    <div class="slds-grid slds-wrap slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <p class="slds-text-heading_small">Progress: {completedCount} / {totalCount}</p>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-text-align_right">
+                            <lightning-progress-bar value={progressPercent} variant={overallStatus}></lightning-progress-bar>
+                        </div>
+                    </div>
+                    <template for:each={checklistItems} for:item="item">
+                        <div key={item.id} class="slds-box slds-box_x-small slds-m-bottom_xx-small checklist-item">
+                            <div class="slds-grid slds-wrap slds-gutters_small">
+                                <div class="slds-col slds-size_1-of-12">
+                                    <lightning-input
+                                        type="checkbox"
+                                        data-id={item.id}
+                                        label=""
+                                        checked={item.checked}
+                                        onchange={handleCheckboxChange}>
+                                    </lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12 slds-text-align_center">
+                                    <lightning-icon icon-name="standard:task" size="small"></lightning-icon>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12">
+                                    <p class="slds-text-heading_x-small">{item.Name}</p>
+                                    <p class="slds-text-body_small slds-text-color_weak">{item.Inspection_Type__c}</p>
+                                    <p class="slds-text-body_small slds-text-color_weak">{item.Result__c}</p>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12 slds-m-around_small">
+                                    <lightning-input
+                                        type="textarea"
+                                        data-id={item.id}
+                                        label="Comment"
+                                        placeholder="Add comment..."
+                                        value={item.Comment__c}
+                                        onchange={handleCommentChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="slds-m-top_medium slds-text-align_center">
+                        <lightning-button
+                            variant="brand"
+                            label={submitLabel}
+                            onclick={handleSubmit}
+                            disabled={canSubmit}>
+                        </lightning-button>
+                    </div>
+                </template>
+                <template if:false={hasItems}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <lightning-icon icon-name="standard:task" size="large"></lightning-icon>
+                        <h3 class="slds-illustration__header slds-text-heading_medium">No Checklist Items</h3>
+                        <p class="slds-illustration__body slds-text-body_regular">No inspection items found for this record.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

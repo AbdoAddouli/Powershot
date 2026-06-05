@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <label>Asset Status</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Operational</fullName>
+                <default>true</default>
+                <label>Operational</label>
+            </value>
+            <value>
+                <fullName>Under Maintenance</fullName>
+                <default>false</default>
+                <label>Under Maintenance</label>
+            </value>
+            <value>
+                <fullName>Beyond Expected Life</fullName>
+                <default>false</default>
+                <label>Beyond Expected Life</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

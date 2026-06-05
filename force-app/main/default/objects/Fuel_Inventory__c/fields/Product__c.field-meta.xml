@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Product__c</fullName>
+    <label>Product</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Crude</fullName>
+                <default>false</default>
+                <label>Crude</label>
+            </value>
+            <value>
+                <fullName>Gasoline</fullName>
+                <default>false</default>
+                <label>Gasoline</label>
+            </value>
+            <value>
+                <fullName>Diesel</fullName>
+                <default>false</default>
+                <label>Diesel</label>
+            </value>
+            <value>
+                <fullName>Jet Fuel</fullName>
+                <default>false</default>
+                <label>Jet Fuel</label>
+            </value>
+            <value>
+                <fullName>NGL</fullName>
+                <default>false</default>
+                <label>NGL</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
