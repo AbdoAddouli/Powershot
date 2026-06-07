@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_Zero_Production</name>
+        <label>Check Zero Production</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <defaultConnectorLabel>Has Production</defaultConnectorLabel>
+        <rules>
+            <name>Zero_Production</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Oil_Volume_bbls__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <numberValue>0.0</numberValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Gas_Volume_MCF__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <numberValue>0.0</numberValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Flag_Discrepancy</targetReference>
+            </connector>
+            <label>Zero Production</label>
+        </rules>
+    </decisions>
+    <description>Flag production records with zero oil or gas volumes monthly</description>
+    <label>Production Reconciliation</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Flag_Discrepancy</name>
+        <label>Flag Discrepancy</label>
+        <locationX>400</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Notes__c</field>
+            <value>
+                <stringValue>Zero production reported</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Report_Type__c</field>
+            <value>
+                <stringValue>Production Discrepancy</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value>
+                <stringValue>Pending</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Compliance_Report__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Zero_Production</targetReference>
+        </connector>
+        <object>Production_Allocation__c</object>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2026-07-01</startDate>
+            <startTime>02:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

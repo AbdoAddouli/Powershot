@@ -10,6 +10,11 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
+                <fullName>Permitted</fullName>
+                <default>true</default>
+                <label>Permitted</label>
+            </value>
+            <value>
                 <fullName>Drilling</fullName>
                 <default>false</default>
                 <label>Drilling</label>
@@ -20,6 +25,16 @@
                 <label>Producing</label>
             </value>
             <value>
+                <fullName>Shut-In</fullName>
+                <default>false</default>
+                <label>Shut-In</label>
+            </value>
+            <value>
+                <fullName>Suspended</fullName>
+                <default>false</default>
+                <label>Suspended</label>
+            </value>
+            <value>
                 <fullName>Plugged</fullName>
                 <default>false</default>
                 <label>Plugged</label>
@@ -28,6 +43,11 @@
                 <fullName>Abandoned</fullName>
                 <default>false</default>
                 <label>Abandoned</label>
+            </value>
+            <value>
+                <fullName>Cancelled</fullName>
+                <default>false</default>
+                <label>Cancelled</label>
             </value>
         </valueSetDefinition>
     </valueSet>

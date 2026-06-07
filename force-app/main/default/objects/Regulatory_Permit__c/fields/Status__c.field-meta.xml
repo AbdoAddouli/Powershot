@@ -13,9 +13,19 @@
                 <label>Active</label>
             </value>
             <value>
+                <fullName>Approved</fullName>
+                <default>false</default>
+                <label>Approved</label>
+            </value>
+            <value>
                 <fullName>Expired</fullName>
                 <default>false</default>
                 <label>Expired</label>
+            </value>
+            <value>
+                <fullName>Suspended</fullName>
+                <default>false</default>
+                <label>Suspended</label>
             </value>
             <value>
                 <fullName>Revoked</fullName>

@@ -18,6 +18,16 @@
                 <label>Confined Space</label>
             </value>
             <value>
+                <fullName>Confined Space Entry</fullName>
+                <default>false</default>
+                <label>Confined Space Entry</label>
+            </value>
+            <value>
+                <fullName>Mechanical</fullName>
+                <default>false</default>
+                <label>Mechanical</label>
+            </value>
+            <value>
                 <fullName>Excavation</fullName>
                 <default>false</default>
                 <label>Excavation</label>

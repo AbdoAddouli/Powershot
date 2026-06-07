@@ -18,6 +18,21 @@
                 <label>Non-Compliant</label>
             </value>
             <value>
+                <fullName>Expired</fullName>
+                <default>false</default>
+                <label>Expired</label>
+            </value>
+            <value>
+                <fullName>Critical - Expiring Soon</fullName>
+                <default>false</default>
+                <label>Critical - Expiring Soon</label>
+            </value>
+            <value>
+                <fullName>Approaching Expiration</fullName>
+                <default>false</default>
+                <label>Approaching Expiration</label>
+            </value>
+            <value>
                 <fullName>Pending Review</fullName>
                 <default>false</default>
                 <label>Pending Review</label>

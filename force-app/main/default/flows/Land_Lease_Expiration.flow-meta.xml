@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Create tasks for Lease records expiring within 90 days</description>
+    <label>Land Lease Expiration</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <formulas>
+        <name>Expiration_Threshold</name>
+        <dataType>Date</dataType>
+        <expression>$Flow.CurrentDate + 90</expression>
+    </formulas>
+    <recordLookups>
+        <name>Get_Expiring_Leases</name>
+        <label>Get Expiring Leases</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <connector>
+            <targetReference>Loop_Leases</targetReference>
+        </connector>
+        <filterLogic>AND</filterLogic>
+        <filters>
+            <field>Lease_End_Date__c</field>
+            <operator>LessThanOrEqualTo</operator>
+            <value>
+                <elementReference>Expiration_Threshold</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Lease_End_Date__c</field>
+            <operator>GreaterThanOrEqualTo</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </filters>
+        <object>Lease__c</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Lease_End_Date__c</queriedFields>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <loops>
+        <name>Loop_Leases</name>
+        <label>Loop Leases</label>
+        <locationX>400</locationX>
+        <locationY>200</locationY>
+        <collectionReference>Get_Expiring_Leases</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Create_Task</targetReference>
+        </nextValueConnector>
+    </loops>
+    <recordCreates>
+        <name>Create_Task</name>
+        <label>Create Task</label>
+        <locationX>600</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Lease Expiring Soon</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>Loop_Leases.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>Loop_Leases.Lease_End_Date__c</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Expiring_Leases</targetReference>
+        </connector>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2026-07-01</startDate>
+            <startTime>02:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

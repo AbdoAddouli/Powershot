@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Create escalation tasks for reportable or critical incidents</description>
+    <label>HSE Incident Escalation</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <decisions>
+        <name>Route_By_Severity</name>
+        <label>Route by Severity</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <defaultConnector>
+            <targetReference>General_Notification</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Low or Medium Severity</defaultConnectorLabel>
+        <rules>
+            <name>Critical_Fatality</name>
+            <conditionLogic>AND</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Severity__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Critical</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Fatality_Occurred__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                <booleanValue>true</booleanValue>
+            </rightValue>
+        </conditions>
+            <connector>
+                <targetReference>Fatality_Notification</targetReference>
+            </connector>
+            <label>Critical with Fatality</label>
+        </rules>
+        <rules>
+            <name>Regulatory_Reportable</name>
+            <conditionLogic>AND</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Regulatory_Reportable__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                <booleanValue>true</booleanValue>
+            </rightValue>
+        </conditions>
+            <connector>
+                <targetReference>Regulatory_Notification</targetReference>
+            </connector>
+            <label>Regulatory Reportable</label>
+        </rules>
+    </decisions>
+    <recordCreates>
+        <name>Fatality_Notification</name>
+        <label>Fatality Task</label>
+        <locationX>400</locationX>
+        <locationY>100</locationY>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>CRITICAL INCIDENT with fatality</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordCreates>
+        <name>Regulatory_Notification</name>
+        <label>Regulatory Task</label>
+        <locationX>400</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>File regulatory report for incident</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordCreates>
+        <name>General_Notification</name>
+        <label>General Task</label>
+        <locationX>400</locationX>
+        <locationY>300</locationY>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Incident recorded</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Route_By_Severity</targetReference>
+        </connector>
+        <filterFormula>OR(Regulatory_Reportable__c = true, TEXT(Severity__c) = &quot;Critical&quot;)</filterFormula>
+        <object>HSE_Incident__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

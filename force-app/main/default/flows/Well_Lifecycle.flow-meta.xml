@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Create Well_Operation record on Well status change</description>
+    <label>Well Lifecycle</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Create_Well_Operation</name>
+        <label>Create Well Operation</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Well__c</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Operation_Type__c</field>
+            <value>
+                <stringValue>Workover</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value>
+                <stringValue>Planned</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description__c</field>
+            <value>
+                <stringValue>Auto-created from Well status change</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Well_Operation__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Create_Well_Operation</targetReference>
+        </connector>
+        <filters>
+            <field>Status__c</field>
+            <operator>IsChanged</operator>
+        </filters>
+        <object>Well__c</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

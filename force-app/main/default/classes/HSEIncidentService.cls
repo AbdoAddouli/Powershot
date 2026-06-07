@@ -58,31 +58,32 @@ public with sharing class HSEIncidentService {
             LIMIT 1
         ];
 
-        List<String> recipients = new List<String>();
+        List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
         List<GroupMember> complianceMembers = [
             SELECT UserOrGroupId
             FROM GroupMember
             WHERE Group.Name = 'HSE_Compliance_Team'
         ];
         for (GroupMember gm : complianceMembers) {
-            recipients.add(gm.UserOrGroupId);
+            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+            mail.setTargetObjectId(gm.UserOrGroupId);
+            mail.setSubject('Regulatory Reportable Incident: ' + incident.Name);
+            mail.setPlainTextBody(
+                'A regulatory reportable incident has been reported.\n\n' +
+                'Incident: ' + incident.Name + '\n' +
+                'Type: ' + incident.Incident_Type__c + '\n' +
+                'Severity: ' + incident.Severity__c + '\n' +
+                'Location: ' + incident.Location__c + '\n' +
+                'Date: ' + incident.Incident_Date__c + '\n' +
+                'Description: ' + incident.Description__c + '\n\n' +
+                'Please review and take appropriate action.'
+            );
+            emails.add(mail);
         }
 
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        mail.setTargetObjectId(recipients[0]);
-        mail.setSubject('Regulatory Reportable Incident: ' + incident.Name);
-        mail.setPlainTextBody(
-            'A regulatory reportable incident has been reported.\n\n' +
-            'Incident: ' + incident.Name + '\n' +
-            'Type: ' + incident.Incident_Type__c + '\n' +
-            'Severity: ' + incident.Severity__c + '\n' +
-            'Location: ' + incident.Location__c + '\n' +
-            'Date: ' + incident.Incident_Date__c + '\n' +
-            'Description: ' + incident.Description__c + '\n\n' +
-            'Please review and take appropriate action.'
-        );
-
-        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
+        if (!emails.isEmpty()) {
+            Messaging.sendEmail(emails);
+        }
     }
 
     @AuraEnabled(cacheable=true)
@@ -106,31 +107,32 @@ public with sharing class HSEIncidentService {
             LIMIT 1
         ];
 
-        List<String> execRecipients = new List<String>();
+        List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
         List<GroupMember> execMembers = [
             SELECT UserOrGroupId
             FROM GroupMember
             WHERE Group.Name = 'Executive_Leadership'
         ];
         for (GroupMember gm : execMembers) {
-            execRecipients.add(gm.UserOrGroupId);
+            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+            mail.setTargetObjectId(gm.UserOrGroupId);
+            mail.setSubject('CRITICAL INCIDENT ESCALATION: ' + incident.Name);
+            mail.setPlainTextBody(
+                'A critical incident requires immediate executive attention.\n\n' +
+                'Incident: ' + incident.Name + '\n' +
+                'Type: ' + incident.Incident_Type__c + '\n' +
+                'Severity: ' + incident.Severity__c + '\n' +
+                'Location: ' + incident.Location__c + '\n' +
+                'Date: ' + incident.Incident_Date__c + '\n' +
+                'Description: ' + incident.Description__c + '\n\n' +
+                'Immediate escalation and response required.'
+            );
+            emails.add(mail);
         }
 
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        mail.setTargetObjectId(execRecipients[0]);
-        mail.setSubject('CRITICAL INCIDENT ESCALATION: ' + incident.Name);
-        mail.setPlainTextBody(
-            'A critical incident requires immediate executive attention.\n\n' +
-            'Incident: ' + incident.Name + '\n' +
-            'Type: ' + incident.Incident_Type__c + '\n' +
-            'Severity: ' + incident.Severity__c + '\n' +
-            'Location: ' + incident.Location__c + '\n' +
-            'Date: ' + incident.Incident_Date__c + '\n' +
-            'Description: ' + incident.Description__c + '\n\n' +
-            'Immediate escalation and response required.'
-        );
-
-        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
+        if (!emails.isEmpty()) {
+            Messaging.sendEmail(emails);
+        }
 
         Task escalationTask = new Task(
             Subject = 'Critical Incident Escalation: ' + incident.Name,

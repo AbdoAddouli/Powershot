@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Create Invoice records for active Joint Ventures monthly</description>
+    <label>Joint Venture Billing</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <formulas>
+        <name>Is_First_Day</name>
+        <dataType>Boolean</dataType>
+        <expression>DAY($Flow.CurrentDate) = 1</expression>
+    </formulas>
+    <decisions>
+        <name>Check_First_Day</name>
+        <label>Check First Day</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <defaultConnectorLabel>Not First Day</defaultConnectorLabel>
+        <rules>
+            <name>First_Day_Of_Month</name>
+            <conditionLogic>AND</conditionLogic>
+            <conditions>
+                <leftValueReference>Is_First_Day</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Active_JV</targetReference>
+            </connector>
+            <label>First Day of Month</label>
+        </rules>
+    </decisions>
+    <recordLookups>
+        <name>Get_Active_JV</name>
+        <label>Get Active JV</label>
+        <locationX>400</locationX>
+        <locationY>200</locationY>
+        <connector>
+            <targetReference>Loop_JV</targetReference>
+        </connector>
+        <filterLogic>AND</filterLogic>
+        <filters>
+            <field>Status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Active</stringValue>
+            </value>
+        </filters>
+        <object>Joint_Venture__c</object>
+        <queriedFields>Id</queriedFields>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <loops>
+        <name>Loop_JV</name>
+        <label>Loop JV</label>
+        <locationX>600</locationX>
+        <locationY>200</locationY>
+        <collectionReference>Get_Active_JV</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Create_Invoice</targetReference>
+        </nextValueConnector>
+    </loops>
+    <recordCreates>
+        <name>Create_Invoice</name>
+        <label>Create Invoice</label>
+        <locationX>800</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>JV__c</field>
+            <value>
+                <elementReference>Loop_JV.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Invoice_Date__c</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value>
+                <stringValue>Pending</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Amount__c</field>
+            <value>
+                <numberValue>0.0</numberValue>
+            </value>
+        </inputAssignments>
+        <object>Invoice__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_First_Day</targetReference>
+        </connector>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2026-07-01</startDate>
+            <startTime>02:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

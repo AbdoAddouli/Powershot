@@ -3,10 +3,10 @@ import getWellProduction from '@salesforce/apex/WellStatusService.getWellProduct
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const COLUMNS = [
-    { label: 'Date', fieldName: 'Production_Date__c', type: 'date' },
-    { label: 'Oil (bbls)', fieldName: 'Oil_Volume__c', type: 'number', cellAttributes: { class: 'slds-text-color_success' } },
-    { label: 'Gas (MCF)', fieldName: 'Gas_Volume__c', type: 'number', cellAttributes: { class: 'slds-text-color_weak' } },
-    { label: 'Water (bbls)', fieldName: 'Water_Volume__c', type: 'number', cellAttributes: { class: 'slds-text-color_inverse-weak' } }
+    { label: 'Date', fieldName: 'Period_Start__c', type: 'date' },
+    { label: 'Oil (bbls)', fieldName: 'Oil_Volume_bbls__c', type: 'number', cellAttributes: { class: 'slds-text-color_success' } },
+    { label: 'Gas (MCF)', fieldName: 'Gas_Volume_MCF__c', type: 'number', cellAttributes: { class: 'slds-text-color_weak' } },
+    { label: 'Water (bbls)', fieldName: 'Water_Volume_bbls__c', type: 'number', cellAttributes: { class: 'slds-text-color_inverse-weak' } }
 ];
 
 export default class WellProductionChart extends LightningElement {
@@ -35,19 +35,19 @@ export default class WellProductionChart extends LightningElement {
 
     buildChartData(records) {
         this.chartData = records.map(r => ({
-            date: r.Production_Date__c,
-            oil: r.Oil_Volume__c ?? 0,
-            gas: r.Gas_Volume__c ?? 0,
-            water: r.Water_Volume__c ?? 0
+            date: r.Period_Start__c,
+            oil: r.Oil_Volume_bbls__c ?? 0,
+            gas: r.Gas_Volume_MCF__c ?? 0,
+            water: r.Water_Volume_bbls__c ?? 0
         }));
     }
 
     calculateStats(records) {
         const stats = { oilTotal: 0, gasTotal: 0, waterTotal: 0, daysOn: 0 };
         records.forEach(r => {
-            stats.oilTotal += r.Oil_Volume__c ?? 0;
-            stats.gasTotal += r.Gas_Volume__c ?? 0;
-            stats.waterTotal += r.Water_Volume__c ?? 0;
+            stats.oilTotal += r.Oil_Volume_bbls__c ?? 0;
+            stats.gasTotal += r.Gas_Volume_MCF__c ?? 0;
+            stats.waterTotal += r.Water_Volume_bbls__c ?? 0;
             stats.daysOn += r.Days_On_Production__c ?? 0;
         });
         this.productionStats = stats;

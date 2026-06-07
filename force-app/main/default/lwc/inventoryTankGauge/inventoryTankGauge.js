@@ -9,7 +9,7 @@ export default class InventoryTankGauge extends LightningElement {
     tanks = [];
     error;
 
-    @wire(getTankInventory, { terminalId: '$recordId', limit: '$maxTanks' })
+    @wire(getTankInventory, { terminalId: '$recordId', maxRows: '$maxTanks' })
     wiredTanks({ error, data }) {
         if (data) {
             this.tanks = data.map(t => this.enrichTank(t));
