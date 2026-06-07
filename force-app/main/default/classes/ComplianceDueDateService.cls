@@ -46,9 +46,11 @@ public with sharing class ComplianceDueDateService {
 
         for (Regulatory_Permit__c permit : upcoming) {
             if (permit.Renewal_Reminder_Sent__c == true) continue;
+            if (permit.Responsible_Party__c == null) continue;
 
             Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
             mail.setTargetObjectId(permit.Responsible_Party__c);
+            mail.setSaveAsActivity(false);
             mail.setSubject('Permit Renewal Reminder: ' + permit.Name);
             mail.setPlainTextBody(
                 'The following permit is approaching its expiration date:\n\n' +
@@ -63,8 +65,11 @@ public with sharing class ComplianceDueDateService {
         }
 
         for (Compliance_Report__c report : overdue) {
+            if (report.Assigned_To__c == null) continue;
+
             Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
             mail.setTargetObjectId(report.Assigned_To__c);
+            mail.setSaveAsActivity(false);
             mail.setSubject('OVERDUE Compliance Report: ' + report.Name);
             mail.setPlainTextBody(
                 'The following compliance report is past due:\n\n' +

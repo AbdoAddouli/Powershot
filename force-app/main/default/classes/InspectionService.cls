@@ -16,7 +16,11 @@ public with sharing class InspectionService {
 
     @AuraEnabled
     public static void submitChecklist(String checklistData, Id parentId) {
-        List<Map<String, Object>> items = (List<Map<String, Object>>) JSON.deserializeUntyped(checklistData);
+        List<Object> itemsList = (List<Object>) JSON.deserializeUntyped(checklistData);
+        List<Map<String, Object>> items = new List<Map<String, Object>>();
+        for (Object obj : itemsList) {
+            items.add((Map<String, Object>) obj);
+        }
         List<Inspection__c> updates = new List<Inspection__c>();
 
         for (Map<String, Object> item : items) {

@@ -22,7 +22,7 @@ trigger AssetTrigger on Asset (before insert, before update) {
             }
 
             if (asset.PurchaseDate != null && asset.UsageEndDate == null) {
-                Integer assetAgeInDays = Date.today().daysBetween(asset.PurchaseDate);
+                Integer assetAgeInDays = asset.PurchaseDate.daysBetween(Date.today());
                 if (asset.Expected_Lifespan_Days__c != null &&
                     assetAgeInDays > asset.Expected_Lifespan_Days__c) {
                     asset.Status__c = 'Beyond Expected Life';

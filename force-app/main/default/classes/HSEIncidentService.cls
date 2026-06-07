@@ -84,6 +84,16 @@ public with sharing class HSEIncidentService {
         if (!emails.isEmpty()) {
             Messaging.sendEmail(emails);
         }
+
+        Task notifyTask = new Task(
+            Subject = 'Compliance Notification: ' + incident.Name,
+            Description = 'Regulatory reportable incident requiring compliance review: ' + incident.Id,
+            Priority = 'High',
+            Status = 'Not Started',
+            ActivityDate = Date.today(),
+            WhatId = incidentId
+        );
+        insert notifyTask;
     }
 
     @AuraEnabled(cacheable=true)
