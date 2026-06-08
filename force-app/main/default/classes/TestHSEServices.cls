@@ -1,4 +1,12 @@
-@isTest
+/**
+ * TestHSEServices
+ * =================
+ * Tests HSE incident severity classification (Critical / High / Medium / Low),
+ * regulatory reportability detection, HSE incident queries, compliance due-date
+ * tracking (upcoming renewals, overdue reports, reminder emails), and the
+ * RegulatoryPermitTrigger compliance status updates.
+ */
+@IsTest
 public with sharing class TestHSEServices {
 
     @TestSetup
@@ -27,7 +35,7 @@ public with sharing class TestHSEServices {
         insert incident;
     }
 
-    @isTest
+    @IsTest
     static void testClassifySeverityCriticalFatality() {
         HSE_Incident__c inc = [SELECT Id, Fatality_Occurred__c FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = true;
@@ -44,7 +52,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('Critical', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testClassifySeverityHighSpill() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -61,7 +69,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('High', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testClassifySeverityMedium() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -78,7 +86,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('Medium', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testClassifySeverityLow() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -95,7 +103,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('Low', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testIsRegulatoryReportable() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = true;
@@ -108,7 +116,7 @@ public with sharing class TestHSEServices {
         Assert.isTrue(reportable);
     }
 
-    @isTest
+    @IsTest
     static void testIsRegulatoryReportableSpill() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -125,7 +133,7 @@ public with sharing class TestHSEServices {
         Assert.isTrue(reportable, 'Spill >= 50 should be reportable');
     }
 
-    @isTest
+    @IsTest
     static void testGetHSEIncidents() {
         HSE_Incident__c inc = [SELECT Id, Well__c FROM HSE_Incident__c LIMIT 1];
         Test.startTest();
@@ -134,7 +142,7 @@ public with sharing class TestHSEServices {
         Assert.isFalse(results.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testComplianceDueDateServiceUpcomingRenewals() {
         Regulatory_Permit__c permit = new Regulatory_Permit__c(
             Name = 'Test Permit',
@@ -151,7 +159,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual(permit.Id, renewals[0].Id);
     }
 
-    @isTest
+    @IsTest
     static void testComplianceDueDateServiceOverdueReports() {
         Compliance_Report__c report = new Compliance_Report__c(
             Due_Date__c = Date.today().addDays(-5),
@@ -168,7 +176,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual(report.Id, overdue[0].Id);
     }
 
-    @isTest
+    @IsTest
     static void testComplianceDueDateServiceSendReminders() {
         Regulatory_Permit__c permit = new Regulatory_Permit__c(
             Name = 'Test Permit',
@@ -186,7 +194,7 @@ public with sharing class TestHSEServices {
         Assert.isTrue(updated.Renewal_Reminder_Sent__c);
     }
 
-    @isTest
+    @IsTest
     static void testRegulatoryPermitTriggerComplianceOnExpiration() {
         Regulatory_Permit__c permit = new Regulatory_Permit__c(
             Name = 'Expiring Permit',
@@ -201,7 +209,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('Expired', result.Compliance_Status__c);
     }
 
-    @isTest
+    @IsTest
     static void testRegulatoryPermitTriggerComplianceOnStatusChange() {
         Regulatory_Permit__c permit = new Regulatory_Permit__c(
             Name = 'Status Permit',
@@ -219,7 +227,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('Non-Compliant', result.Compliance_Status__c);
     }
 
-    @isTest
+    @IsTest
     static void testClassifyCriticalByInjury() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -234,7 +242,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('Critical', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testClassifyHighByLostTime() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -249,7 +257,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('High', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testClassifyHighByModerate() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -264,7 +272,7 @@ public with sharing class TestHSEServices {
         Assert.areEqual('High', result.Severity__c);
     }
 
-    @isTest
+    @IsTest
     static void testIsNotRegulatoryReportable() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
@@ -278,7 +286,7 @@ public with sharing class TestHSEServices {
         Assert.isFalse(reportable);
     }
 
-    @isTest
+    @IsTest
     static void testComplianceDueDateGetUpcomingDeadlines() {
         Account acct = [SELECT Id FROM Account LIMIT 1];
         Regulatory_Permit__c permit = new Regulatory_Permit__c(

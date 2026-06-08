@@ -1,5 +1,21 @@
+/**
+ * ComplianceDueDateService
+ * =========================
+ * Tracks regulatory permit renewals, overdue compliance reports, and sends
+ * automated reminder emails to responsible parties. Used by
+ * RegulatoryPermitTrigger to keep Compliance_Status__c current.
+ *
+ * Business Process: Regulatory Compliance (Cross-Domain)
+ *   Permit Issued → Expiration Tracking → Reminder Notifications
+ *   → Status Updates (Compliant / Non-Compliant / Expired) → Renewal
+ */
 public with sharing class ComplianceDueDateService {
 
+    /**
+     * Finds permits whose expiration date falls within the next N days.
+     * @param daysAhead  The look-ahead window in days
+     * @return  Permits approaching expiration, ordered by date ascending
+     */
     public static List<Regulatory_Permit__c> getUpcomingRenewals(Integer daysAhead) {
         Date targetDate = Date.today().addDays(daysAhead);
         return [
@@ -13,6 +29,10 @@ public with sharing class ComplianceDueDateService {
         ];
     }
 
+    /**
+     * Returns compliance reports that are past due and not yet submitted/waived.
+     * @return  Overdue reports ordered by due date ascending
+     */
     public static List<Compliance_Report__c> getOverdueReports() {
         return [
             SELECT Id, Name, Report_Type__c, Due_Date__c, Status__c,
@@ -26,6 +46,11 @@ public with sharing class ComplianceDueDateService {
         ];
     }
 
+    /**
+     * @AuraEnabled LWC-facing method returning permits for a given account.
+     * @param accountId  The Account Id
+     * @return  Permits ordered by expiration date ascending
+     */
     @AuraEnabled(cacheable=true)
     public static List<Regulatory_Permit__c> getUpcomingDeadlines(Id accountId) {
         return [
@@ -38,6 +63,64 @@ public with sharing class ComplianceDueDateService {
         ];
     }
 
+    /**
+     * Updates Compliance_Status__c on permits based on expiration date proximity
+     * (Expired / Critical - Expiring Soon / Approaching Expiration) or status
+     * changes (Compliant / Expired / Non-Compliant).
+     * @param expiringPermitIds  Permits whose expiration date changed
+     * @param statusChangedPermitIds  Permits whose Status__c changed
+     */
+    public static void updateComplianceStatuses(Set<Id> expiringPermitIds, Set<Id> statusChangedPermitIds) {
+        if (!expiringPermitIds.isEmpty()) {
+            List<Regulatory_Permit__c> expiringPermits = [
+                SELECT Id, Name, Permit_Type__c, Expiration_Date__c,
+                       Responsible_Party__c, Compliance_Status__c
+                FROM Regulatory_Permit__c
+                WHERE Id IN :expiringPermitIds
+            ];
+
+            for (Regulatory_Permit__c permit : expiringPermits) {
+                if (permit.Expiration_Date__c <= Date.today()) {
+                    permit.Compliance_Status__c = 'Expired';
+                } else if (permit.Expiration_Date__c <= Date.today().addDays(30)) {
+                    permit.Compliance_Status__c = 'Critical - Expiring Soon';
+                } else {
+                    permit.Compliance_Status__c = 'Approaching Expiration';
+                }
+            }
+
+            if (!expiringPermits.isEmpty()) {
+                update expiringPermits;
+            }
+        }
+
+        if (!statusChangedPermitIds.isEmpty()) {
+            List<Regulatory_Permit__c> statusChanged = [
+                SELECT Id, Name, Status__c, Compliance_Status__c
+                FROM Regulatory_Permit__c
+                WHERE Id IN :statusChangedPermitIds
+            ];
+
+            for (Regulatory_Permit__c permit : statusChanged) {
+                if (permit.Status__c == 'Active' || permit.Status__c == 'Approved') {
+                    permit.Compliance_Status__c = 'Compliant';
+                } else if (permit.Status__c == 'Expired') {
+                    permit.Compliance_Status__c = 'Expired';
+                } else if (permit.Status__c == 'Suspended' || permit.Status__c == 'Revoked') {
+                    permit.Compliance_Status__c = 'Non-Compliant';
+                }
+            }
+
+            if (!statusChanged.isEmpty()) {
+                update statusChanged;
+            }
+        }
+    }
+
+    /**
+     * Sends email reminders for upcoming permit renewals (60-day window) and
+     * overdue compliance reports to the assigned responsible parties.
+     */
     public static void sendRenewalReminders() {
         List<Regulatory_Permit__c> upcoming = getUpcomingRenewals(60);
         List<Compliance_Report__c> overdue = getOverdueReports();

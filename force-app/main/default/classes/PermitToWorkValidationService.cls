@@ -1,5 +1,22 @@
+/**
+ * PermitToWorkValidationService
+ * ==============================
+ * Enforces safety validation rules for Permit-to-Work (PTW) including energy
+ * isolation verification, gas test results, and multi-level authorization
+ * chains based on risk level. Used by field services to determine permit readiness.
+ *
+ * Business Process: Permit to Work (Downstream / HSE)
+ *   PTW Request → Risk Assessment → Isolation Verification → Gas Testing
+ *   → Authorization Chain → Permit Issuance → Work Execution → Permit Closure
+ */
 public with sharing class PermitToWorkValidationService {
 
+    /**
+     * Validates energy isolation requirements: checks Isolation_Verified__c,
+     * Lockout-Tagout for Electrical/Mechanical permits, and Zero Energy State.
+     * @param permitId  The Permit_to_Work__c Id
+     * @return  true if all isolation requirements are satisfied
+     */
     public static Boolean validateIsolationRequirements(Id permitId) {
         Permit_to_Work__c permit = [
             SELECT Id, Isolation_Required__c, Isolation_Verified__c,
@@ -26,6 +43,13 @@ public with sharing class PermitToWorkValidationService {
         return true;
     }
 
+    /**
+     * Validates gas test results against safe limits: O2 (19.5-23.5 %),
+     * LEL (<=10 %), H2S (<=10 ppm), CO (<=25 ppm). Also checks that gas
+     * testing was completed and did not fail.
+     * @param permitId  The Permit_to_Work__c Id
+     * @return  true if all gas test criteria are within safe ranges
+     */
     public static Boolean validateGasTestResults(Id permitId) {
         Permit_to_Work__c permit = [
             SELECT Id, Gas_Test_Required__c, Gas_Test_Completed__c,
@@ -53,6 +77,13 @@ public with sharing class PermitToWorkValidationService {
         return true;
     }
 
+    /**
+     * Validates that the permit has sufficient approvals based on risk level:
+     *   1 approval for Low, 2 for Medium/High, 3 for Critical.
+     * Confined Space/Hot Work/Electrical/Excavation types always require >= 2.
+     * @param permitId  The Permit_to_Work__c Id
+     * @return  true if the required number of authorizations have been obtained
+     */
     public static Boolean validateAuthorizationChain(Id permitId) {
         Permit_to_Work__c permit = [
             SELECT Id, Permit_Type__c, Risk_Level__c, Location__c,
@@ -106,6 +137,12 @@ public with sharing class PermitToWorkValidationService {
         return true;
     }
 
+    /**
+     * @AuraEnabled LWC-facing method returning permits related to a well,
+     * pipeline station, terminal, or refinery.
+     * @param parentId  The parent record Id
+     * @return  Permits ordered by creation date descending
+     */
     @AuraEnabled(cacheable=true)
     public static List<Permit_to_Work__c> getPermitsToWork(Id parentId) {
         return [SELECT Id, Name, Permit_Type__c, Status__c, Holder__c, Holder__r.Name,
@@ -116,12 +153,23 @@ public with sharing class PermitToWorkValidationService {
                 ORDER BY CreatedDate DESC];
     }
 
+    /**
+     * @AuraEnabled LWC-facing method to update a permit's status.
+     * @param permitId  The Permit_to_Work__c Id
+     * @param newStatus  The new status value
+     */
     @AuraEnabled
     public static void updatePermitStatus(Id permitId, String newStatus) {
         Permit_to_Work__c permit = new Permit_to_Work__c(Id = permitId, Status__c = newStatus);
         update permit;
     }
 
+    /**
+     * Returns a list of all missing or incomplete requirements for a permit,
+     * including scope of work, dates, isolation, gas test, and authorizations.
+     * @param permitId  The Permit_to_Work__c Id
+     * @return  Human-readable list of missing prerequisites
+     */
     public static List<String> getMissingRequirements(Id permitId) {
         List<String> missing = new List<String>();
 

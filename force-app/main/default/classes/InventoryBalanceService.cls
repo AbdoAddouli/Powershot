@@ -1,5 +1,22 @@
+/**
+ * InventoryBalanceService
+ * ========================
+ * Manages fuel inventory tracking at terminals: records receipts, deliveries,
+ * transfers, and reconciliations, and alerts when inventory drops below the
+ * configured minimum threshold.
+ *
+ * Business Process: Inventory Management (Downstream)
+ *   Product Receipt → Storage → Delivery / Transfer → Consumption
+ *   → Reconciliation → Low-Inventory Alerts
+ */
 public with sharing class InventoryBalanceService {
 
+    /**
+     * @AuraEnabled LWC-facing method returning tanks at a terminal.
+     * @param terminalId  The Terminal__c Id
+     * @param maxRows  Maximum number of rows to return
+     * @return  Tank inventory records ordered by tank number
+     */
     @AuraEnabled(cacheable=true)
     public static List<Fuel_Inventory__c> getTankInventory(Id terminalId, Integer maxRows) {
         return [
@@ -12,6 +29,13 @@ public with sharing class InventoryBalanceService {
         ];
     }
 
+    /**
+     * Records an inventory movement (Receipt / Delivery / Transfer / Consumption),
+     * updates the tank's Current_Volume__c, and creates an Inventory_Transaction__c audit record.
+     * @param inventoryId  The Fuel_Inventory__c Id
+     * @param volumeChange  Volume change amount (positive)
+     * @param movementType  Receipt, Delivery, Transfer-In, Transfer-Out, Consumption
+     */
     public static void recordInventoryMovement(Id inventoryId, Decimal volumeChange, String movementType) {
         Fuel_Inventory__c inventory = [
             SELECT Id, Current_Volume__c, Product_Type__c, Storage_Location__c,
@@ -47,6 +71,11 @@ public with sharing class InventoryBalanceService {
         insert txn;
     }
 
+    /**
+     * Returns the current volume for a given inventory record (or 0 if null).
+     * @param inventoryId  The Fuel_Inventory__c Id
+     * @return  Current volume
+     */
     public static Decimal getCurrentInventory(Id inventoryId) {
         Fuel_Inventory__c inventory = [
             SELECT Id, Current_Volume__c
@@ -57,11 +86,19 @@ public with sharing class InventoryBalanceService {
         return inventory.Current_Volume__c != null ? inventory.Current_Volume__c : 0;
     }
 
+    /**
+     * Returns tanks whose Current_Volume__c is at or below the Minimum_Threshold__c.
+     * @param thresholdPercent  Unused (reserved for percentage-based threshold)
+     * @return  Tanks needing replenishment
+     */
     public static List<Fuel_Inventory__c> getLowInventoryAlerts(Decimal thresholdPercent) {
         List<Fuel_Inventory__c> allInventory = [
             SELECT Id, Name, Product_Type__c, Current_Volume__c, Maximum_Capacity__c,
                    Minimum_Threshold__c, Storage_Location__c, Unit__c
             FROM Fuel_Inventory__c
+            WHERE Minimum_Threshold__c != null
+            ORDER BY Current_Volume__c ASC
+            LIMIT 10000
         ];
         List<Fuel_Inventory__c> alerts = new List<Fuel_Inventory__c>();
         for (Fuel_Inventory__c inv : allInventory) {
@@ -72,6 +109,13 @@ public with sharing class InventoryBalanceService {
         return alerts;
     }
 
+    /**
+     * Performs a physical-count reconciliation: records the discrepancy as an
+     * Inventory_Transaction__c (type 'Reconciliation'), updates the tank volume,
+     * and flags significant discrepancies (>5 % variance).
+     * @param inventoryId  The Fuel_Inventory__c Id
+     * @param physicalCount  Actual measured volume
+     */
     public static void reconcileInventory(Id inventoryId, Decimal physicalCount) {
         Fuel_Inventory__c inventory = [
             SELECT Id, Current_Volume__c, Product_Type__c, Storage_Location__c

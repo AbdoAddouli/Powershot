@@ -1,5 +1,21 @@
+/**
+ * RoyaltyCalculationService
+ * ==========================
+ * Computes royalty payments from production allocation revenue for lease
+ * partners (Joint Ventures), and generates Tasks to track pending payments.
+ *
+ * Business Process: Revenue / Royalty Management (Upstream / Commercial)
+ *   Production Allocated → Revenue Calculated → Royalty Rate Applied
+ *   → Partner Distribution → Payment Task Creation
+ */
 public with sharing class RoyaltyCalculationService {
 
+    /**
+     * Calculates the royalty payment for a single lease and allocation.
+     * @param leaseId  The Lease__c Id
+     * @param allocationId  The Production_Allocation__c Id
+     * @return  Royalty amount (Allocated_Revenue__c * Royalty_Percent__c / 100)
+     */
     public static Decimal calculateRoyaltyPayment(Id leaseId, Id allocationId) {
         Lease__c lease = [
             SELECT Id, Royalty_Percent__c, Lease_Type__c
@@ -22,6 +38,14 @@ public with sharing class RoyaltyCalculationService {
         return allocation.Allocated_Revenue__c * (lease.Royalty_Percent__c / 100);
     }
 
+    /**
+     * Calculates royalty payments for all active JV partners on a lease for
+     * a given period, based on each partner's Revenue Interest percentage.
+     * @param leaseId  The Lease__c Id
+     * @param periodStart  Start of the period
+     * @param periodEnd  End of the period
+     * @return  Map of Joint_Venture__c Id to calculated payment amount
+     */
     public static Map<Id, Decimal> calculateMonthlyRoyalties(Id leaseId, Date periodStart, Date periodEnd) {
         Lease__c lease = [
             SELECT Id, Royalty_Percent__c, Lease_Type__c, Account__c
@@ -68,6 +92,13 @@ public with sharing class RoyaltyCalculationService {
         return partnerPayments;
     }
 
+    /**
+     * Creates a Task for each JV partner documenting the calculated royalty
+     * payment for the given period.
+     * @param leaseId  The Lease__c Id
+     * @param periodStart  Start of the royalty period
+     * @param periodEnd  End of the royalty period
+     */
     public static void generateRoyaltyStatements(Id leaseId, Date periodStart, Date periodEnd) {
         Lease__c lease = [
             SELECT Id, Name, Royalty_Percent__c, Account__c

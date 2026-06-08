@@ -179,8 +179,7 @@ Valid Transitions (WellStatusService.VALID_TRANSITIONS):
 - **After Insert:** Creates Well_Operation__c if status != 'Permitted'
 - **After Update:** Creates Well_Operation__c on status change
 
-**Well_Lifecycle Flow** (Record-Triggered, Update on Well__c):
-- On Status__c change, creates a Well_Operation__c with Operation_Type = 'Workover', Status = 'Planned'
+~~**Well_Lifecycle Flow** (Record-Triggered, Update on Well__c):~~ *(Deleted — Apex WellTrigger handles this with correct dynamic values; flow had hardcoded wrong values and would cause duplicates)*
 
 ### 3.4 Production Allocation Process
 
@@ -636,7 +635,7 @@ WorkOrder (standard)      CRUD        R     -            -         -        -   
 | **Production_Reconciliation** | Scheduled (Daily) | Production_Allocation__c | Daily 02:00 | Flags zero production → Compliance_Report__c |
 | **Regulatory_Permit_Compliance** | Record-Triggered (CreateAndUpdate) | Regulatory_Permit__c | On creation/update | Creates Compliance_Report__c for near-expiry permits |
 | **Retail_Inventory_Alert** | Scheduled (Daily) | Fuel_Inventory__c | Daily 05:00 | Creates restock Tasks when below threshold |
-| **Well_Lifecycle** | Record-Triggered (Update) | Well__c | On status change | Creates Well_Operation__c record |
+| ~~Well_Lifecycle~~ *(Deleted)* | Record-Triggered (Update) | Well__c | On status change | ~~Creates Well_Operation__c record~~ *(Apex WellTrigger handles this)* |
 
 ### 11.2 Apex Triggers
 
@@ -653,12 +652,12 @@ WorkOrder (standard)      CRUD        R     -            -         -        -   
 
 | Class | Key Methods | Business Function |
 |---|---|---|
-| **WellStatusService** | `isValidTransition()`, `transitionWellStatus()`, `createWellOperationOnStatusChange()`, `getWellsDueForAbandonment()` | Well lifecycle state machine |
-| **HSEIncidentService** | `classifySeverity()`, `isRegulatoryReportable()`, `notifyComplianceTeam()`, `escalateIfCritical()` | Incident triage & notification |
-| **ComplianceDueDateService** | `getUpcomingRenewals()`, `getOverdueReports()`, `sendRenewalReminders()` | Permit renewal & report reminders |
-| **InspectionService** | `getChecklistItems()`, `submitChecklist()` | Inspection checklist management (Aura-enabled) |
+| **WellStatusService** | `isValidTransition()`, `transitionWellStatus()`, `createWellOperations()`, `getWellsDueForAbandonment()` | Well lifecycle state machine (bulkified) |
+| **HSEIncidentService** | `classifySeverity(s)`, `isRegulatoryReportable()`, `notifyComplianceTeam(s)`, `escalateIfCritical(s)` | Incident triage & notification (bulkified) |
+| **ComplianceDueDateService** | `getUpcomingRenewals()`, `getOverdueReports()`, `sendRenewalReminders()`, `updateComplianceStatuses()` | Permit renewal, reports & compliance status updates |
+| **InspectionService** | `getChecklistItems()`, `submitChecklist()`, `updateParentInspectionDates()`, `createRecurringInspections()` | Inspection checklist management & lifecycle |
 | **InventoryBalanceService** | `recordInventoryMovement()`, `reconcileInventory()`, `getLowInventoryAlerts()` | Tank inventory & transaction management |
-| **ProductionAllocationService** | `calculateMonthlyAllocation()`, `getProductionHistory()` | Production allocation creation |
+| **ProductionAllocationService** | `calculateMonthlyAllocation()`, `getProductionHistory()`, `validateWorkingInterest()` | Production allocation creation & validation |
 | **RoyaltyCalculationService** | `calculateRoyaltyPayment()`, `calculateMonthlyRoyalties()`, `generateRoyaltyStatements()` | Royalty math & partner payment task creation |
 | **PermitToWorkValidationService** | `validateIsolationRequirements()`, `validateGasTestResults()`, `validateAuthorizationChain()` | Permit safety & authorization validation |
 | **PipelineIntegrityService** | `isInspectionCompliant()`, `flagNonCompliantPipelines()`, `calculateNextInspectionDueDate()` | Pipeline inspection compliance |
@@ -679,9 +678,9 @@ Record-Triggered Flows:
   HSE_Incident_Escalation    ← HSE_Incident__c create/update
   Permit_to_Work_Approval    ← Permit_to_Work__c creation
   Regulatory_Permit_Compliance ← Regulatory_Permit__c create/update
-  Well_Lifecycle             ← Well__c status change
+  ~~Well_Lifecycle~~ *(Deleted — superseded by Apex WellTrigger)*
 
-Apex Triggers (synergistic with flows):
+Apex Triggers:
   WellTrigger                ← validates before flow runs
   HSEIncidentTrigger         ← classifies severity before escalation flow
   InspectionTrigger          ← updates parents + creates recurring
@@ -726,8 +725,7 @@ Apex Triggers (synergistic with flows):
      ↓
   3. DRILLING
      Well__c.Status = "Drilling"
-     Well_Lifecycle Flow creates Well_Operation__c (Operation_Type = "Workover", Planned)
-     WellStatusService validates transition → Well_Operation__c for status change
+      WellTrigger + WellStatusService validates transition → creates Well_Operation__c (Operation_Type = "Status Change", Status = newStatus)
      ↓
   4. COMPLETION & PRODUCTION
      Well__c.Status = "Producing"
@@ -930,7 +928,7 @@ Apex Triggers (synergistic with flows):
 
 ### Architecture Observations
 
-1. **Duplicate automation:** Well status changes trigger both the `Well_Lifecycle` Flow AND the `WellTrigger` + `WellStatusService` Apex — both create `Well_Operation__c` records with slightly different logic (flow sets Workover/Planned, trigger sets Status Change + newStatus). This will cause duplicate Well_Operation__c records.
+1. ~~**Duplicate automation:** Well status changes trigger both the `Well_Lifecycle` Flow AND the `WellTrigger` + `WellStatusService` Apex — both create `Well_Operation__c` records~~ *(RESOLVED: Well_Lifecycle flow deleted — Apex WellTrigger handles this with correct dynamic values)*
 
 2. **Flow vs Apex overlap:** Several processes are split between flows and Apex triggers (e.g., HSE incident escalation runs in both flow and trigger). Consider consolidating to one automation channel to avoid conflicts.
 

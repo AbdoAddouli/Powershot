@@ -1,3 +1,10 @@
+/**
+ * AssetTrigger
+ * =============
+ * Before-insert / before-update: calculates Next_Inspection_Date__c and
+ * Maintenance_Schedule__c from inspection frequency, and marks assets as
+ * 'Beyond Expected Life' when age exceeds Expected_Lifespan_Days__c.
+ */
 trigger AssetTrigger on Asset (before insert, before update) {
 
     if (Trigger.isBefore) {

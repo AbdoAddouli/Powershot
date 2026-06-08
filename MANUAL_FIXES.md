@@ -11,7 +11,6 @@ Open **Setup → Flow** and create these 8 flows:
 
 | Flow | Type | Trigger / Schedule | Description |
 |------|------|-------------------|-------------|
-| Well_Lifecycle | Record-Triggered | Well__c status change | Create Well_Operation record, notify team |
 | HSE_Incident_Escalation | Record-Triggered | HSE_Incident__c created/updated | Notify HSE Manager, Legal, Regulatory if reportable |
 | Compliance_Calendar | Scheduled | Daily | Check upcoming permit expirations, report due dates, send reminders |
 | Inspection_Due | Scheduled | Weekly | Create Inspection records for overdue/scheduled inspections |
@@ -34,14 +33,14 @@ All 8 Apex classes have field references that don't match the deployed schema. F
 
 | Class | Problem |
 |-------|---------|
-| `ProductionAllocationService` | References `Well_Production__c`, `Working_Interest__c` — not in schema |
-| `RoyaltyCalculationService` | References `Mineral_Lease__c`, `Mineral_Right_Owner__c`, `Royalty_Statement__c` — not in schema |
-| `PipelineIntegrityService` | References fields on `Pipeline__c` that don't exist (e.g. `Last_Inspection_Date__c`, `Status_Change_Date__c`) |
-| `WellStatusService` | References `Status_Change_Date__c` — field not created |
-| `PermitToWorkValidationService` | References `Isolation_Verified__c`, `Gas_Test_Required__c` — fields not created |
+| `ProductionAllocationService` | References `Well_Production__c` — not in schema |
+| `RoyaltyCalculationService` | References `Royalty_Statement__c` — not in schema |
+| `PermitToWorkValidationService` | May reference fields not in schema |
 | `HSEIncidentService` | May reference fields not in schema |
 | `ComplianceDueDateService` | May reference fields not in schema |
 | `InventoryBalanceService` | May reference fields not in schema |
+
+**Note:** `PipelineIntegrityService`, `WellStatusService`, and `ProductionAllocationService` field references were already resolved in the schema. `Gas_Test_Required__c`, `Isolation_Verified__c`, `Last_Inspection_Date__c`, `Status_Change_Date__c`, `Working_Interest_Percent__c`, and `Revenue_Interest_Percent__c` all exist on their respective objects.
 
 ### Triggers
 

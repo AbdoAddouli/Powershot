@@ -1,5 +1,20 @@
+/**
+ * PipelineIntegrityService
+ * =========================
+ * Monitors pipeline inspection compliance by checking overdue inspections,
+ * flagging non-compliant pipelines, and calculating next due dates based on
+ * required inspection intervals.
+ *
+ * Business Process: Pipeline Integrity (Midstream)
+ *   Schedule Inspection → Conduct → Record Results → Evaluate Compliance
+ *   → Flag Non-Compliant → Schedule Next Inspection
+ */
 public with sharing class PipelineIntegrityService {
 
+    /**
+     * Returns inspections whose due date has passed and are not completed/cancelled.
+     * @return  Overdue inspections ordered by next due date ascending
+     */
     public static List<Inspection__c> getOverdueInspections() {
         return [
             SELECT Id, Name, Pipeline__c, Pipeline__r.Name, Inspection_Type__c,
@@ -14,6 +29,11 @@ public with sharing class PipelineIntegrityService {
         ];
     }
 
+    /**
+     * Checks whether a pipeline's last inspection is within the required interval.
+     * @param pipelineId  The Pipeline__c Id
+     * @return  true if the pipeline is compliant with inspection requirements
+     */
     public static Boolean isInspectionCompliant(Id pipelineId) {
         Pipeline__c pipeline = [
             SELECT Id, Required_Inspection_Interval_Months__c,
@@ -33,11 +53,17 @@ public with sharing class PipelineIntegrityService {
         return nextDueDate >= Date.today();
     }
 
+    /**
+     * Batch-updates Compliance_Status__c on all pipelines to 'Compliant' or
+     * 'Non-Compliant' based on inspection recency.
+     */
     public static void flagNonCompliantPipelines() {
         List<Pipeline__c> pipelines = [
             SELECT Id, Last_Inspection_Date__c, Required_Inspection_Interval_Months__c,
                    Compliance_Status__c
             FROM Pipeline__c
+            ORDER BY Last_Inspection_Date__c ASC
+            LIMIT 10000
         ];
 
         List<Pipeline__c> toUpdate = new List<Pipeline__c>();
@@ -57,6 +83,12 @@ public with sharing class PipelineIntegrityService {
         }
     }
 
+    /**
+     * Calculates the next required inspection date for a pipeline, defaulting
+     * to 12-month interval when not specified and advancing past today if overdue.
+     * @param pipelineId  The Pipeline__c Id
+     * @return  The next due date
+     */
     public static Date calculateNextInspectionDueDate(Id pipelineId) {
         Pipeline__c pipeline = [
             SELECT Id, Last_Inspection_Date__c, Required_Inspection_Interval_Months__c

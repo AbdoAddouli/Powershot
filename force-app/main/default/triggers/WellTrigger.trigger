@@ -1,3 +1,12 @@
+/**
+ * WellTrigger
+ * ============
+ * Before-insert defaults status to 'Permitted' and validates Name. Before-update
+ * enforces valid lifecycle transitions via WellStatusService. After-insert/update
+ * creates Well_Operation__c audit records for any non-default status changes.
+ *
+ * Used by: WellStatusService
+ */
 trigger WellTrigger on Well__c (before insert, before update, after insert, after update) {
 
     if (Trigger.isBefore) {
@@ -32,10 +41,12 @@ trigger WellTrigger on Well__c (before insert, before update, after insert, afte
     }
 
     if (Trigger.isAfter) {
+        List<Well__c> statusChangedWells = new List<Well__c>();
+
         if (Trigger.isInsert) {
             for (Well__c well : Trigger.new) {
                 if (well.Status__c != 'Permitted') {
-                    WellStatusService.createWellOperationOnStatusChange(well.Id, well.Status__c);
+                    statusChangedWells.add(well);
                 }
             }
         }
@@ -44,9 +55,13 @@ trigger WellTrigger on Well__c (before insert, before update, after insert, afte
             for (Well__c well : Trigger.new) {
                 Well__c oldWell = Trigger.oldMap.get(well.Id);
                 if (well.Status__c != oldWell.Status__c) {
-                    WellStatusService.createWellOperationOnStatusChange(well.Id, well.Status__c);
+                    statusChangedWells.add(well);
                 }
             }
+        }
+
+        if (!statusChangedWells.isEmpty()) {
+            WellStatusService.createWellOperations(statusChangedWells);
         }
     }
 }

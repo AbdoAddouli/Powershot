@@ -1,4 +1,11 @@
-@isTest
+/**
+ * TestWellLifecycle
+ * ==================
+ * Tests the well lifecycle state machine (WellStatusService) including valid
+ * and invalid transitions, Well_Operation__c creation on status changes,
+ * abandonment queries, and the WellTrigger / AssetTrigger field defaults.
+ */
+@IsTest
 public with sharing class TestWellLifecycle {
 
     @TestSetup
@@ -36,7 +43,7 @@ public with sharing class TestWellLifecycle {
         insert shutInWell;
     }
 
-    @isTest
+    @IsTest
     static void testValidTransition() {
         Well__c well = [SELECT Id, Status__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
         Test.startTest();
@@ -45,7 +52,7 @@ public with sharing class TestWellLifecycle {
         Assert.isTrue(valid, 'Permitted -> Drilling should be valid');
     }
 
-    @isTest
+    @IsTest
     static void testInvalidTransition() {
         Well__c well = [SELECT Id, Status__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
         Test.startTest();
@@ -54,7 +61,7 @@ public with sharing class TestWellLifecycle {
         Assert.isFalse(valid, 'Permitted -> Abandoned should be invalid');
     }
 
-    @isTest
+    @IsTest
     static void testTransitionWellStatus() {
         Well__c well = [SELECT Id, Status__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
         Test.startTest();
@@ -66,7 +73,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual(Date.today(), updated.Status_Change_Date__c);
     }
 
-    @isTest
+    @IsTest
     static void testInvalidTransitionThrows() {
         Well__c well = [SELECT Id, Status__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
         Test.startTest();
@@ -79,11 +86,12 @@ public with sharing class TestWellLifecycle {
         Test.stopTest();
     }
 
-    @isTest
+    @IsTest
     static void testCreateWellOperationOnStatusChange() {
-        Well__c well = [SELECT Id, Name FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
+        Well__c well = [SELECT Id, Name, Status__c, Status_Change_Date__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
+        well.Status__c = 'Drilling';
         Test.startTest();
-        WellStatusService.createWellOperationOnStatusChange(well.Id, 'Drilling');
+        WellStatusService.createWellOperations(new List<Well__c>{ well });
         Test.stopTest();
 
         List<Well_Operation__c> ops = [SELECT Id, Well__c, Operation_Type__c, Status__c FROM Well_Operation__c WHERE Well__c = :well.Id];
@@ -93,7 +101,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual(well.Id, ops[0].Well__c);
     }
 
-    @isTest
+    @IsTest
     static void testGetWellsDueForAbandonment() {
         Well__c well = [SELECT Id FROM Well__c WHERE Status__c = 'Shut-In' LIMIT 1];
 
@@ -105,7 +113,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual(well.Id, due[0].Id);
     }
 
-    @isTest
+    @IsTest
     static void testWellTriggerDefaultStatus() {
         Well__c well = new Well__c(
             Name = 'New Well',
@@ -120,7 +128,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual(Date.today(), inserted.Status_Change_Date__c);
     }
 
-    @isTest
+    @IsTest
     static void testWellTriggerRejectsInvalidTransition() {
         Well__c well = [SELECT Id, Status__c FROM Well__c LIMIT 1];
         well.Status__c = 'Abandoned';
@@ -135,7 +143,7 @@ public with sharing class TestWellLifecycle {
         Test.stopTest();
     }
 
-    @isTest
+    @IsTest
     static void testWellTriggerCreatesOperationOnInsert() {
         Well__c well = new Well__c(
             Name = 'Active Well',
@@ -150,7 +158,7 @@ public with sharing class TestWellLifecycle {
         Assert.isFalse(ops.isEmpty(), 'Should create operation on insert for non-Permitted status');
     }
 
-    @isTest
+    @IsTest
     static void testAssetTriggerCalcSchedule() {
         Account acct = new Account(Name = 'Asset Owner');
         insert acct;
@@ -169,7 +177,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual('Quarterly', inserted.Maintenance_Schedule__c);
     }
 
-    @isTest
+    @IsTest
     static void testAssetTriggerBeyondLife() {
         Account acct = new Account(Name = 'Asset Owner 2');
         insert acct;
@@ -185,7 +193,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual('Beyond Expected Life', inserted.Status__c);
     }
 
-    @isTest
+    @IsTest
     static void testAssetTriggerMonthly() {
         Account acct = new Account(Name = 'Asset Owner Monthly');
         insert acct;
@@ -202,7 +210,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual('Monthly', inserted.Maintenance_Schedule__c);
     }
 
-    @isTest
+    @IsTest
     static void testAssetTriggerSemiAnnual() {
         Account acct = new Account(Name = 'Asset Owner SA');
         insert acct;
@@ -219,7 +227,7 @@ public with sharing class TestWellLifecycle {
         Assert.areEqual('Semi-Annual', inserted.Maintenance_Schedule__c);
     }
 
-    @isTest
+    @IsTest
     static void testAssetTriggerAnnual() {
         Account acct = new Account(Name = 'Asset Owner Annual');
         insert acct;

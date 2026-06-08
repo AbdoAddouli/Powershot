@@ -1,4 +1,12 @@
-@isTest
+/**
+ * TestFieldServices
+ * ==================
+ * Tests inspection checklist operations (getChecklistItems, submitChecklist),
+ * inspection trigger (asset date rollup, recurring creation), pipeline integrity
+ * compliance checks, and Permit-to-Work validation rules (isolation, gas test,
+ * authorization chain, missing requirements).
+ */
+@IsTest
 public with sharing class TestFieldServices {
 
     @TestSetup
@@ -61,7 +69,7 @@ public with sharing class TestFieldServices {
         insert pipelineInsp;
     }
 
-    @isTest
+    @IsTest
     static void testInspectionServiceGetChecklistItems() {
         Asset asset = [SELECT Id FROM Asset LIMIT 1];
         Test.startTest();
@@ -70,7 +78,7 @@ public with sharing class TestFieldServices {
         Assert.isFalse(items.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testInspectionServiceSubmitChecklist() {
         Inspection__c inspection = [SELECT Id FROM Inspection__c WHERE Inspection_Type__c = 'Safety' LIMIT 1];
 
@@ -85,7 +93,7 @@ public with sharing class TestFieldServices {
         Assert.areEqual('All good', updated.Findings__c);
     }
 
-    @isTest
+    @IsTest
     static void testInspectionTriggerUpdatesAsset() {
         Inspection__c inspection = [SELECT Id, Asset__c FROM Inspection__c WHERE Asset__c != NULL LIMIT 1];
         inspection.Status__c = 'Completed';
@@ -100,7 +108,7 @@ public with sharing class TestFieldServices {
         Assert.areEqual(Date.today(), asset.Last_Inspection_Date__c);
     }
 
-    @isTest
+    @IsTest
     static void testInspectionTriggerCreatesRecurring() {
         Inspection__c inspection = [SELECT Id, Is_Recurring__c, Recurring_Interval_Days__c FROM Inspection__c WHERE Is_Recurring__c = true LIMIT 1];
         inspection.Status__c = 'Completed';
@@ -117,7 +125,7 @@ public with sharing class TestFieldServices {
         Assert.isFalse(nextInspections.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testPipelineIntegrityIsCompliant() {
         Pipeline__c pipeline = [SELECT Id FROM Pipeline__c LIMIT 1];
         Test.startTest();
@@ -126,7 +134,7 @@ public with sharing class TestFieldServices {
         Assert.isTrue(compliant);
     }
 
-    @isTest
+    @IsTest
     static void testPipelineIntegrityIsNotCompliant() {
         Pipeline__c pipeline = [SELECT Id FROM Pipeline__c LIMIT 1];
         pipeline.Last_Inspection_Date__c = Date.today().addMonths(-18);
@@ -138,7 +146,7 @@ public with sharing class TestFieldServices {
         Assert.isFalse(compliant);
     }
 
-    @isTest
+    @IsTest
     static void testPipelineIntegrityFlagNonCompliant() {
         Pipeline__c pipeline = [SELECT Id FROM Pipeline__c LIMIT 1];
         pipeline.Last_Inspection_Date__c = Date.today().addMonths(-18);
@@ -152,7 +160,7 @@ public with sharing class TestFieldServices {
         Assert.areEqual('Non-Compliant', updated.Compliance_Status__c);
     }
 
-    @isTest
+    @IsTest
     static void testPipelineIntegrityCalculateNextDue() {
         Pipeline__c pipeline = [SELECT Id FROM Pipeline__c LIMIT 1];
         pipeline.Last_Inspection_Date__c = Date.today().addMonths(-6);
@@ -165,7 +173,7 @@ public with sharing class TestFieldServices {
         Assert.areEqual(Date.today().addMonths(6), nextDue);
     }
 
-    @isTest
+    @IsTest
     static void testPermitValidationIsolation() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Isolation_Required__c = true;
@@ -180,7 +188,7 @@ public with sharing class TestFieldServices {
         Assert.isTrue(valid);
     }
 
-    @isTest
+    @IsTest
     static void testPermitValidationIsolationFailsWhenNotVerified() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Isolation_Required__c = true;
@@ -193,7 +201,7 @@ public with sharing class TestFieldServices {
         Assert.isFalse(valid);
     }
 
-    @isTest
+    @IsTest
     static void testPermitValidationGasTest() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Gas_Test_Required__c = true;
@@ -210,7 +218,7 @@ public with sharing class TestFieldServices {
         Assert.isTrue(valid);
     }
 
-    @isTest
+    @IsTest
     static void testPermitValidationGasTestFails() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Gas_Test_Required__c = true;
@@ -224,7 +232,7 @@ public with sharing class TestFieldServices {
         Assert.isFalse(valid);
     }
 
-    @isTest
+    @IsTest
     static void testPermitValidationAuthorization() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Risk_Level__c = 'Low';
@@ -239,7 +247,7 @@ public with sharing class TestFieldServices {
         Assert.isTrue(valid);
     }
 
-    @isTest
+    @IsTest
     static void testPermitValidationAuthorizationFails() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Risk_Level__c = 'High';
@@ -252,7 +260,7 @@ public with sharing class TestFieldServices {
         Assert.isFalse(valid);
     }
 
-    @isTest
+    @IsTest
     static void testGetMissingRequirements() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Scope_of_Work__c = 'Short';

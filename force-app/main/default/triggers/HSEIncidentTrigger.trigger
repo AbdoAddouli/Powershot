@@ -1,23 +1,35 @@
+/**
+ * HSEIncidentTrigger
+ * ===================
+ * After-insert: classifies severity, notifies compliance for reportable
+ * incidents, and escalates critical incidents. After-update: re-classifies
+ * when incident details change, notifies on newly reportable status, and
+ * escalates when severity becomes Critical.
+ *
+ * Used by: HSEIncidentService
+ */
 trigger HSEIncidentTrigger on HSE_Incident__c (after insert, after update) {
 
     if (Trigger.isAfter) {
+        List<Id> classifyIds = new List<Id>();
+        List<Id> notifyIds = new List<Id>();
+        List<Id> escalateIds = new List<Id>();
+
         if (Trigger.isInsert) {
             for (HSE_Incident__c incident : Trigger.new) {
-                HSEIncidentService.classifySeverity(incident.Id);
+                classifyIds.add(incident.Id);
 
                 if (incident.Regulatory_Reportable__c) {
-                    HSEIncidentService.notifyComplianceTeam(incident.Id);
+                    notifyIds.add(incident.Id);
                 }
 
                 if (incident.Severity__c == 'Critical') {
-                    HSEIncidentService.escalateIfCritical(incident.Id);
+                    escalateIds.add(incident.Id);
                 }
             }
         }
 
         if (Trigger.isUpdate) {
-            Set<Id> needsSeverityUpdate = new Set<Id>();
-
             for (HSE_Incident__c incident : Trigger.new) {
                 HSE_Incident__c old = Trigger.oldMap.get(incident.Id);
 
@@ -26,24 +38,29 @@ trigger HSEIncidentTrigger on HSE_Incident__c (after insert, after update) {
                     incident.Environmental_Impact__c != old.Environmental_Impact__c ||
                     incident.Spill_Volume__c != old.Spill_Volume__c ||
                     incident.Fatality_Occurred__c != old.Fatality_Occurred__c) {
-                    needsSeverityUpdate.add(incident.Id);
+                    classifyIds.add(incident.Id);
                 }
 
                 if (incident.Regulatory_Reportable__c == true && old.Regulatory_Reportable__c == false) {
-                    HSEIncidentService.notifyComplianceTeam(incident.Id);
+                    notifyIds.add(incident.Id);
                 }
-            }
 
-            for (Id incidentId : needsSeverityUpdate) {
-                HSEIncidentService.classifySeverity(incidentId);
-            }
-
-            for (HSE_Incident__c incident : Trigger.new) {
-                HSE_Incident__c old = Trigger.oldMap.get(incident.Id);
                 if (incident.Severity__c != old.Severity__c && incident.Severity__c == 'Critical') {
-                    HSEIncidentService.escalateIfCritical(incident.Id);
+                    escalateIds.add(incident.Id);
                 }
             }
+        }
+
+        if (!classifyIds.isEmpty()) {
+            HSEIncidentService.classifySeverities(classifyIds);
+        }
+
+        if (!notifyIds.isEmpty()) {
+            HSEIncidentService.notifyComplianceTeams(notifyIds);
+        }
+
+        if (!escalateIds.isEmpty()) {
+            HSEIncidentService.escalateIfCritical(escalateIds);
         }
     }
 }

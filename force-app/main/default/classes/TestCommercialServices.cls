@@ -1,4 +1,12 @@
-@isTest
+/**
+ * TestCommercialServices
+ * =======================
+ * Tests inventory management (receipt, delivery, reconciliation, low-inventory
+ * alerts), production allocation creation and revenue retrieval, royalty
+ * calculations (individual + monthly + statement generation), and the
+ * working-interest validation in ProductionAllocationTrigger.
+ */
+@IsTest
 public with sharing class TestCommercialServices {
 
     @TestSetup
@@ -71,7 +79,7 @@ public with sharing class TestCommercialServices {
         insert tank;
     }
 
-    @isTest
+    @IsTest
     static void testInventoryMovementReceipt() {
         Fuel_Inventory__c tank = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c LIMIT 1];
         Decimal startingVolume = tank.Current_Volume__c;
@@ -88,7 +96,7 @@ public with sharing class TestCommercialServices {
         Assert.areEqual('Receipt', txns[0].Movement_Type__c);
     }
 
-    @isTest
+    @IsTest
     static void testInventoryMovementDelivery() {
         Fuel_Inventory__c tank = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c LIMIT 1];
 
@@ -100,7 +108,7 @@ public with sharing class TestCommercialServices {
         Assert.areEqual(300, updated.Current_Volume__c);
     }
 
-    @isTest
+    @IsTest
     static void testInventoryReconciliation() {
         Fuel_Inventory__c tank = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c LIMIT 1];
 
@@ -113,7 +121,7 @@ public with sharing class TestCommercialServices {
         Assert.areEqual(Date.today(), updated.Last_Reconciliation_Date__c);
     }
 
-    @isTest
+    @IsTest
     static void testGetLowInventoryAlerts() {
         Test.startTest();
         List<Fuel_Inventory__c> alerts = InventoryBalanceService.getLowInventoryAlerts(10);
@@ -122,7 +130,7 @@ public with sharing class TestCommercialServices {
         Assert.isFalse(alerts.isEmpty(), 'Tank below threshold should trigger alert');
     }
 
-    @isTest
+    @IsTest
     static void testGetCurrentInventory() {
         Fuel_Inventory__c tank = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c LIMIT 1];
 
@@ -133,7 +141,7 @@ public with sharing class TestCommercialServices {
         Assert.areEqual(tank.Current_Volume__c, vol);
     }
 
-    @isTest
+    @IsTest
     static void testGetTankInventory() {
         Fuel_Inventory__c tank = [SELECT Id, Terminal__c FROM Fuel_Inventory__c LIMIT 1];
 
@@ -144,7 +152,7 @@ public with sharing class TestCommercialServices {
         Assert.areEqual(1, tanks.size());
     }
 
-    @isTest
+    @IsTest
     static void testProductionAllocationCreate() {
         Well__c well = [SELECT Id, Lease__c, Lease__r.Working_Interest_Percent__c, Lease__r.Revenue_Interest_Percent__c FROM Well__c LIMIT 1];
 
@@ -160,7 +168,7 @@ public with sharing class TestCommercialServices {
         Assert.isFalse(allocs.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testGetAllocatedRevenue() {
         Production_Allocation__c alloc = [SELECT Id, Allocated_Revenue__c FROM Production_Allocation__c LIMIT 1];
 
@@ -171,7 +179,7 @@ public with sharing class TestCommercialServices {
         Assert.areEqual(alloc.Allocated_Revenue__c, revenue);
     }
 
-    @isTest
+    @IsTest
     static void testGetProductionHistory() {
         Well__c well = [SELECT Id FROM Well__c LIMIT 1];
 
@@ -182,7 +190,7 @@ public with sharing class TestCommercialServices {
         Assert.isFalse(history.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testRoyaltyCalculation() {
         Lease__c lease = [SELECT Id FROM Lease__c LIMIT 1];
         Production_Allocation__c alloc = [SELECT Id, Allocated_Revenue__c FROM Production_Allocation__c LIMIT 1];
@@ -194,7 +202,7 @@ public with sharing class TestCommercialServices {
         Assert.areNotEqual(0, payment);
     }
 
-    @isTest
+    @IsTest
     static void testCalculateMonthlyRoyalties() {
         Lease__c lease = [SELECT Id FROM Lease__c LIMIT 1];
 
@@ -209,7 +217,7 @@ public with sharing class TestCommercialServices {
         Assert.isFalse(payments.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testGenerateRoyaltyStatements() {
         Lease__c lease = [SELECT Id FROM Lease__c LIMIT 1];
 
@@ -225,7 +233,7 @@ public with sharing class TestCommercialServices {
         Assert.isFalse(tasks.isEmpty());
     }
 
-    @isTest
+    @IsTest
     static void testProductionAllocationTriggerValidatesWI() {
         Well__c well = [SELECT Id FROM Well__c LIMIT 1];
 

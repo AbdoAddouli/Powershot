@@ -1,3 +1,12 @@
+/**
+ * ProductionAllocationTrigger
+ * ============================
+ * Before-insert defaults numeric volume / interest fields to 0, then validates
+ * that working interest across all allocations for the same well stays ≤ 100 %.
+ * Before-update enforces that WI + NRI does not exceed 200 %.
+ *
+ * Used by: ProductionAllocationService
+ */
 trigger ProductionAllocationTrigger on Production_Allocation__c (before insert, before update) {
 
     if (Trigger.isBefore) {
@@ -23,42 +32,7 @@ trigger ProductionAllocationTrigger on Production_Allocation__c (before insert, 
         }
 
         if (Trigger.isInsert) {
-            Set<Id> wellIds = new Set<Id>();
-            for (Production_Allocation__c alloc : Trigger.new) {
-                if (alloc.Well__c != null) {
-                    wellIds.add(alloc.Well__c);
-                }
-            }
-
-            if (!wellIds.isEmpty()) {
-                Map<Id, List<Production_Allocation__c>> existingByWell = new Map<Id, List<Production_Allocation__c>>();
-                for (Production_Allocation__c alloc : [
-                    SELECT Well__c, Working_Interest_Share__c
-                    FROM Production_Allocation__c
-                    WHERE Well__c IN :wellIds
-                ]) {
-                    if (!existingByWell.containsKey(alloc.Well__c)) {
-                        existingByWell.put(alloc.Well__c, new List<Production_Allocation__c>());
-                    }
-                    existingByWell.get(alloc.Well__c).add(alloc);
-                }
-
-                for (Production_Allocation__c alloc : Trigger.new) {
-                    if (alloc.Well__c != null && existingByWell.containsKey(alloc.Well__c)) {
-                        List<Production_Allocation__c> existing = existingByWell.get(alloc.Well__c);
-                        Decimal totalWi = alloc.Working_Interest_Share__c != null ? alloc.Working_Interest_Share__c : 0;
-                        for (Production_Allocation__c ex : existing) {
-                            totalWi += ex.Working_Interest_Share__c != null ? ex.Working_Interest_Share__c : 0;
-                        }
-                        if (totalWi > 100) {
-                            alloc.addError(
-                                'Total Working Interest for well ' + alloc.Well__c +
-                                ' exceeds 100%. Current total: ' + totalWi + '%'
-                            );
-                        }
-                    }
-                }
-            }
+            ProductionAllocationService.validateWorkingInterest(Trigger.new);
         }
 
         if (Trigger.isUpdate) {
