@@ -65,19 +65,92 @@ All custom objects, fields, Apex classes, triggers, LWCs, permission sets, and r
 
 ---
 
-## Remaining for Next Session
+---
 
-1. **Deploy 8 custom objects** (`Well__c`, `Supply_Agreement__c`, `Inspection__c`, `Permit_to_Work__c`, `HSE_Incident__c`, `Pipeline_Segment__c`, etc.) — prerequisite for Apex/Flows
-2. **Deploy 9 flows** (`Compliance_Calendar`, `Field_Service_Dispatch`, `HSE_Incident_Escalation`, `Inspection_Due`, `Joint_Venture_Billing`, `Land_Lease_Expiration`, `Pipeline_Maintenance_Schedule`, `Production_Decline`, `Well_Shut_Down`)
-3. **Verify `Commodity__c` picklist** on `Supply_Agreement__c` has all required values
-4. **Run all 4 test classes** to validate services
-5. **Verify data** — check `Supply_Agreement__c` records exist for daily sync
+## Session 3: Named Credential Refactoring, Slack Alert Flow & EIA Integration
+
+### What Changed
+
+- **Named Credential auth changed** from `Anonymous/NoAuthentication` with in-code auth header, to **`Basic protocol` + `NamedPrincipal`** with credentials stored via `ConnectApi.NamedCredentials.createCredential()`
+- **External Credentials** created for `CommodityPricing`, `EIA_API`, and `Slack_HSE_Webhook`
+- **Slack HSE Alert** (`HSE_Critical_Slack_Alert` flow) now sends to `#hse-emergency` via `@future(callout=true)` — working end-to-end
+- **EIA API** (`EIAPricingService`) fetches weekly retail fuel prices + national crude stock levels
+- **CommodityPricing** (`CommodityPricingService`) now uses `{!$Credential.Password}` merge field in headers (resolved by Named Credential framework)
+- **API keys stored in `.env`** at project root, populated at runtime via Apex `ConnectApi.NamedCredentials.createCredential()` (never in metadata XML)
+- **Secrets for Slack webhook** use dummy credentials — Slack ignores Basic auth, webhook URL provides all auth
+
+### Deployed
+
+| Component | Type | Details |
+|---|---|---|
+| `SlackAlertService` | Apex class | `@future(callout=true)` sends JSON to Slack webhook |
+| `CommodityPricingService` | Apex class | Refactored: `{!$Credential.Password}` header, 7 commodity codes |
+| `CommodityPriceSyncScheduler` | Apex class | Schedulable wrapper for daily 06:00 sync |
+| `EIAPricingService` | Apex class | Fetch retail prices + national stocks via `X-Api-Key` header |
+| `EIAPriceSyncScheduler` | Apex class | Schedulable wrapper |
+| `TestEIAPricingService` | Apex test | 17 tests: response parsing + sync logic |
+| `TestAPIEndToEnd` | Apex class | Manual test via anonymous Apex (`@future(callout=true)`) |
+| `Slack_HSE_Webhook` | Named Credential | `SecuredEndpoint`, dummy Basic credentials |
+| `CommodityPricing` | Named Credential | `SecuredEndpoint`, `{!$Credential.Password}` resolved by NC |
+| `EIA_API` | Named Credential | `SecuredEndpoint`, `allowMergeFieldsInHeader=true` |
+| `CommodityPricing` | External Credential | Basic protocol, `NamedPrincipal` |
+| `EIA_API` | External Credential | Basic protocol, `NamedPrincipal` |
+| `Slack_HSE_Webhook` | External Credential | Basic protocol, `NamedPrincipal` |
+| CSP trusted sites | 3 | `CommodityPricing`, `EIA_API`, `Slack` |
+| `O_G_All_Access` | Permission Set | Updated with `SetupEntityAccess` grants |
+| `HSE_Critical_Slack_Alert` | Flow | AutoLaunched, triggers on Critical severity update |
+
+### Verified
+
+- All **86 tests pass**
+- **Commodity API** (OilPriceAPI): WTI Crude = **$72.84/barrel** (via Named Credential callout)
+- **EIA Price API**: U.S. Gasoline = **$4.048/gallon** (via `X-Api-Key` header)
+- **EIA Stock API**: U.S. Crude Stocks = **758,473 MBBL** (via `X-Api-Key` header)
+- **Slack alert**: Confirmed delivered to `#hse-emergency` (no error Task)
+- **Named Credentials** authenticate via merge field resolution in headers (Commodity) and custom headers (EIA)
+
+### Key Decisions
+
+- **NamedPrincipal needs SetupEntityAccess**: `SetupEntityAccess` record linking ExternalCredentialPrincipal → PermissionSet is required before any user can call out via that Named Credential. Without it: `cannot access the credential`
+- **Merge fields in headers only**: `{!$Credential.Password}` in `setHeader()` resolves correctly. In `setEndpoint()` URL it causes `Illegal character in opaque part` because `callout:` URIs don't allow `{!$}` chars
+- **EIA accepts `X-Api-Key` header**: EIA Open Data API v2 accepts the API key as a custom header, not just as a query param
+- **`@future(callout=true)` required** for Slack because flow runs in `CurrentTransaction` mode alongside DML (uncommitted work blocks synchronous callouts)
 
 ---
 
-## How to continue
+## Remaining for Next Session
+
+### Blockers (must resolve first)
+
+1. **`Supply_Agreement__c.Commodity__c` field inaccessible** — exists in Tooling API metadata but REST describe, SOQL, and anonymous Apex all fail with "Field does not exist". This org-level schema corruption prevents:
+   - Creating `Supply_Agreement__c` records with a commodity value
+   - Triggering `CommodityPricingService.syncPrices()` to test end-to-end Apex flow
+   - Options: deploy to a fresh scratch org, or investigate if field was deleted/recreated
+
+2. **CRM Analytics not licensed** — Phase 1.3 (Well Production Dashboard) requires CRM Analytics license. Developer Edition doesn't include it.
+
+### Ready to continue when blockers resolved
+
+1. **Fix Commodity__c field** → create test `Supply_Agreement__c` records → verify commodity pricing sync
+2. **Deploy 9 flows** (`Compliance_Calendar`, `Field_Service_Dispatch`, `HSE_Incident_Escalation`, `Inspection_Due`, `Joint_Venture_Billing`, `Land_Lease_Expiration`, `Pipeline_Maintenance_Schedule`, `Production_Decline`, `Well_Shut_Down`)
+3. **Phase 2 — Automations**: Process builder flows, approval processes, scheduled jobs
+4. **Phase 3 — Compliance**: Regulatory permit triggers, compliance deadlines, reporting
+5. **Enable CRM Analytics + configure Well Production Dashboard** (Phase 1.3)
+
+### How to continue
 
 ```powershell
-# Deploy force-app again
-sf project deploy start --source-dir force-app --target-org addouliabdo9.76deae143000@agentforce.com --wait 30
+# Deploy force-app (all metadata)
+sf project deploy start --source-dir force-app --target-org vscodeOrg --wait 30
+
+# Run all tests
+sf apex run test --test-level RunLocalTests --target-org vscodeOrg --wait 15
+
+# Set commodity pricing API key
+sf apex run --file scripts/apex/create_and_sync.apex --target-org vscodeOrg
+
+# Test Commodity API manually from Developer Console
+#   TestAPIEndToEnd.testCommodityAPI();
+#   TestAPIEndToEnd.testEIAAPI();
+#   TestAPIEndToEnd.testAllAPIs();
 ```
