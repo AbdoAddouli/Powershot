@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>HSE Incident</label>
     <nameField>
-        <label>HSE Incident</label>
+    <label>HSE Incident</label>
+    <description>Records Health, Safety & Environment incidents such as spills, injuries, and near-misses with severity classification and regulatory reporting flags.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

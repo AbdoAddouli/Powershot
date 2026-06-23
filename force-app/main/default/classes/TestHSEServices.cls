@@ -302,4 +302,64 @@ public with sharing class TestHSEServices {
         Assert.isFalse(deadlines.isEmpty());
         Assert.areEqual(permit.Id, deadlines[0].Id);
     }
+
+    @IsTest
+    static void testSlackAlertSuccess() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+
+        Test.setMock(HttpCalloutMock.class, new SlackCalloutMock(200, 'ok'));
+
+        Test.startTest();
+        SlackAlertService.sendAlert(new List<Id>{ inc.Id });
+        Test.stopTest();
+
+        List<Task> errorTasks = [SELECT Id FROM Task WHERE Subject = 'Slack Alert Failed'];
+        Assert.areEqual(0, errorTasks.size(), 'No error task should be created on success');
+    }
+
+    @IsTest
+    static void testSlackAlertHttpError() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+
+        Test.setMock(HttpCalloutMock.class, new SlackCalloutMock(500, 'Internal Server Error'));
+
+        Test.startTest();
+        SlackAlertService.sendAlert(new List<Id>{ inc.Id });
+        Test.stopTest();
+
+        List<Task> errorTasks = [SELECT Id, Description FROM Task WHERE Subject = 'Slack Alert Failed' AND WhatId = :inc.Id];
+        Assert.areEqual(1, errorTasks.size(), 'Error task should be created on HTTP error');
+        Assert.isTrue(errorTasks[0].Description.contains('500'));
+    }
+
+    @IsTest
+    static void testSlackAlertCalloutException() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+
+        Test.setMock(HttpCalloutMock.class, new SlackCalloutMock(0, null));
+
+        Test.startTest();
+        SlackAlertService.sendAlert(new List<Id>{ inc.Id });
+        Test.stopTest();
+
+        List<Task> errorTasks = [SELECT Id FROM Task WHERE Subject = 'Slack Alert Failed' AND WhatId = :inc.Id];
+        Assert.areEqual(1, errorTasks.size(), 'Error task should be created on callout failure');
+    }
+
+    private class SlackCalloutMock implements HttpCalloutMock {
+        private Integer statusCode;
+        private String body;
+
+        public SlackCalloutMock(Integer statusCode, String body) {
+            this.statusCode = statusCode;
+            this.body = body;
+        }
+
+        public HttpResponse respond(HttpRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setStatusCode(statusCode);
+            res.setBody(body);
+            return res;
+        }
+    }
 }

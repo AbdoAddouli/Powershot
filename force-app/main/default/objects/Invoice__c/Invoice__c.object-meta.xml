@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Invoice</label>
+    <description>Manages billing invoices for crude, gas, and refined product sales between operators, partners, and third-party purchasers.</description>
     <nameField>
         <label>Invoice Number</label>
         <type>AutoNumber</type>

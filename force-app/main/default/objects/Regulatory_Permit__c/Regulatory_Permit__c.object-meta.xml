@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Regulatory Permit</label>
+    <description>Tracks government-issued permits for drilling, operations, emissions, and discharges with expiration and compliance monitoring.</description>
     <nameField>
         <label>Permit Number</label>
         <type>Text</type>

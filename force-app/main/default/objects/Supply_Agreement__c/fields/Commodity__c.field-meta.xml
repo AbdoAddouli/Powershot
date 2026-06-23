@@ -3,6 +3,9 @@
     <fullName>Commodity__c</fullName>
     <label>Commodity</label>
     <required>false</required>
+    <description>Type of commodity (Crude, Gas, Refined, NGL)</description>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
         <valueSetDefinition>

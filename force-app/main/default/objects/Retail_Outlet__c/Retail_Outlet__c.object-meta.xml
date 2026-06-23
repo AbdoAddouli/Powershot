@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Retail Outlet</label>
+    <description>Manages retail fuel station locations including fuel types, monthly volumes, and operational details.</description>
     <nameField>
         <label>Outlet Code</label>
         <type>AutoNumber</type>

@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Well Operation</label>
+    <description>Records well operational activities including status changes, workovers, stimulation, and maintenance interventions.</description>
     <nameField>
         <label>Operation</label>
         <type>AutoNumber</type>

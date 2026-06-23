@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Fuel Inventory</label>
+    <description>Manages fuel storage tank inventory including current volume, capacity, product type, and minimum threshold alerts at terminals and retail outlets.</description>
     <nameField>
         <label>Inventory</label>
         <type>AutoNumber</type>

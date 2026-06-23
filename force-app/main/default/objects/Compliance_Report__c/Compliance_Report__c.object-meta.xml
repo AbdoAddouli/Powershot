@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>Compliance Report</label>
     <nameField>
-        <label>Compliance Report</label>
+    <label>Compliance Report</label>
+    <description>Tracks environmental, safety, and regulatory compliance reports required by government agencies, including due dates, submission status, and findings.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Production Allocation</label>
+    <description>Allocates produced oil, gas, and water volumes to wells by period with working interest and revenue share calculations.</description>
     <nameField>
         <label>Allocation</label>
         <type>AutoNumber</type>

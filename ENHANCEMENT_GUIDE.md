@@ -2,7 +2,7 @@
 
 **Target Org:** `addouliabdo9.76deae143000@agentforce.com`
 **API Version:** 66.0
-**Last Updated:** June 2026
+**Last Updated:** June 2026 (Phase 1 refreshed to reflect External Credential migration)
 
 ---
 
@@ -23,57 +23,181 @@
 
 Wire real-time pricing into `Supply_Agreement__c` and `Production_Allocation__c`.
 
-**Step 1: Create a Named Credential**
+**Step 1: Create External Credential + Named Credential (SecuredEndpoint format)**
+
+Create the External Credential metadata:
+
+```xml
+<!-- externalCredentials/CommodityPricing.externalCredential-meta.xml -->
+<ExternalCredential xmlns="http://soap.sforce.com/2006/04/metadata">
+    <authenticationProtocol>Basic</authenticationProtocol>
+    <label>CommodityPricing</label>
+</ExternalCredential>
+```
+
+Create the Named Credential:
+
+```xml
+<!-- namedCredentials/CommodityPricing.namedCredential-meta.xml -->
+<NamedCredential xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowMergeFieldsInBody>false</allowMergeFieldsInBody>
+    <allowMergeFieldsInHeader>true</allowMergeFieldsInHeader>
+    <label>CommodityPricing</label>
+    <namedCredentialParameters>
+        <parameterName>Url</parameterName>
+        <parameterType>Url</parameterType>
+        <parameterValue>https://api.oilpriceapi.com/v1</parameterValue>
+    </namedCredentialParameters>
+    <namedCredentialParameters>
+        <externalCredential>CommodityPricing</externalCredential>
+        <parameterName>ExternalCredential</parameterName>
+        <parameterType>Authentication</parameterType>
+    </namedCredentialParameters>
+    <namedCredentialType>SecuredEndpoint</namedCredentialType>
+</NamedCredential>
+```
+
+> **Important:** Metadata API v66.0 does not support `Password` or `NoAuthentication` protocols for ExternalCredentials. Use `Basic` protocol instead.
+
+**Step 1b: Populate the External Credential Principal**
+
+After deploying the metadata, set the actual credential values via Apex or the Connect REST API (secrets must never live in XML):
+
+```apex
+ConnectApi.CredentialInput input = new ConnectApi.CredentialInput();
+input.authenticationProtocol = ConnectApi.CredentialAuthenticationProtocol.Basic;
+input.externalCredential = 'CommodityPricing';
+input.principalType = ConnectApi.CredentialPrincipalType.NamedPrincipal;
+input.principalName = 'NamedPrincipal';
+
+Map<String, ConnectApi.CredentialValueInput> creds = new Map<String, ConnectApi.CredentialValueInput>();
+
+ConnectApi.CredentialValueInput username = new ConnectApi.CredentialValueInput();
+username.encrypted = false;
+username.value = 'placeholder';
+creds.put('username', username);
+
+ConnectApi.CredentialValueInput password = new ConnectApi.CredentialValueInput();
+password.encrypted = true;
+password.value = 'ca5d4a0ef4a62fc508ba4bee550753657539bd58b6147793ae53dd726042ae65';
+creds.put('password', password);
+
+input.credentials = creds;
+ConnectApi.NamedCredentials.createCredential(input);
+```
+
+If the principal does not exist yet, use the Connect REST API to add it first:
 
 ```
-Setup → Named Credentials → New
-  Label: CommodityPricing
-  URL: https://api.allcommidity.com/v1 (or Platts/Argus/ICE endpoint)
-  Identity Type: Named Principal
-  Authentication: Custom (API Key header)
-  Generate Authorization Header: Unchecked
+PUT /services/data/v66.0/named-credentials/external-credentials/CommodityPricing
+{
+  "authenticationProtocol": "Basic",
+  "masterLabel": "CommodityPricing",
+  "developerName": "CommodityPricing",
+  "principals": [
+    {
+      "principalName": "NamedPrincipal",
+      "principalType": "NamedPrincipal",
+      "sequenceNumber": 1
+    }
+  ]
+}
 ```
 
-**Step 2: Create a Remote Site Setting**
+> All secrets should be stored in the project's `.env` file and populated via the Connect API / Apex `sf apex run` script, never in metadata XML.
+
+**Step 1c: Grant Principal Access**
+
+For `NamedPrincipal` type, the user needs `SetupEntityAccess` to the principal. Run this once per permission set:
+
+```apex
+SetupEntityAccess access = new SetupEntityAccess();
+access.ParentId = [SELECT Id FROM PermissionSet WHERE Name = 'O_G_All_Access' LIMIT 1].Id;
+access.SetupEntityId = '0pug...principalId';
+insert access;
+```
+
+**Step 2: Remote Site Setting** (still required for non-Named-Credential callouts, or verify the org's CSP Trusted Sites include the domain)
 
 ```
 Setup → Remote Site Settings → New Remote Site
   Remote Site Name: CommodityPricing
-  Remote Site URL: https://api.allcommidity.com
+  Remote Site URL: https://api.oilpriceapi.com
 ```
 
-**Step 3: Create an Apex Service Class**
+**Step 3: Add `Current_Price__c` field to `Supply_Agreement__c`**
+
+Create field: `Supply_Agreement__c.Current_Price__c` (Number(18,2))
+
+**Step 4: Create an Apex Service Class**
 
 ```apex
 public with sharing class CommodityPricingService {
+
+    private static final Map<String, String> COMMODITY_CODE_MAP = new Map<String, String>{
+        'Crude' => 'WTI_USD',
+        'Gas' => 'NATURAL_GAS_USD',
+        'NGL' => 'BRENT_CRUDE_USD',
+        'Refined' => 'GASOLINE_USD',
+        'Diesel' => 'DIESEL_USD',
+        'Jet Fuel' => 'JET_FUEL_USD',
+        'Heating Oil' => 'HEATING_OIL_USD'
+    };
+
     @future(callout=true)
     public static void syncPrices(Set<Id> agreementIds) {
-        Http http = new Http();
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint('callout:CommodityPricing/prices/latest');
-        req.setMethod('GET');
-        req.setHeader('X-API-Key', '{!$Credential.Password}');
+        List<Supply_Agreement__c> agreements = [
+            SELECT Id, Commodity__c, Current_Price__c
+            FROM Supply_Agreement__c
+            WHERE Id IN :agreementIds
+        ];
+        if (agreements.isEmpty()) return;
 
-        HttpResponse res = http.send(req);
-        Map<String, Object> prices = (Map<String, Object>)
-            JSON.deserializeUntyped(res.getBody());
+        Set<String> commodities = new Set<String>();
+        for (Supply_Agreement__c ag : agreements) {
+            if (ag.Commodity__c != null) commodities.add(ag.Commodity__c);
+        }
+
+        Map<String, Decimal> priceByCode = new Map<String, Decimal>();
+        for (String commodity : commodities) {
+            String apiCode = COMMODITY_CODE_MAP.get(commodity);
+            if (apiCode == null) continue;
+            Decimal price = fetchPrice(apiCode);
+            if (price != null) priceByCode.put(commodity, price);
+        }
 
         List<Supply_Agreement__c> updates = new List<Supply_Agreement__c>();
-        for (Supply_Agreement__c ag : [SELECT Id, Commodity__c
-                                        FROM Supply_Agreement__c
-                                        WHERE Id IN :agreementIds]) {
-            Decimal price = (Decimal) prices.get(ag.Commodity__c);
-            if (price != null) {
-                ag.Current_Price__c = price;
+        for (Supply_Agreement__c ag : agreements) {
+            if (priceByCode.containsKey(ag.Commodity__c)) {
+                ag.Current_Price__c = priceByCode.get(ag.Commodity__c);
                 updates.add(ag);
             }
         }
-        update updates;
+        if (!updates.isEmpty()) update updates;
+    }
+
+    private static Decimal fetchPrice(String apiCode) {
+        Http http = new Http();
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('callout:CommodityPricing/prices/latest?by_code=' + apiCode);
+        req.setMethod('GET');
+        req.setTimeout(10000);
+        try {
+            HttpResponse res = http.send(req);
+            if (res.getStatusCode() != 200) return null;
+            Map<String, Object> responseMap = (Map<String, Object>)
+                JSON.deserializeUntyped(res.getBody());
+            Map<String, Object> data = (Map<String, Object>) responseMap.get('data');
+            return data != null ? (Decimal) data.get('price') : null;
+        } catch (Exception e) {
+            System.debug('Failed to fetch price for ' + apiCode + ': ' + e.getMessage());
+            return null;
+        }
     }
 }
 ```
 
-**Step 4: Schedule Daily Sync**
+**Step 5: Schedule Daily Sync**
 
 ```
 Setup → Apex Classes → Schedule Apex
@@ -114,32 +238,157 @@ settings:
 
 Slack App → Incoming Webhooks → Activate → Add New Webhook → Post to #hse-emergency
 
-**Step 3: Create a Flow for Slack Notification**
+**Step 3: Create External Credential + Named Credential (SecuredEndpoint)**
+
+Slack webhooks use a token embedded in the URL. No auth headers are needed, but `SecuredEndpoint` with `Basic` protocol requires a configured principal.
+
+```xml
+<!-- externalCredentials/Slack_HSE_Webhook.externalCredential-meta.xml -->
+<ExternalCredential xmlns="http://soap.sforce.com/2006/04/metadata">
+    <authenticationProtocol>Basic</authenticationProtocol>
+    <label>Slack_HSE_Webhook</label>
+</ExternalCredential>
+```
+
+```xml
+<!-- namedCredentials/Slack_HSE_Webhook.namedCredential-meta.xml -->
+<NamedCredential xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowMergeFieldsInBody>false</allowMergeFieldsInBody>
+    <allowMergeFieldsInHeader>false</allowMergeFieldsInHeader>
+    <label>Slack_HSE_Webhook</label>
+    <namedCredentialParameters>
+        <parameterName>Url</parameterName>
+        <parameterType>Url</parameterType>
+        <parameterValue>https://hooks.slack.com/services/T.../B.../xxxxx</parameterValue>
+    </namedCredentialParameters>
+    <namedCredentialParameters>
+        <externalCredential>Slack_HSE_Webhook</externalCredential>
+        <parameterName>ExternalCredential</parameterName>
+        <parameterType>Authentication</parameterType>
+    </namedCredentialParameters>
+    <namedCredentialType>SecuredEndpoint</namedCredentialType>
+</NamedCredential>
+```
+
+**Step 3b: Populate the Principal & Grant Access**
+
+Add a named principal with dummy credentials (Slack ignores them), then grant user access via `SetupEntityAccess`:
+
+```
+PUT /services/data/v66.0/named-credentials/external-credentials/Slack_HSE_Webhook
+{
+  "authenticationProtocol": "Basic",
+  "masterLabel": "Slack_HSE_Webhook",
+  "developerName": "Slack_HSE_Webhook",
+  "principals": [{
+    "principalName": "NamedPrincipal",
+    "principalType": "NamedPrincipal",
+    "sequenceNumber": 1
+  }]
+}
+```
+
+```apex
+// Set dummy credentials (Slack webhooks ignore auth headers)
+ConnectApi.CredentialInput input = new ConnectApi.CredentialInput();
+input.authenticationProtocol = ConnectApi.CredentialAuthenticationProtocol.Basic;
+input.externalCredential = 'Slack_HSE_Webhook';
+input.principalType = ConnectApi.CredentialPrincipalType.NamedPrincipal;
+input.principalName = 'NamedPrincipal';
+
+Map<String, ConnectApi.CredentialValueInput> creds = new Map<String, ConnectApi.CredentialValueInput>();
+ConnectApi.CredentialValueInput u = new ConnectApi.CredentialValueInput();
+u.encrypted = false; u.value = 'slack'; creds.put('username', u);
+ConnectApi.CredentialValueInput p = new ConnectApi.CredentialValueInput();
+p.encrypted = true; p.value = 'not-used'; creds.put('password', p);
+input.credentials = creds;
+ConnectApi.NamedCredentials.createCredential(input);
+
+// Grant access via SetupEntityAccess
+SetupEntityAccess sea = new SetupEntityAccess();
+sea.ParentId = [SELECT Id FROM PermissionSet WHERE Name = 'O_G_All_Access' LIMIT 1].Id;
+sea.SetupEntityId = '0pug...principalId'; // from Connect API response
+insert sea;
+```
+
+**Step 4: Create an Apex Service with @future(callout=true)**
+
+⚠️ The flow runs in the same transaction as the record update. Use `@future(callout=true)` to avoid the "uncommitted work pending" error.
+
+```apex
+public with sharing class SlackAlertService {
+
+    @InvocableMethod(label='Send HSE Slack Alert')
+    public static void sendAlert(List<Id> recordIds) {
+        List<HSE_Incident__c> incidents = [
+            SELECT Id, Incident_Type__c, Location__c, Incident_Date__c, CreatedBy.Name
+            FROM HSE_Incident__c WHERE Id IN :recordIds
+        ];
+        for (HSE_Incident__c inc : incidents) {
+            sendAlertAsync(inc.Id, inc.Incident_Type__c, inc.Location__c,
+                inc.Incident_Date__c, inc.CreatedBy.Name);
+        }
+    }
+
+    @future(callout=true)
+    private static void sendAlertAsync(Id incidentId, String incidentType,
+            String location, Date incidentDate, String reportedBy) {
+        String recordUrl = Url.getOrgDomainUrl().toExternalForm() + '/' + incidentId;
+        String slackText = '*🚨 CRITICAL HSE INCIDENT*\n' +
+            '*Type:* ' + incidentType + '\n*Location:* ' + location + '\n' +
+            '*Date:* ' + incidentDate + '\n*Reported by:* ' + reportedBy + '\n' +
+            '<' + recordUrl + '|View in Salesforce>';
+
+        Map<String, Object> message = new Map<String, Object>();
+        message.put('channel', '#hse-emergency');
+        message.put('blocks', new List<Object>{
+            new Map<String, Object>{
+                'type' => 'section',
+                'text' => new Map<String, Object>{
+                    'type' => 'mrkdwn', 'text' => slackText
+                }
+            }
+        });
+
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('callout:Slack_HSE_Webhook');
+        req.setMethod('POST');
+        req.setHeader('Content-Type', 'application/json');
+        req.setBody(JSON.serialize(message));
+        req.setTimeout(10000);
+
+        try {
+            HttpResponse res = new Http().send(req);
+            if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
+                insert new Task(Subject = 'Slack Alert Failed',
+                    Description = 'HTTP ' + res.getStatusCode() + ': ' + res.getBody(),
+                    Priority = 'High', Status = 'Not Started', WhatId = incidentId);
+            }
+        } catch (Exception e) {
+            insert new Task(Subject = 'Slack Alert Failed',
+                Description = e.getMessage(),
+                Priority = 'High', Status = 'Not Started', WhatId = incidentId);
+        }
+    }
+}
+```
+
+**Step 5: Create the Flow**
 
 ```
 Flow: HSE_Critical_Slack_Alert
   Trigger: Record-Triggered (Update) on HSE_Incident__c
   Condition: Severity__c = 'Critical' AND PRIORVALUE(Severity__c) != 'Critical'
-  Action: HTTP Callout
-    Method: POST
-    URL: https://hooks.slack.com/services/T00/B00/xxxxx
-    Body:
-      {
-        "channel": "#hse-emergency",
-        "blocks": [
-          { "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*🚨 CRITICAL HSE INCIDENT*\n*Type:* {!$Record.Incident_Type__c}\n*Location:* {!$Record.Location__c}\n*Date:* {!$Record.Incident_Date__c}\n*Reported by:* {!$Record.CreatedBy.Name}\n<{!$Record.Link}|View in Salesforce>"
-            }
-          }
-        ]
-      }
+  Action: Invocable Apex → SlackAlertService.sendAlert (pass $Record.Id)
+  Transaction Model: CurrentTransaction
+  Status: Active
 ```
 
-**Step 4: Activate the Flow**
+**Step 6: Activate the Flow**
 
+```
 Setup → Flows → HSE_Critical_Slack_Alert → Activate
+```
 
 ### 1.3 Well Production Dashboard (CRM Analytics)
 
@@ -260,14 +509,17 @@ trigger MeasurementTrigger on Measurement__c (after insert) {
 
 ### 2.2 Drilling Data Integration (Petrel / EDM)
 
-**Step 1: Create External Object Mapping**
+**Step 1: Create Named Credential for Petrel API**
 
+Create an External Credential + Named Credential (same SecuredEndpoint pattern as in 1.1) to avoid hardcoding the Petrel API URL and auth token in Apex:
+
+```apex
+// Reference in Apex: callout:PetrelAPI/wells?status=active
 ```
-Setup → External Data Sources → New
-  External Data Source: PetrelWells
-  Type: Salesforce Connect: OData 4.0
-  URL: https://petrel-api.company.com/odata
-```
+
+For the authentication method, choose the protocol that matches Petrel's API:
+- **Basic** for username/password (store in Principal credentials)
+- **Custom** for API key in a header
 
 **Step 2: Sync Wells to Custom Object**
 
@@ -709,7 +961,63 @@ sf project deploy start --target-org "Oil gas" --pre-destructive-changes destruc
 sf project retrieve start --target-org "Oil gas" -m "CustomObject:A,Layout,Flow,ApexClass,PermissionSet"
 ```
 
-### C. Enhancement ROI Matrix
+### C. Secret Management Strategy
+
+**Never store secrets in metadata XML files.** The `.env` file at the project root is the source of truth:
+
+```
+# .env
+OIL_PRICE_API_KEY=xxx
+EIA_API_KEY=xxx
+SLACK_WEBHOOK_URL=xxx
+```
+
+After deploying External Credentials + Named Credentials, populate the Principal credentials via the Connect REST API or Apex:
+
+```bash
+# 1. Add a principal to the External Credential
+curl -X PUT https://domain.my.salesforce.com/services/data/v66.0/named-credentials/external-credentials/MyCred \
+  -H "Authorization: Bearer $token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "authenticationProtocol": "Basic",
+    "masterLabel": "MyCred",
+    "developerName": "MyCred",
+    "principals": [{"principalName": "NamedPrincipal", "principalType": "NamedPrincipal", "sequenceNumber": 1}]
+  }'
+
+# 2. Set credential values
+sf apex run --target-org myOrg --file scripts/set_credentials.apex
+```
+
+The Apex script reads from the Connect API:
+
+```apex
+ConnectApi.CredentialInput input = new ConnectApi.CredentialInput();
+input.externalCredential = 'MyCred';
+input.principalType = ConnectApi.CredentialPrincipalType.NamedPrincipal;
+input.principalName = 'NamedPrincipal';
+input.authenticationProtocol = ConnectApi.CredentialAuthenticationProtocol.Basic;
+// Map of credential values (username, password, or custom params)
+Map<String, ConnectApi.CredentialValueInput> creds = new Map<String, ConnectApi.CredentialValueInput>();
+ConnectApi.CredentialValueInput val = new ConnectApi.CredentialValueInput();
+val.encrypted = true;
+val.value = 'the-secret-value';
+creds.put('password', val);
+input.credentials = creds;
+ConnectApi.NamedCredentials.createCredential(input);
+```
+
+Then grant user access via `SetupEntityAccess`:
+
+```apex
+SetupEntityAccess sea = new SetupEntityAccess();
+sea.ParentId = [SELECT Id FROM PermissionSet WHERE Name = 'O_G_All_Access' LIMIT 1].Id;
+sea.SetupEntityId = principalId; // from Connect API response
+insert sea;
+```
+
+### D. Enhancement ROI Matrix
 
 | Enhancement | Effort | Impact | Timeline |
 |---|---|---|---|

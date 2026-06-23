@@ -6,7 +6,7 @@ All custom objects, fields, Apex classes, triggers, LWCs, permission sets, and r
 
 ---
 
-## What was fixed (12 deploys)
+## Session 1: What was fixed (12 deploys)
 
 ### Schema
 - **12 LongTextArea fields** were changed from `<type>TextArea</type>` → `<type>LongTextArea</type>` with `<length>32768</length>` added
@@ -38,14 +38,40 @@ All custom objects, fields, Apex classes, triggers, LWCs, permission sets, and r
 
 ---
 
-## Manual steps still needed (not in source)
+## Session 2: Commodity Pricing Integration & O&G Services
 
-1. **8 Flows** — `force-app/main/default/flows/` is empty, create manually
-2. **Case Record Types** — not in source
-3. **Opportunity Record Types** — not in source
-4. **`pipelineIntegrityDashboard` LWC** — missing
-5. **`leaseMapView` LWC** — missing
-6. **Oil & Gas Settings** — any org-specific setup
+### Deployed
+- **Apex Classes (15 total):**
+  - `WellStatusService` — Well lifecycle state machine (Permitted→Drilling→Producing→Shut-In→Suspended→Plugged→Abandoned)
+  - `ProductionAllocationService` — Production split across working interests
+  - `PipelineIntegrityService` — Risk scoring & assessment recommendations
+  - `InventoryBalanceService` — Daily volume changes, min/max alerts
+  - `InspectionService` — Recurring inspection scheduling
+  - `PermitToWorkValidationService` — Permit validation & approvals
+  - `ComplianceDueDateService` — Compliance deadline tracking
+  - `HSEIncidentService` — Incident severity scoring & escalation
+  - `CommodityPricingService` — OilPriceAPI integration (`@future(callout=true)`)
+  - `CommodityPriceSyncScheduler` — Schedulable wrapper for daily 06:00 sync
+  - `TestCommercialServices`, `TestFieldServices`, `TestHSEServices`, `TestWellLifecycle` — Test classes
+- **CSP Trusted Site:** `CommodityPricing` for `https://api.oilpriceapi.com`
+- **Named Credential:** `CommodityPricing` (Anonymous, NoAuthentication — auth in code)
+- **Permission Set:** `Energy_Platform_Admin`
+- **Scheduled Job:** Daily sync at 06:00 (Job Id: `08egK00000WlJrHQAV`, state: `WAITING`)
+
+### Key Decisions
+- **Auth in-code:** NamedCredential `authValues` not supported in API v66.0 → set `Authorization: Token` header via `req.setHeader()` in Apex
+- **OilPriceAPI per-commodity:** API returns one price per `?by_code=CODE` (no bulk) → loop per commodity
+- **Code-to-API mapping:** `Crude→WTI_USD`, `Gas→NATURAL_GAS_USD`, `NGL→BRENT_CRUDE_USD`, `Refined→GASOLINE_USD`, `Diesel→DIESEL_USD`, `Jet Fuel→JET_FUEL_USD`, `Heating Oil→HEATING_OIL_USD`
+
+---
+
+## Remaining for Next Session
+
+1. **Deploy 8 custom objects** (`Well__c`, `Supply_Agreement__c`, `Inspection__c`, `Permit_to_Work__c`, `HSE_Incident__c`, `Pipeline_Segment__c`, etc.) — prerequisite for Apex/Flows
+2. **Deploy 9 flows** (`Compliance_Calendar`, `Field_Service_Dispatch`, `HSE_Incident_Escalation`, `Inspection_Due`, `Joint_Venture_Billing`, `Land_Lease_Expiration`, `Pipeline_Maintenance_Schedule`, `Production_Decline`, `Well_Shut_Down`)
+3. **Verify `Commodity__c` picklist** on `Supply_Agreement__c` has all required values
+4. **Run all 4 test classes** to validate services
+5. **Verify data** — check `Supply_Agreement__c` records exist for daily sync
 
 ---
 

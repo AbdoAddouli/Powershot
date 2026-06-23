@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>Inspection</label>
     <nameField>
-        <label>Inspection</label>
+    <label>Inspection</label>
+    <description>Manages scheduled and completed inspections for assets, pipelines, wells, and facilities with recurring inspection support.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

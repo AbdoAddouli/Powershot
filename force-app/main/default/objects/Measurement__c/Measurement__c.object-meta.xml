@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>Measurement</label>
     <nameField>
-        <label>Measurement</label>
+    <label>Measurement</label>
+    <description>Records flow measurement data from wellheads, pipelines, and meters for production volume tracking and allocation.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Terminal</label>
+    <description>Manages storage terminal facilities including capacity, commodity types, and operational status for product handling.</description>
     <nameField>
         <label>Terminal Code</label>
         <type>AutoNumber</type>

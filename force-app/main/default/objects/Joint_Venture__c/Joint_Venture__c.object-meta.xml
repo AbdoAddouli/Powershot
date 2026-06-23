@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Joint Venture</label>
+    <description>Represents partnership agreements between operators and working interest partners for shared oil and gas operations.</description>
     <nameField>
         <label>JV Name</label>
         <type>Text</type>

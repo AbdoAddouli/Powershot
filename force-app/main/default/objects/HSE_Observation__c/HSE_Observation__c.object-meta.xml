@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>HSE Observation</label>
     <nameField>
-        <label>HSE Observation</label>
+    <label>HSE Observation</label>
+    <description>Captures proactive safety observations, hazard identifications, and positive safety behaviors for continuous HSE improvement.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

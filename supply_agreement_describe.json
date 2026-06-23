@@ -1,0 +1,9 @@
+﻿sf.cmd :  ┬╗   Warning: @salesforce/cli update available from [92m2.135.7[39m to [92m2.139.6[39m.
+At line:1 char:1
++ & "C:\Program Files\sf\bin\sf.cmd" api request --method GET --path "/ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( ┬╗   Warning: ...2m2.139.6[39m.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ ┬╗   Warning: [33mapi request[39m is not a sf command.
+ ┬╗   Error: Run [36m[1msf help api[22m[39m for a list of available commands.

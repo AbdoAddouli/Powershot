@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Sends Slack alert to #hse-emergency when HSE incident severity changes to Critical</description>
+    <label>HSE Critical Slack Alert</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Send_Slack_Alert</targetReference>
+        </connector>
+        <filterFormula>AND(TEXT(Severity__c) = &quot;Critical&quot;, TEXT($Record__Prior.Severity__c) != &quot;Critical&quot;)</filterFormula>
+        <object>HSE_Incident__c</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <actionCalls>
+        <name>Send_Slack_Alert</name>
+        <label>Send Slack Alert</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <actionName>SlackAlertService</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordIds</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <status>Active</status>
+</Flow>

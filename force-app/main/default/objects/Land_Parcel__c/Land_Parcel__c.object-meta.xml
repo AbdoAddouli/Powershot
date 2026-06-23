@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Land Parcel</label>
+    <description>Tracks surface and mineral land parcels including ownership, acreage, legal descriptions, and lease assignments.</description>
     <nameField>
         <label>Parcel Number</label>
         <type>AutoNumber</type>

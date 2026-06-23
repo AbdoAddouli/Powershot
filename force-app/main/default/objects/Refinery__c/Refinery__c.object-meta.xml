@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Refinery</label>
+    <description>Manages refinery facility information including capacity, PADD district, Nelson Complexity Index, and operational status.</description>
     <nameField>
         <label>Refinery Name</label>
         <type>Text</type>

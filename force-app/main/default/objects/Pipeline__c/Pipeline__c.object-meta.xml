@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Pipeline</label>
+    <description>Manages pipeline infrastructure assets including capacity, commodity type, inspection compliance, and integrity status.</description>
     <nameField>
         <label>Pipeline Name</label>
         <type>Text</type>

@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Pipeline Station</label>
+    <description>Tracks pipeline stations, pump stations, and compressor stations along pipeline routes with operational status.</description>
     <nameField>
         <label>Station Name</label>
         <type>Text</type>

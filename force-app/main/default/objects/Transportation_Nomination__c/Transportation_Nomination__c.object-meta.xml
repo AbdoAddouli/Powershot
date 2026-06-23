@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Transportation Nomination</label>
+    <description>Manages pipeline and trucking transport nominations for crude, gas, and refined product movements.</description>
     <nameField>
         <label>Nomination</label>
         <type>AutoNumber</type>

@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>Permit to Work</label>
     <nameField>
-        <label>Permit to Work</label>
+    <label>Permit to Work</label>
+    <description>Controls high-risk work authorizations with isolation verification, gas testing, and multi-level approval chains.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

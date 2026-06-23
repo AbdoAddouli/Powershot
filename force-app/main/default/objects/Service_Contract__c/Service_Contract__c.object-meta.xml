@@ -17,7 +17,8 @@
     <enableStreamingApi>true</enableStreamingApi>
     <label>Service Contract</label>
     <nameField>
-        <label>Service Contract</label>
+    <label>Service Contract</label>
+    <description>Manages contracts with third-party service providers for well services, maintenance, and field operations.</description>
         <type>AutoNumber</type>
         <displayFormat>{0000}</displayFormat>
     </nameField>

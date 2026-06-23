@@ -16,6 +16,7 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <label>Lease</label>
+    <description>Manages oil and gas lease contracts including royalty rates, working interest, revenue interest, and lease terms.</description>
     <nameField>
         <label>Lease Number</label>
         <type>AutoNumber</type>
