@@ -118,6 +118,7 @@ public with sharing class HSEIncidentService {
             for (GroupMember gm : complianceMembers) {
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                 mail.setTargetObjectId(gm.UserOrGroupId);
+                mail.setSaveAsActivity(false);
                 mail.setSubject('Regulatory Reportable Incident: ' + incident.Name);
                 mail.setPlainTextBody(
                     'A regulatory reportable incident has been reported.\n\n' +
@@ -205,6 +206,7 @@ public with sharing class HSEIncidentService {
             for (GroupMember gm : execMembers) {
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                 mail.setTargetObjectId(gm.UserOrGroupId);
+                mail.setSaveAsActivity(false);
                 mail.setSubject('CRITICAL INCIDENT ESCALATION: ' + incident.Name);
                 mail.setPlainTextBody(
                     'A critical incident requires immediate executive attention.\n\n' +

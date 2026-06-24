@@ -63,5 +63,4 @@
     <tabs>Invoice__c</tabs>
     <tabs>standard-WorkOrder</tabs>
     <uiType>Lightning</uiType>
-    <utilityBar>PowerShot_UtilityBar</utilityBar>
 </CustomApplication>

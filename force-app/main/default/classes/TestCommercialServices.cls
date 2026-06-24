@@ -234,6 +234,37 @@ public with sharing class TestCommercialServices {
     }
 
     @IsTest
+    static void testProductionAllocationTriggerUpdateValid() {
+        Production_Allocation__c alloc = [SELECT Id, Working_Interest_Share__c, Net_Revenue_Interest_Share__c FROM Production_Allocation__c LIMIT 1];
+        alloc.Working_Interest_Share__c = 100;
+        alloc.Net_Revenue_Interest_Share__c = 100;
+
+        Test.startTest();
+        update alloc;
+        Test.stopTest();
+
+        Production_Allocation__c result = [SELECT Id, Working_Interest_Share__c, Net_Revenue_Interest_Share__c FROM Production_Allocation__c WHERE Id = :alloc.Id];
+        Assert.areEqual(100, result.Working_Interest_Share__c);
+        Assert.areEqual(100, result.Net_Revenue_Interest_Share__c);
+    }
+
+    @IsTest
+    static void testProductionAllocationTriggerUpdateInvalid() {
+        Production_Allocation__c alloc = [SELECT Id, Working_Interest_Share__c, Net_Revenue_Interest_Share__c FROM Production_Allocation__c LIMIT 1];
+        alloc.Working_Interest_Share__c = 150;
+        alloc.Net_Revenue_Interest_Share__c = 100;
+
+        Test.startTest();
+        try {
+            update alloc;
+            Assert.fail('Should have thrown');
+        } catch (Exception e) {
+            Assert.isTrue(e.getMessage().contains('200%'));
+        }
+        Test.stopTest();
+    }
+
+    @IsTest
     static void testProductionAllocationTriggerValidatesWI() {
         Well__c well = [SELECT Id FROM Well__c LIMIT 1];
 

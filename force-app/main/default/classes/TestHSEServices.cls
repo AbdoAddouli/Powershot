@@ -346,6 +346,90 @@ public with sharing class TestHSEServices {
         Assert.areEqual(1, errorTasks.size(), 'Error task should be created on callout failure');
     }
 
+    @IsTest
+    static void testNotifyComplianceTeam() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Group grp = new Group(Name = 'HSE_Compliance_Team', Type = 'Regular');
+            insert grp;
+            insert new GroupMember(GroupId = grp.Id, UserOrGroupId = UserInfo.getUserId());
+        }
+
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+
+        Test.startTest();
+        HSEIncidentService.notifyComplianceTeam(inc.Id);
+        Test.stopTest();
+
+        List<Task> tasks = [SELECT Id, Subject FROM Task WHERE WhatId = :inc.Id];
+        Assert.isFalse(tasks.isEmpty(), 'Compliance tasks should be created');
+        Boolean foundComplianceTask = false;
+        for (Task t : tasks) {
+            if (t.Subject.contains('Compliance Notification')) {
+                foundComplianceTask = true;
+                break;
+            }
+        }
+        Assert.isTrue(foundComplianceTask, 'Subject should contain Compliance Notification');
+    }
+
+    @IsTest
+    static void testEscalateIfCritical() {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            Group grp = new Group(Name = 'Executive_Leadership', Type = 'Regular');
+            insert grp;
+            insert new GroupMember(GroupId = grp.Id, UserOrGroupId = UserInfo.getUserId());
+        }
+
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+
+        Test.startTest();
+        HSEIncidentService.escalateIfCritical(inc.Id);
+        Test.stopTest();
+
+        List<Task> tasks = [SELECT Id, Subject FROM Task WHERE WhatId = :inc.Id];
+        Assert.isFalse(tasks.isEmpty(), 'Escalation tasks should be created');
+        Boolean foundEscalationTask = false;
+        for (Task t : tasks) {
+            if (t.Subject.contains('Critical Incident Escalation')) {
+                foundEscalationTask = true;
+                break;
+            }
+        }
+        Assert.isTrue(foundEscalationTask, 'Subject should contain Critical Incident Escalation');
+    }
+
+    @IsTest
+    static void testIsRegulatoryReportableBySeverityHigh() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+        inc.Fatality_Occurred__c = false;
+        inc.Spill_Volume__c = 5000;
+        inc.Injury_Type__c = null;
+        inc.Environmental_Impact__c = null;
+        update inc;
+
+        Test.startTest();
+        Boolean reportable = HSEIncidentService.isRegulatoryReportable(inc.Id);
+        Test.stopTest();
+
+        Assert.isTrue(reportable, 'High severity should be reportable');
+    }
+
+    @IsTest
+    static void testIsRegulatoryReportableByInjuryLostTime() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+        inc.Fatality_Occurred__c = false;
+        inc.Spill_Volume__c = null;
+        inc.Injury_Type__c = 'Lost Time';
+        inc.Environmental_Impact__c = null;
+        update inc;
+
+        Test.startTest();
+        Boolean reportable = HSEIncidentService.isRegulatoryReportable(inc.Id);
+        Test.stopTest();
+
+        Assert.isTrue(reportable, 'Lost Time injury should be reportable');
+    }
+
     private class SlackCalloutMock implements HttpCalloutMock {
         private Integer statusCode;
         private String body;
