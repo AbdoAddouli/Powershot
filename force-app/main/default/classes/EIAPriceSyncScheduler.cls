@@ -16,7 +16,7 @@ public with sharing class EIAPriceSyncScheduler implements Schedulable {
     public void execute(SchedulableContext ctx) {
         List<Supply_Agreement__c> agreements = [
             SELECT Id FROM Supply_Agreement__c
-            WHERE Commodity__c != NULL
+            WHERE Commodity_v2__c != NULL
         ];
         EIAPricingService.syncPricesForAgreements(agreements);
 

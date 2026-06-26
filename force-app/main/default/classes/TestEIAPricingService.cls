@@ -149,7 +149,7 @@ public with sharing class TestEIAPricingService {
         insert acct;
         Supply_Agreement__c ag = new Supply_Agreement__c(
             Account__c = acct.Id,
-            Commodity__c = 'Refined', Status__c = 'Active'
+            Commodity_v2__c = 'Refined', Status__c = 'Active'
         );
         insert ag;
 

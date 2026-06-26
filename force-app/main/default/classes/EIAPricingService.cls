@@ -6,7 +6,7 @@
  * national inventory stock levels.
  *
  * Retail Prices (pri/gnd):
- *   Maps Supply_Agreement__c.Commodity__c ('Refined', 'Gas') to EIA product
+ *   Maps Supply_Agreement__c.Commodity_v2__c ('Refined', 'Gas') to EIA product
  *   code EPM0 (Total Gasoline) and updates Current_Price__c.
  *
  * Inventory Stocks (stoc/wstk):
@@ -52,9 +52,9 @@ public with sharing class EIAPricingService {
     @TestVisible
     private static void processPriceSync(Set<Id> agreementIds) {
         List<Supply_Agreement__c> agreements = [
-            SELECT Id, Commodity__c, Current_Price__c
+            SELECT Id, Commodity_v2__c, Current_Price__c
             FROM Supply_Agreement__c
-            WHERE Id IN :agreementIds AND Commodity__c != NULL
+            WHERE Id IN :agreementIds AND Commodity_v2__c != NULL
         ];
 
         if (agreements.isEmpty()) return;
@@ -63,7 +63,7 @@ public with sharing class EIAPricingService {
 
         Set<String> commodities = new Set<String>();
         for (Supply_Agreement__c ag : agreements) {
-            commodities.add(ag.Commodity__c);
+            commodities.add(ag.Commodity_v2__c);
         }
 
         for (String commodity : commodities) {
@@ -78,8 +78,8 @@ public with sharing class EIAPricingService {
 
         List<Supply_Agreement__c> updates = new List<Supply_Agreement__c>();
         for (Supply_Agreement__c ag : agreements) {
-            if (priceByCommodity.containsKey(ag.Commodity__c)) {
-                ag.Current_Price__c = priceByCommodity.get(ag.Commodity__c);
+            if (priceByCommodity.containsKey(ag.Commodity_v2__c)) {
+                ag.Current_Price__c = priceByCommodity.get(ag.Commodity_v2__c);
                 updates.add(ag);
             }
         }

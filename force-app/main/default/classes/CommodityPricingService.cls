@@ -26,7 +26,7 @@ public with sharing class CommodityPricingService {
     @future(callout=true)
     public static void syncPrices(Set<Id> agreementIds) {
         List<Supply_Agreement__c> agreements = [
-            SELECT Id, Commodity__c, Current_Price__c
+            SELECT Id, Commodity_v2__c, Current_Price__c
             FROM Supply_Agreement__c
             WHERE Id IN :agreementIds
         ];
@@ -35,8 +35,8 @@ public with sharing class CommodityPricingService {
 
         Set<String> commodities = new Set<String>();
         for (Supply_Agreement__c ag : agreements) {
-            if (ag.Commodity__c != null) {
-                commodities.add(ag.Commodity__c);
+            if (ag.Commodity_v2__c != null) {
+                commodities.add(ag.Commodity_v2__c);
             }
         }
 
@@ -54,8 +54,8 @@ public with sharing class CommodityPricingService {
 
         List<Supply_Agreement__c> updates = new List<Supply_Agreement__c>();
         for (Supply_Agreement__c ag : agreements) {
-            if (priceByCode.containsKey(ag.Commodity__c)) {
-                ag.Current_Price__c = priceByCode.get(ag.Commodity__c);
+            if (priceByCode.containsKey(ag.Commodity_v2__c)) {
+                ag.Current_Price__c = priceByCode.get(ag.Commodity_v2__c);
                 updates.add(ag);
             }
         }
