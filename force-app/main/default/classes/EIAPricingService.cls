@@ -49,8 +49,7 @@ public with sharing class EIAPricingService {
         processStockSync(inventoryIds);
     }
 
-    @TestVisible
-    private static void processPriceSync(Set<Id> agreementIds) {
+    public static void processPriceSync(Set<Id> agreementIds) {
         List<Supply_Agreement__c> agreements = [
             SELECT Id, Commodity_v2__c, Current_Price__c
             FROM Supply_Agreement__c
@@ -89,8 +88,7 @@ public with sharing class EIAPricingService {
         }
     }
 
-    @TestVisible
-    private static void processStockSync(Set<Id> inventoryIds) {
+    public static void processStockSync(Set<Id> inventoryIds) {
         List<Fuel_Inventory__c> inventories = [
             SELECT Id, Product__c, Product_Type__c, Current_Volume__c, EIA_National_Stock__c
             FROM Fuel_Inventory__c

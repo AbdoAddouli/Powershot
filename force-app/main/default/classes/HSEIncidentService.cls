@@ -107,17 +107,20 @@ public with sharing class HSEIncidentService {
         if (incidents.isEmpty()) return;
 
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
-        List<GroupMember> complianceMembers = [
-            SELECT UserOrGroupId
-            FROM GroupMember
-            WHERE Group.Name = 'HSE_Compliance_Team'
+        List<User> complianceUsers = [
+            SELECT Id, Email
+            FROM User
+            WHERE Id IN (
+                SELECT UserOrGroupId FROM GroupMember
+                WHERE Group.Name = 'HSE_Compliance_Team'
+            )
         ];
         List<Task> tasks = new List<Task>();
 
         for (HSE_Incident__c incident : incidents) {
-            for (GroupMember gm : complianceMembers) {
+            for (User u : complianceUsers) {
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                mail.setTargetObjectId(gm.UserOrGroupId);
+                mail.setTargetObjectId(u.Id);
                 mail.setSaveAsActivity(false);
                 mail.setSubject('Regulatory Reportable Incident: ' + incident.Name);
                 mail.setPlainTextBody(
@@ -195,17 +198,20 @@ public with sharing class HSEIncidentService {
         if (incidents.isEmpty()) return;
 
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
-        List<GroupMember> execMembers = [
-            SELECT UserOrGroupId
-            FROM GroupMember
-            WHERE Group.Name = 'Executive_Leadership'
+        List<User> execUsers = [
+            SELECT Id, Email
+            FROM User
+            WHERE Id IN (
+                SELECT UserOrGroupId FROM GroupMember
+                WHERE Group.Name = 'Executive_Leadership'
+            )
         ];
         List<Task> tasks = new List<Task>();
 
         for (HSE_Incident__c incident : incidents) {
-            for (GroupMember gm : execMembers) {
+            for (User u : execUsers) {
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                mail.setTargetObjectId(gm.UserOrGroupId);
+                mail.setTargetObjectId(u.Id);
                 mail.setSaveAsActivity(false);
                 mail.setSubject('CRITICAL INCIDENT ESCALATION: ' + incident.Name);
                 mail.setPlainTextBody(

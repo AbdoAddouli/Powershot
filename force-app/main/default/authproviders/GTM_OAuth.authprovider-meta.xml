@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuthProvider xmlns="http://soap.sforce.com/2006/04/metadata">
+    <authorizeUrl>https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&amp;access_type=offline</authorizeUrl>
+    <consumerKey>130324151754-bu9j0ec5f7sno36hkndn4slntb9dh89l.apps.googleusercontent.com</consumerKey>
+    <consumerSecret>Placeholder_Value</consumerSecret>
+    <defaultScopes>openid email profile https://www.googleapis.com/auth/tagmanager.manage.accounts https://www.googleapis.com/auth/analytics.edit https://www.googleapis.com/auth/analytics.readonly</defaultScopes>
+    <friendlyName>GTM_OAuth</friendlyName>
+    <includeOrgIdInIdentifier>false</includeOrgIdInIdentifier>
+    <isPkceEnabled>true</isPkceEnabled>
+    <providerType>Google</providerType>
+    <requireMfa>false</requireMfa>
+    <sendAccessTokenInHeader>false</sendAccessTokenInHeader>
+    <sendClientCredentialsInHeader>false</sendClientCredentialsInHeader>
+    <sendSecretInApis>true</sendSecretInApis>
+    <tokenUrl>https://accounts.google.com/o/oauth2/token</tokenUrl>
+    <userInfoUrl>https://www.googleapis.com/oauth2/userinfo</userInfoUrl>
+</AuthProvider>

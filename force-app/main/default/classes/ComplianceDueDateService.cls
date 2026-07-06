@@ -43,6 +43,7 @@ public with sharing class ComplianceDueDateService {
                 AND Status__c != 'Submitted'
                 AND Status__c != 'Waived'
             ORDER BY Due_Date__c ASC
+            LIMIT 50000
         ];
     }
 

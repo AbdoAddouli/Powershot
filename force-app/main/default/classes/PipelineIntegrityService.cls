@@ -56,31 +56,10 @@ public with sharing class PipelineIntegrityService {
     /**
      * Batch-updates Compliance_Status__c on all pipelines to 'Compliant' or
      * 'Non-Compliant' based on inspection recency.
+     * Uses Database.Batchable internally for large data volumes.
      */
     public static void flagNonCompliantPipelines() {
-        List<Pipeline__c> pipelines = [
-            SELECT Id, Last_Inspection_Date__c, Required_Inspection_Interval_Months__c,
-                   Compliance_Status__c
-            FROM Pipeline__c
-            ORDER BY Last_Inspection_Date__c ASC
-            LIMIT 10000
-        ];
-
-        List<Pipeline__c> toUpdate = new List<Pipeline__c>();
-
-        for (Pipeline__c pipeline : pipelines) {
-            Boolean compliant = isInspectionCompliant(pipeline.Id);
-
-            String expectedStatus = compliant ? 'Compliant' : 'Non-Compliant';
-            if (pipeline.Compliance_Status__c != expectedStatus) {
-                pipeline.Compliance_Status__c = expectedStatus;
-                toUpdate.add(pipeline);
-            }
-        }
-
-        if (!toUpdate.isEmpty()) {
-            update toUpdate;
-        }
+        Database.executeBatch(new PipelineIntegrityBatch(), 200);
     }
 
     /**

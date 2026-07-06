@@ -1,6 +1,5 @@
 public class SlackAlertQueueable implements Queueable, Database.AllowsCallouts {
     private final Id incidentId;
-    private static final String SLACK_ENDPOINT = 'https://hooks.slack.com/services/REPLACED/REPLACED/REPLACED';
 
     public SlackAlertQueueable(Id incidentId) {
         this.incidentId = incidentId;
@@ -49,9 +48,16 @@ public class SlackAlertQueueable implements Queueable, Database.AllowsCallouts {
     }
 
     private static void sendToSlack(Id incidentId, String messageJson) {
+        GTM_Config__c config = GTM_Config__c.getInstance();
+        String webhookUrl = config != null ? config.Slack_Webhook_URL__c : null;
+        if (String.isBlank(webhookUrl)) {
+            createErrorTask(incidentId, 'Slack webhook URL not configured in GTM_Config__c.Slack_Webhook_URL__c');
+            return;
+        }
+
         Http http = new Http();
         HttpRequest req = new HttpRequest();
-        req.setEndpoint(SLACK_ENDPOINT);
+        req.setEndpoint(webhookUrl);
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json');
         req.setBody(messageJson);

@@ -17,7 +17,11 @@ public with sharing class CommodityPriceSyncScheduler implements Schedulable {
         List<Supply_Agreement__c> agreements = [
             SELECT Id FROM Supply_Agreement__c
             WHERE Commodity_v2__c != NULL
+            LIMIT 50000
         ];
-        CommodityPricingService.syncPricesForAgreements(agreements);
+        if (!agreements.isEmpty()) {
+            Set<Id> agreementIds = (new Map<Id, Supply_Agreement__c>(agreements)).keySet();
+            System.enqueueJob(new CommodityPriceSyncQueueable(agreementIds));
+        }
     }
 }

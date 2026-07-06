@@ -66,7 +66,7 @@ public with sharing class ProductionAllocationService {
 
     /**
      * Validates that the total Working Interest for a well does not exceed 100 %
-     * across all allocations (existing + new). Adds an error on the record if violated.
+     * for the same period. Adds an error on the record if violated.
      * @param newAllocations  The allocations being inserted
      */
     public static void validateWorkingInterest(List<Production_Allocation__c> newAllocations) {
@@ -81,7 +81,7 @@ public with sharing class ProductionAllocationService {
 
         Map<Id, List<Production_Allocation__c>> existingByWell = new Map<Id, List<Production_Allocation__c>>();
         for (Production_Allocation__c alloc : [
-            SELECT Well__c, Working_Interest_Share__c
+            SELECT Well__c, Working_Interest_Share__c, Period_Start__c, Period_End__c
             FROM Production_Allocation__c
             WHERE Well__c IN :wellIds
         ]) {
@@ -93,19 +93,26 @@ public with sharing class ProductionAllocationService {
 
         for (Production_Allocation__c alloc : newAllocations) {
             if (alloc.Well__c != null && existingByWell.containsKey(alloc.Well__c)) {
-                List<Production_Allocation__c> existing = existingByWell.get(alloc.Well__c);
                 Decimal totalWi = alloc.Working_Interest_Share__c != null ? alloc.Working_Interest_Share__c : 0;
-                for (Production_Allocation__c ex : existing) {
-                    totalWi += ex.Working_Interest_Share__c != null ? ex.Working_Interest_Share__c : 0;
+                for (Production_Allocation__c ex : existingByWell.get(alloc.Well__c)) {
+                    if (ex.Id == alloc.Id) continue;
+                    if (periodsOverlap(alloc.Period_Start__c, alloc.Period_End__c, ex.Period_Start__c, ex.Period_End__c)) {
+                        totalWi += ex.Working_Interest_Share__c != null ? ex.Working_Interest_Share__c : 0;
+                    }
                 }
                 if (totalWi > 100) {
                     alloc.addError(
                         'Total Working Interest for well ' + alloc.Well__c +
-                        ' exceeds 100%. Current total: ' + totalWi + '%'
+                        ' exceeds 100% for this period. Current total: ' + totalWi + '%'
                     );
                 }
             }
         }
+    }
+
+    private static Boolean periodsOverlap(Date startA, Date endA, Date startB, Date endB) {
+        if (startA == null || endA == null || startB == null || endB == null) return true;
+        return startA <= endB && endA >= startB;
     }
 
     /**

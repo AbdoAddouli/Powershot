@@ -1,0 +1,313 @@
+<template>
+    <template if:true={showProvisioning}>
+        <c-store-provisioning ongotostores={handleGoToStores}></c-store-provisioning>
+    </template>
+
+    <template if:false={showProvisioning}>
+    <div class="container">
+        <div class="header">
+            <h2 class="title">Store Manager</h2>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" onclick={loadStores} title="Refresh stores">
+                    <lightning-icon icon-name="utility:refresh" size="small"></lightning-icon>
+                </button>
+                <button class="btn-primary" onclick={handleNewStore}>
+                    <lightning-icon icon-name="utility:add" size="small"></lightning-icon>
+                    New Store
+                </button>
+            </div>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={hasError}>
+            <lightning-card title="Error" icon-name="utility:error">
+                <div class="error-message">
+                    <lightning-icon icon-name="utility:warning" size="small"></lightning-icon>
+                    <p>{errorMessage}</p>
+                </div>
+            </lightning-card>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:true={hasStores}>
+<lightning-datatable
+    key-field="id"
+    data={stores}
+    columns={columns}
+    hide-checkbox-column
+    sorted-by={sortedBy}
+    sorted-direction={sortedDirection}
+    onsort={handleSort}
+    onrowaction={handleRowAction}
+    class="data-table">
+</lightning-datatable>
+            </template>
+
+            <template if:false={hasStores}>
+                <div class="empty-state">
+                    <lightning-icon icon-name="utility:store" size="large"></lightning-icon>
+                    <p>No stores configured yet.</p>
+                    <p class="empty-hint">Click "New Store" to add your TikTok or Snap store.</p>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={showDetailPanel}>
+            <section class="detail-panel">
+                <div class="detail-header">
+                    <h3>{selectedStoreName}</h3>
+                    <div class="detail-actions">
+                        <lightning-combobox
+                            name="detail-store-picker"
+                            label="Store"
+                            value={selectedDetailStoreId}
+                            placeholder="All Stores (Global)"
+                            options={detailStoreOptions}
+                            onchange={handleDetailStoreChange}
+                            variant="label-hidden"
+                            class="detail-store-picker">
+                        </lightning-combobox>
+                        <label class="auto-refresh-toggle">
+                            <lightning-input
+                                type="toggle"
+                                label="Auto-refresh"
+                                checked={autoRefresh}
+                                onchange={handleAutoRefreshToggle}
+                                variant="label-hidden">
+                            </lightning-input>
+                            <span class="toggle-label">Auto</span>
+                        </label>
+                        <button class="btn-icon" onclick={handleRefreshEvents} title="Refresh">
+                            <lightning-icon icon-name="utility:refresh" size="small"></lightning-icon>
+                        </button>
+                        <button class="btn-icon" onclick={handleCloseDetail} title="Close">
+                            <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <template if:true={selectedGtmUrl}>
+                    <div class="detail-links">
+                        <a href={selectedGtmUrl} target="_blank" class="detail-link" title="Open GTM container">
+                            <lightning-icon icon-name="utility:link" size="xx-small"></lightning-icon>
+                            GTM: {selectedGtmId}
+                        </a>
+                        <a href={selectedGa4Url} target="_blank" class="detail-link" title="Open GA4 property">
+                            <lightning-icon icon-name="utility:link" size="xx-small"></lightning-icon>
+                            GA4: {selectedGa4Id}
+                        </a>
+                    </div>
+                </template>
+
+                <template if:true={isEventsLoading}>
+                    <div class="spinner-container">
+                        <lightning-spinner alternative-text="Loading events" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+
+                <template if:false={isEventsLoading}>
+                    <template if:true={hasDetailData}>
+                        <div class="events-summary">
+                            <div class="summary-item">
+                                <span class="summary-value">{totalEventCount}</span>
+                                <span class="summary-label">Total Events</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-value">{uniqueEventCount}</span>
+                                <span class="summary-label">Event Types</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-value">{totalUserSum}</span>
+                                <span class="summary-label">Total Users</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-value">{topEventName}</span>
+                                <span class="summary-label">Top Event</span>
+                                <span class="summary-sub">{topEventCount}x</span>
+                            </div>
+                            <div class="summary-item summary-click">
+                                <span class="summary-value">{clickEventCount}</span>
+                                <span class="summary-label">Click Events</span>
+                                <span class="summary-sub">{clickTotalUsers} users &middot; {clickPercentage}% of events</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-toolbar">
+                            <div class="view-tabs">
+                                <button
+                                    class="tab-btn {activeView == 'all' ? 'active' : ''}"
+                                    value="all"
+                                    onclick={handleViewChange}>
+                                    All Events
+                                </button>
+                                <button
+                                    class="tab-btn {activeView == 'click' ? 'active' : ''}"
+                                    value="click"
+                                    onclick={handleViewChange}>
+                                    Click Events
+                                    <span class="tab-badge">{clickEvents.length}</span>
+                                </button>
+                            </div>
+                            <div class="toolbar-right">
+                                <lightning-input
+                                    label="Search events"
+                                    placeholder="Filter by event name..."
+                                    value={searchTerm}
+                                    onchange={handleSearch}
+                                    class="search-input">
+                                </lightning-input>
+                                <span class="record-count">{filteredEvents.length} event(s)</span>
+                            </div>
+                        </div>
+
+                        <template if:true={hasFilteredEvents}>
+                            <lightning-datatable
+                                key-field="id"
+                                data={filteredEvents}
+                                columns={eventColumns}
+                                hide-checkbox-column
+                                sorted-by={eventSortBy}
+                                sorted-direction={eventSortDirection}
+                                onsort={handleEventSort}
+                                class="data-table">
+                            </lightning-datatable>
+                        </template>
+
+                        <template if:false={hasFilteredEvents}>
+                            <div class="no-filtered-data">
+                                <lightning-icon icon-name="utility:search" size="small"></lightning-icon>
+                                <p>No events match your search</p>
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:false={hasDetailData}>
+                        <div class="empty-state small">
+                            <p>No event data available for this period.</p>
+                        </div>
+                    </template>
+
+                    <div class="last-updated">
+                        <small>
+                            Last updated: {lastUpdated}
+                            <template if:true={autoRefresh}>
+                                &middot; Auto-refreshing every 30s
+                            </template>
+                        </small>
+                    </div>
+                </template>
+            </section>
+        </template>
+    </div>
+
+    <template if:true={showModal}>
+        <section class="modal-backdrop" onclick={handleBackdropClick}>
+            <div class="modal-content" onclick={handleModalClick}>
+                <div class="modal-header">
+                    <h3>{formTitle}</h3>
+                    <button class="btn-icon" onclick={handleCancel} title="Close">
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <lightning-record-edit-form
+                        object-api-name="Store__c"
+                        record-id={editingStoreId}
+                        onsuccess={handleSaveSuccess}
+                        onerror={handleFormError}
+                        density="comfy">
+                        <lightning-messages></lightning-messages>
+
+                        <lightning-input-field field-name="Name"></lightning-input-field>
+                        <lightning-input-field field-name="Store_Type__c"></lightning-input-field>
+                        <lightning-input-field field-name="Website_URL__c"></lightning-input-field>
+                        <lightning-input-field field-name="Active__c"></lightning-input-field>
+
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick={handleCancel}>Cancel</button>
+                            <button class="btn-primary" type="submit">Save</button>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template if:true={showScriptModal}>
+        <section class="modal-backdrop" onclick={handleCloseScript}>
+            <div class="modal-content modal-script" onclick={handleModalClick}>
+                <div class="modal-header">
+                    <h3>Installation Script: {scriptStoreName}</h3>
+                    <button class="btn-icon" onclick={handleCloseScript} title="Close">
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <template if:true={scriptLoading}>
+                        <div class="spinner-container">
+                            <lightning-spinner alternative-text="Loading script..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template if:false={scriptLoading}>
+                        <template if:true={scriptError}>
+                            <div class="error-message">{scriptError}</div>
+                        </template>
+
+                        <template if:true={scriptData}>
+                            <div class="install-instructions">
+                                <lightning-icon icon-name="utility:info" size="x-small"></lightning-icon>
+                                <span>Copy and paste these snippets into your website's HTML.</span>
+                            </div>
+
+                            <template if:true={previewUrl}>
+                                <div class="preview-bar">
+                                    <lightning-icon icon-name="utility:preview" size="x-small"></lightning-icon>
+                                    <span>Test your tags before going live:</span>
+                                    <a href={previewUrl} target="_blank" class="btn-preview">
+                                        <lightning-icon icon-name="utility:open" size="x-small"></lightning-icon>
+                                        Open GTM Preview
+                                    </a>
+                                </div>
+                            </template>
+
+                            <div class="snippet-section">
+                                <div class="snippet-header">
+                                    <div class="snippet-label">
+                                        <strong>1. Paste in the &lt;head&gt; of your website</strong>
+                                    </div>
+                                    <button class="btn-secondary copy-btn" onclick={handleCopyHead}>
+                                        <lightning-icon icon-name="utility:copy" size="x-small"></lightning-icon>
+                                        Copy Head
+                                    </button>
+                                </div>
+                                <pre class="snippet-box snippet-head">{formattedHeadSnippet}</pre>
+                            </div>
+
+                            <div class="snippet-section">
+                                <div class="snippet-header">
+                                    <div class="snippet-label">
+                                        <strong>2. Paste immediately after the opening &lt;body&gt; tag</strong>
+                                    </div>
+                                    <button class="btn-secondary copy-btn" onclick={handleCopyBody}>
+                                        <lightning-icon icon-name="utility:copy" size="x-small"></lightning-icon>
+                                        Copy Body
+                                    </button>
+                                </div>
+                                <pre class="snippet-box snippet-body">{formattedBodySnippet}</pre>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </section>
+    </template>
+    </template>
+</template>

@@ -25,6 +25,10 @@ public with sharing class CommodityPricingService {
 
     @future(callout=true)
     public static void syncPrices(Set<Id> agreementIds) {
+        processPriceSync(agreementIds);
+    }
+
+    public static void processPriceSync(Set<Id> agreementIds) {
         List<Supply_Agreement__c> agreements = [
             SELECT Id, Commodity_v2__c, Current_Price__c
             FROM Supply_Agreement__c
@@ -65,12 +69,17 @@ public with sharing class CommodityPricingService {
         }
     }
 
+    private static String getApiKey() {
+        API_Key_Settings__c settings = API_Key_Settings__c.getOrgDefaults();
+        return settings.OilPrice_API_Key__c;
+    }
+
     private static Decimal fetchPrice(String apiCode) {
         Http http = new Http();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(BASE_URL + '/prices/latest?by_code=' + apiCode);
         req.setMethod('GET');
-        req.setHeader('Authorization', 'Token {!$Credential.Password}');
+        req.setHeader('Authorization', 'Token ' + getApiKey());
         req.setTimeout(10000);
 
         try {

@@ -26,7 +26,10 @@ public with sharing class PermitToWorkValidationService {
             WHERE Id = :permitId
             LIMIT 1
         ];
+        return validateIsolationRequirements(permit);
+    }
 
+    private static Boolean validateIsolationRequirements(Permit_to_Work__c permit) {
         if (permit.Isolation_Required__c == false) return true;
         if (permit.Isolation_Verified__c == false) return false;
 
@@ -59,7 +62,10 @@ public with sharing class PermitToWorkValidationService {
             WHERE Id = :permitId
             LIMIT 1
         ];
+        return validateGasTestResults(permit);
+    }
 
+    private static Boolean validateGasTestResults(Permit_to_Work__c permit) {
         if (permit.Gas_Test_Required__c == false) return true;
         if (permit.Gas_Test_Completed__c == false) return false;
         if (permit.Gas_Test_Result__c == 'Fail') return false;
@@ -94,6 +100,10 @@ public with sharing class PermitToWorkValidationService {
             WHERE Id = :permitId
             LIMIT 1
         ];
+        return validateAuthorizationChain(permit);
+    }
+
+    private static Boolean validateAuthorizationChain(Permit_to_Work__c permit) {
 
         Map<String, Integer> authLevels = new Map<String, Integer>{
             'Low' => 1,
@@ -207,14 +217,14 @@ public with sharing class PermitToWorkValidationService {
             missing.add('Issuing authority must be specified');
         }
 
-        if (!validateIsolationRequirements(permitId)) {
+        if (!validateIsolationRequirements(permit)) {
             if (permit.Isolation_Required__c == true && permit.Isolation_Verified__c == false) {
                 missing.add('Isolation requirements not verified');
             }
             missing.add('Energy isolation / lockout-tagout not completed');
         }
 
-        if (!validateGasTestResults(permitId)) {
+        if (!validateGasTestResults(permit)) {
             if (permit.Gas_Test_Required__c == true && permit.Gas_Test_Completed__c == false) {
                 missing.add('Gas testing not completed');
             } else {
@@ -222,7 +232,7 @@ public with sharing class PermitToWorkValidationService {
             }
         }
 
-        if (!validateAuthorizationChain(permitId)) {
+        if (!validateAuthorizationChain(permit)) {
             missing.add('Incomplete authorization chain - required approvals not obtained');
         }
 

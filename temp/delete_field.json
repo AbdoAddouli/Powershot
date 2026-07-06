@@ -1,0 +1,8 @@
+{
+    "body":  {
+                 "raw":  "",
+                 "mode":  "raw"
+             },
+    "method":  "DELETE",
+    "url":  "/services/data/v61.0/tooling/sobjects/CustomField/Well__c.Is_Declining__c"
+}

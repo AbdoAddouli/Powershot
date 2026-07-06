@@ -107,27 +107,46 @@ public with sharing class RoyaltyCalculationService {
             LIMIT 1
         ];
 
-        Map<Id, Decimal> partnerPayments = calculateMonthlyRoyalties(leaseId, periodStart, periodEnd);
-        List<Task> royaltyTasks = new List<Task>();
-
-        for (Id partnerId : partnerPayments.keySet()) {
-            Joint_Venture__c partner = [
-                SELECT Id, Name, Account__c
+        List<Joint_Venture__c> partners = new List<Joint_Venture__c>();
+        if (lease.Account__c != null) {
+            partners = [
+                SELECT Id, Name, Revenue_Interest_Percent__c
                 FROM Joint_Venture__c
-                WHERE Id = :partnerId
-                LIMIT 1
+                WHERE Account__c = :lease.Account__c
+                    AND Status__c = 'Active'
             ];
+        }
 
-            Task t = new Task(
+        List<Production_Allocation__c> allocations = [
+            SELECT Id, Allocated_Revenue__c
+            FROM Production_Allocation__c
+            WHERE Lease__c = :leaseId
+                AND Period_Start__c >= :periodStart
+                AND Period_End__c <= :periodEnd
+        ];
+
+        Decimal totalRevenue = 0;
+        for (Production_Allocation__c alloc : allocations) {
+            totalRevenue += alloc.Allocated_Revenue__c != null ? alloc.Allocated_Revenue__c : 0;
+        }
+
+        Decimal leaseRoyaltyRate = lease.Royalty_Percent__c != null ? lease.Royalty_Percent__c : 0;
+        Decimal totalRoyalty = totalRevenue * (leaseRoyaltyRate / 100);
+
+        List<Task> royaltyTasks = new List<Task>();
+        for (Joint_Venture__c partner : partners) {
+            Decimal partnerPct = partner.Revenue_Interest_Percent__c != null ? partner.Revenue_Interest_Percent__c : 0;
+            Decimal payment = totalRoyalty * (partnerPct / 100);
+
+            royaltyTasks.add(new Task(
                 Subject = 'Royalty Payment - ' + lease.Name + ' - ' + partner.Name,
-                Description = 'Royalty of $' + partnerPayments.get(partnerId) +
+                Description = 'Royalty of $' + payment +
                               ' for period ' + periodStart + ' to ' + periodEnd,
                 Status = 'Not Started',
                 Priority = 'Normal',
                 ActivityDate = Date.today(),
                 WhatId = leaseId
-            );
-            royaltyTasks.add(t);
+            ));
         }
 
         if (!royaltyTasks.isEmpty()) {
