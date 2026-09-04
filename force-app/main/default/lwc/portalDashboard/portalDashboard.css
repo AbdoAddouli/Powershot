@@ -1,0 +1,191 @@
+:host {
+  --bg: #0f1720;
+  --panel: #16212b;
+  --panel-raised: #1c2933;
+  --line: #26333e;
+  --text: #e7edf2;
+  --text-dim: #8ca0af;
+  --text-faint: #5b6c79;
+  --amber: #e8963c;
+  --amber-dim: #8a5a22;
+  --rust: #b5502c;
+  --teal: #4fa786;
+  --red: #d14343;
+  --blue: #4c8dbd;
+  --disp:
+    "Barlow Condensed", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  --body:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Courier New", monospace;
+
+  display: block;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+}
+
+lightning-card {
+  --slds-c-card-color-background: var(--panel);
+  --slds-c-card-color-border: var(--line);
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: var(--text);
+}
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 18px 20px 0;
+  margin-bottom: 22px;
+}
+
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.kpi-gauge {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 6px solid var(--blue);
+}
+
+.kpi-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.kpi-body {
+  min-width: 0;
+}
+
+.kpi-label {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.kpi-sub.warn {
+  color: var(--amber);
+}
+
+.stat-blue .kpi-gauge {
+  border-color: var(--blue);
+}
+
+.stat-teal .kpi-gauge {
+  border-color: var(--teal);
+}
+
+.stat-red .kpi-gauge {
+  border-color: var(--rust);
+}
+
+.stat-orange .kpi-gauge {
+  border-color: var(--amber);
+}
+
+.section-title {
+  font-family: var(--disp);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.75rem;
+}
+
+.table-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.slds-box.slds-theme_error {
+  background: rgba(209, 67, 67, 0.12);
+  border: 1px solid var(--red);
+  color: var(--red);
+  border-radius: 8px;
+}
+
+.slds-theme_shade {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--line);
+  color: var(--text-dim);
+  border-radius: 8px;
+}
+
+lightning-datatable {
+  --slds-c-table-color-background: var(--panel);
+  --slds-c-table-color-background-header: var(--panel-raised);
+  --slds-c-table-color-text-header: var(--text-faint);
+  --slds-c-table-color-text-default: var(--text-dim);
+  --slds-c-table-color-border: var(--line);
+  --slds-c-table-color-border-header: var(--line);
+  --slds-c-table-color-background-row-hover: rgba(255, 255, 255, 0.02);
+  --slds-c-table-color-text-strong: var(--text);
+  --slds-c-table-radius-border: 8px;
+  --slds-c-table-header-font-size: 10px;
+  --slds-c-table-header-text-transform: uppercase;
+  --slds-c-table-header-letter-spacing: 0.06em;
+  --slds-c-table-cell-padding-block-start: 11px;
+  --slds-c-table-cell-padding-block-end: 11px;
+  --slds-c-table-cell-padding-inline: 12px;
+  overflow-x: auto;
+}
+
+.prod-table {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 12.5px;
+}
+
+.prod-table thead th {
+  background: var(--panel-raised);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.prod-table tbody td {
+  color: var(--text-dim);
+  border-top: 1px solid var(--line);
+}
+
+.prod-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+  color: var(--text);
+}
+
+@media (max-width: 860px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

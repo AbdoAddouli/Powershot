@@ -117,12 +117,7 @@
                 <identifier>flexipage_tabset</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>complianceCalendar</componentName>
-                <identifier>c_complianceCalendar</identifier>
-            </componentInstance>
-        </itemInstances>
+
         <mode>Replace</mode>
         <name>main</name>
         <type>Region</type>

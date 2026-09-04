@@ -1,0 +1,13 @@
+{
+    "required": ["incidentId"],
+    "properties": {
+        "incidentId": {
+            "title": "Incident Id",
+            "description": "The HSE_Incident__c record to classify.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

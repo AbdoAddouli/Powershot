@@ -46,3 +46,9 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# SCADA bridge runtime config (secrets) — keep the .example committed
+bridge/scada_bridge.env
+
+# Temporary diagnostic scratch files
+temp/

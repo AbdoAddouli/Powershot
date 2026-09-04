@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Price_Frequency__c</fullName>
+    <label>Price Sync Frequency</label>
+    <required>false</required>
+    <description>How often the price should be synced from external API</description>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Real-Time</fullName>
+                <default>false</default>
+                <label>Real-Time</label>
+            </value>
+            <value>
+                <fullName>Daily</fullName>
+                <default>true</default>
+                <label>Daily</label>
+            </value>
+            <value>
+                <fullName>Weekly</fullName>
+                <default>false</default>
+                <label>Weekly</label>
+            </value>
+            <value>
+                <fullName>Monthly</fullName>
+                <default>false</default>
+                <label>Monthly</label>
+            </value>
+            <value>
+                <fullName>On-Demand</fullName>
+                <default>false</default>
+                <label>On-Demand Only</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -66,6 +66,7 @@ GET /v2/petroleum/stoc/st/data/?api_key=KEY        # Weekly inventory
 - `InventoryBalanceService` — benchmark `Current_Volume__c` and `Minimum_Threshold__c` against PAD district averages
 - `PipelineIntegrityService` — correlate inspection schedules with regional supply data
 - Compliance reporting — cross-reference EIA production data for regulatory submissions
+- `EIAPricingService` — syncs retail fuel prices and national stock benchmarks to `Supply_Agreement__c.Current_Price__c` and `Fuel_Inventory__c.EIA_National_Stock__c` on weekly schedule (Thu 2:30 PM). Product codes: Refined→`EER_EPMRU_PF4_Y44NY_DPG`, Gas→`EER_EPMRU_PF4_Y35NY_DPG`, Diesel→`EPDXL0`, Jet Fuel→`EPJK`, Heating Oil→`EPMM`
 
 ---
 

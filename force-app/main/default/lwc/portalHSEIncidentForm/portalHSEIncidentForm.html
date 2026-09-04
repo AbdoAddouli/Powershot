@@ -1,0 +1,170 @@
+<template>
+  <lightning-card title="HSE Incidents" icon-name="custom:custom56">
+    <template if:true="{hasError}">
+      <div class="slds-box slds-theme_error slds-m-around_medium">
+        <p>{errorMessage}</p>
+      </div>
+    </template>
+
+    <template if:false="{hasError}">
+      <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+        <lightning-button
+          label="Report New Incident"
+          variant="brand"
+          onclick="{handleNewIncident}"
+          class="slds-m-right_small report-btn"
+        >
+        </lightning-button>
+      </div>
+
+      <div class="sev-row">
+        <div class="sev-chip sev-high">
+          <div class="n">{highOpen}</div>
+          <div class="l">High Severity Open</div>
+        </div>
+        <div class="sev-chip sev-medium">
+          <div class="n">{mediumOpen}</div>
+          <div class="l">Medium Severity Open</div>
+        </div>
+        <div class="sev-chip sev-low">
+          <div class="n">{lowOpen}</div>
+          <div class="l">Low Severity Open</div>
+        </div>
+        <div class="sev-chip sev-closed">
+          <div class="n">{closedCount}</div>
+          <div class="l">Closed</div>
+        </div>
+      </div>
+
+      <template if:true="{showForm}">
+        <div class="slds-m-around_medium form-panel">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            New HSE Incident
+          </h2>
+
+          <div class="form-grid">
+            <div class="field">
+              <lightning-combobox
+                label="Incident Type"
+                placeholder="Select type"
+                value="{incidentType}"
+                options="{incidentTypeOptions}"
+                onchange="{handleTypeChange}"
+              >
+              </lightning-combobox>
+            </div>
+
+            <div class="field">
+              <lightning-input
+                type="date"
+                label="Incident Date"
+                value="{incidentDate}"
+                onchange="{handleDateChange}"
+              >
+              </lightning-input>
+            </div>
+
+            <div class="field">
+              <lightning-combobox
+                label="Severity"
+                placeholder="Select severity"
+                value="{severity}"
+                options="{severityOptions}"
+                onchange="{handleSeverityChange}"
+              >
+              </lightning-combobox>
+            </div>
+
+            <div class="field">
+              <lightning-input
+                type="text"
+                label="Location"
+                value="{location}"
+                onchange="{handleLocationChange}"
+              >
+              </lightning-input>
+            </div>
+
+            <div class="field full">
+              <lightning-textarea
+                label="Description"
+                value="{description}"
+                onchange="{handleDescriptionChange}"
+              >
+              </lightning-textarea>
+            </div>
+
+            <div class="field full">
+              <lightning-input
+                type="number"
+                label="Spill Volume (bbls)"
+                value="{spillVolume}"
+                onchange="{handleSpillVolumeChange}"
+              >
+              </lightning-input>
+            </div>
+          </div>
+
+          <div class="slds-m-top_small">
+            <lightning-button
+              label="Submit"
+              variant="brand"
+              onclick="{handleSubmit}"
+              class="slds-m-right_small submit-btn"
+            >
+            </lightning-button>
+            <lightning-button
+              label="Cancel"
+              variant="neutral"
+              onclick="{handleCancel}"
+              class="cancel-btn"
+            >
+            </lightning-button>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasIncidents}">
+        <div class="slds-p-around_medium">
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{incidents}"
+              columns="{columns}"
+              hide-checkbox-column
+              onrowselection="{handleRowSelect}"
+            >
+            </lightning-datatable>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{incidentDetail}">
+        <div class="slds-m-around_medium detail-panel">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            {incidentDetail.Name}
+          </h2>
+          <p><strong>Type:</strong> {incidentDetail.Incident_Type__c}</p>
+          <p><strong>Date:</strong> {incidentDetail.Incident_Date__c}</p>
+          <p><strong>Severity:</strong> {incidentDetail.Severity__c}</p>
+          <p><strong>Status:</strong> {incidentDetail.Status__c}</p>
+          <p><strong>Location:</strong> {incidentDetail.Location__c}</p>
+          <p><strong>Description:</strong> {incidentDetail.Description__c}</p>
+          <template if:true="{incidentDetail.Well__r}">
+            <p><strong>Well:</strong> {incidentDetail.Well__r.Name}</p>
+          </template>
+          <template if:true="{incidentDetail.Corrective_Action__c}">
+            <p>
+              <strong>Corrective Action:</strong>
+              {incidentDetail.Corrective_Action__c}
+            </p>
+          </template>
+        </div>
+      </template>
+    </template>
+  </lightning-card>
+</template>

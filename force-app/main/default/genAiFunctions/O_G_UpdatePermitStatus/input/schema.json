@@ -1,0 +1,20 @@
+{
+    "required": ["permitId", "newStatus"],
+    "properties": {
+        "permitId": {
+            "title": "Permit Id",
+            "description": "The Permit_To_Work__c record to update.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "newStatus": {
+            "title": "New Status",
+            "description": "Target permit status value (must pass validation guardrails).",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

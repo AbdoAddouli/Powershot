@@ -12,11 +12,16 @@
 public with sharing class CommodityPricingService {
 
     private static final String BASE_URL = 'callout:CommodityPricing';
+    // The OilPriceAPI token is injected server-side by the named credential's
+    // external credential principal (merge field), so no key material is held
+    // in source or resolved in code. The token is stored in the principal's
+    // Password (see ENHANCEMENT_GUIDE.md); the Username is a placeholder.
+    private static final String AUTH_HEADER = 'Token {!$Credential.Password}';
 
     private static final Map<String, String> COMMODITY_CODE_MAP = new Map<String, String>{
         'Crude' => 'WTI_USD',
         'Gas' => 'NATURAL_GAS_USD',
-        'NGL' => 'BRENT_CRUDE_USD',
+        'NGL' => 'NGL_USD',
         'Refined' => 'GASOLINE_USD',
         'Diesel' => 'DIESEL_USD',
         'Jet Fuel' => 'JET_FUEL_USD',
@@ -69,17 +74,12 @@ public with sharing class CommodityPricingService {
         }
     }
 
-    private static String getApiKey() {
-        API_Key_Settings__c settings = API_Key_Settings__c.getOrgDefaults();
-        return settings.OilPrice_API_Key__c;
-    }
-
     private static Decimal fetchPrice(String apiCode) {
         Http http = new Http();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(BASE_URL + '/prices/latest?by_code=' + apiCode);
         req.setMethod('GET');
-        req.setHeader('Authorization', 'Token ' + getApiKey());
+        req.setHeader('Authorization', AUTH_HEADER);
         req.setTimeout(10000);
 
         try {

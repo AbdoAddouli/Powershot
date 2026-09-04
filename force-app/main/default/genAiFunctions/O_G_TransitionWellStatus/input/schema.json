@@ -1,0 +1,20 @@
+{
+    "required": ["wellId", "newStatus"],
+    "properties": {
+        "wellId": {
+            "title": "Well Id",
+            "description": "The Well__c record to transition.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "newStatus": {
+            "title": "New Status",
+            "description": "Target status value, e.g. Producing, Shut-In, Plugged.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

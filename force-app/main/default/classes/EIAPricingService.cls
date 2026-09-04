@@ -31,12 +31,16 @@ public with sharing class EIAPricingService {
         'Gasoline' => 'EPM0',
         'Diesel' => 'EPDXL0',
         'Jet Fuel' => 'EPJK',
+        'Heating Oil' => 'EPMM',
         'NGL' => 'EPN0'
     };
 
     private static final Map<String, String> PRICE_PRODUCT_MAP = new Map<String, String>{
         'Refined' => 'EPM0',
-        'Gas' => 'EPM0'
+        'Gas' => 'EPM0',
+        'Diesel' => 'EPDXL0',
+        'Jet Fuel' => 'EPJK',
+        'Heating Oil' => 'EPMM'
     };
 
     @future(callout=true)

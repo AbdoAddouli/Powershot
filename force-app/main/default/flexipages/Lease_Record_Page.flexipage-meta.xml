@@ -117,18 +117,7 @@
                 <identifier>flexipage_tabset</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>complianceCalendar</componentName>
-                <identifier>c_complianceCalendar</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>wellProductionChart</componentName>
-                <identifier>c_wellProductionChart</identifier>
-            </componentInstance>
-        </itemInstances>
+
         <mode>Replace</mode>
         <name>main</name>
         <type>Region</type>

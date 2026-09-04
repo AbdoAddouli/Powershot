@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Calculate a royalty summary for a given lease over an optional period (total royalty, total allocated revenue, and applied royalty rate). Use when the user asks about royalty amounts, lease revenue shares, or royalty calculations for a leased asset.</description>
+    <invocationTarget>RoyaltyCalculationWrapper</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Calculate Royalty</masterLabel>
+</GenAiFunction>

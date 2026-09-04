@@ -97,6 +97,53 @@ public with sharing class TestCommercialServices {
     }
 
     @IsTest
+    static void testInvocableRecordInventoryMovementReceipt() {
+        Fuel_Inventory__c tank = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c LIMIT 1];
+        Decimal startingVolume = tank.Current_Volume__c;
+
+        InventoryBalanceService.InventoryMovementRequest req = new InventoryBalanceService.InventoryMovementRequest();
+        req.inventoryId = tank.Id;
+        req.volumeChange = 250;
+        req.movementType = 'Receipt';
+
+        Test.startTest();
+        List<InventoryBalanceService.InventoryMovementResult> results =
+            InventoryBalanceService.recordInventoryMovements(new List<InventoryBalanceService.InventoryMovementRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, results.size());
+        Assert.isTrue(results[0].success);
+        Assert.areEqual(startingVolume + 250, results[0].newVolume);
+
+        Fuel_Inventory__c updated = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c WHERE Id = :tank.Id];
+        Assert.areEqual(startingVolume + 250, updated.Current_Volume__c);
+        List<Inventory_Transaction__c> txns = [SELECT Id, Movement_Type__c FROM Inventory_Transaction__c];
+        Assert.areEqual(1, txns.size());
+        Assert.areEqual('Receipt', txns[0].Movement_Type__c);
+    }
+
+    @IsTest
+    static void testInvocableRecordInventoryMovementInvalidVolume() {
+        Fuel_Inventory__c tank = [SELECT Id FROM Fuel_Inventory__c LIMIT 1];
+
+        InventoryBalanceService.InventoryMovementRequest req = new InventoryBalanceService.InventoryMovementRequest();
+        req.inventoryId = tank.Id;
+        req.volumeChange = -50;
+        req.movementType = 'Delivery';
+
+        Test.startTest();
+        List<InventoryBalanceService.InventoryMovementResult> results =
+            InventoryBalanceService.recordInventoryMovements(new List<InventoryBalanceService.InventoryMovementRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, results.size());
+        Assert.isFalse(results[0].success);
+        Assert.isTrue(results[0].message.contains('positive'));
+        List<Inventory_Transaction__c> txns = [SELECT Id FROM Inventory_Transaction__c];
+        Assert.areEqual(0, txns.size());
+    }
+
+    @IsTest
     static void testInventoryMovementDelivery() {
         Fuel_Inventory__c tank = [SELECT Id, Current_Volume__c FROM Fuel_Inventory__c LIMIT 1];
 

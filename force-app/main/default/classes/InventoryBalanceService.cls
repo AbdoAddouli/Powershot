@@ -72,6 +72,64 @@ public with sharing class InventoryBalanceService {
     }
 
     /**
+     * @InvocableMethod Agent/Flow/MCP-facing wrapper for recording inventory movements.
+     * @param requests  List of @InvocableVariable InventoryMovementRequest
+     */
+    @InvocableMethod(
+        label='Record Inventory Movement'
+        description='Records a Receipt/Delivery/Transfer/Consumption movement and updates tank volume.'
+    )
+    public static List<InventoryMovementResult> recordInventoryMovements(List<InventoryMovementRequest> requests) {
+        List<InventoryMovementResult> results = new List<InventoryMovementResult>();
+        for (InventoryMovementRequest req : requests) {
+            InventoryMovementResult result = new InventoryMovementResult();
+            result.inventoryId = req.inventoryId;
+            result.success = true;
+            try {
+                if (String.isBlank(req.movementType)) {
+                    throw new InventoryServiceException('Movement type is required.');
+                }
+                if (req.volumeChange == null || req.volumeChange <= 0) {
+                    throw new InventoryServiceException('Volume change must be a positive number.');
+                }
+                recordInventoryMovement(req.inventoryId, req.volumeChange, req.movementType);
+                Decimal currentVolume = getCurrentInventory(req.inventoryId);
+                result.newVolume = currentVolume;
+                result.message = 'Recorded ' + req.movementType + ' of ' + req.volumeChange +
+                    ' units. New volume: ' + (currentVolume != null ? String.valueOf(currentVolume) : 'unknown') + '.';
+            } catch (Exception ex) {
+                result.success = false;
+                result.message = ex.getMessage();
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
+    public class InventoryMovementRequest {
+        @InvocableVariable(label='Inventory Id' required=true description='The Fuel_Inventory__c tank record.')
+        public Id inventoryId;
+        @InvocableVariable(label='Volume Change' required=true description='Positive volume amount.')
+        public Decimal volumeChange;
+        @InvocableVariable(label='Movement Type' required=true
+            description='Receipt, Delivery, Transfer-In, Transfer-Out, or Consumption.')
+        public String movementType;
+    }
+
+    public class InventoryMovementResult {
+        @InvocableVariable(label='Inventory Id')
+        public Id inventoryId;
+        @InvocableVariable(label='Success')
+        public Boolean success;
+        @InvocableVariable(label='New Volume')
+        public Decimal newVolume;
+        @InvocableVariable(label='Message')
+        public String message;
+    }
+
+    public class InventoryServiceException extends Exception {}
+
+    /**
      * Returns the current volume for a given inventory record (or 0 if null).
      * @param inventoryId  The Fuel_Inventory__c Id
      * @return  Current volume

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Price_Benchmark__c</fullName>
+    <label>Price Benchmark</label>
+    <required>false</required>
+    <description>Which price benchmark is used (WTI, Brent, HH, TTF, JKM, etc.)</description>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>WTI</fullName>
+                <default>false</default>
+                <label>WTI (West Texas Intermediate)</label>
+            </value>
+            <value>
+                <fullName>Brent</fullName>
+                <default>false</default>
+                <label>Brent Crude</label>
+            </value>
+            <value>
+                <fullName>HH</fullName>
+                <default>false</default>
+                <label>Henry Hub Natural Gas</label>
+            </value>
+            <value>
+                <fullName>TTF</fullName>
+                <default>false</default>
+                <label>TTF (Title Transfer Facility)</label>
+            </value>
+            <value>
+                <fullName>JKM</fullName>
+                <default>false</default>
+                <label>JKM (Japan Korea Marker)</label>
+            </value>
+            <value>
+                <fullName>Dubai</fullName>
+                <default>false</default>
+                <label>Dubai Crude</label>
+            </value>
+            <value>
+                <fullName>NYMEX</fullName>
+                <default>false</default>
+                <label>NYMEX</label>
+            </value>
+            <value>
+                <fullName>Platts</fullName>
+                <default>false</default>
+                <label>Platts</label>
+            </value>
+            <value>
+                <fullName>OPIS</fullName>
+                <default>false</default>
+                <label>OPIS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

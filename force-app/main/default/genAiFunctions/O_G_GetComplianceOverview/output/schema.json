@@ -1,0 +1,21 @@
+{
+    "properties": {
+        "success": {
+            "title": "Success",
+            "description": "Whether the overview query succeeded.",
+            "lightning:type": "lightning__booleanType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "message": {
+            "title": "Message",
+            "description": "Result message or error detail.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

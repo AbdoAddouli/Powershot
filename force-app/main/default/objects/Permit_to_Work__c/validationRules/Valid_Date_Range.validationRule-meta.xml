@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Valid_Date_Range</fullName>
+    <active>true</active>
+    <description>Permit end time must be after start time.</description>
+    <errorConditionFormula>NOT(ISBLANK(Start_DateTime__c)) &amp;&amp; NOT(ISBLANK(End_DateTime__c)) &amp;&amp; End_DateTime__c &lt;= Start_DateTime__c</errorConditionFormula>
+    <errorMessage>Permit End Date/Time must be after Start Date/Time.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,97 @@
+<template>
+  <lightning-card title="Well Status" icon-name="custom:custom57">
+    <template if:true="{hasError}">
+      <div class="slds-box slds-theme_error slds-m-around_medium">
+        <p>{errorMessage}</p>
+      </div>
+    </template>
+
+    <template if:false="{hasError}">
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{totalWells}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Total Wells</div>
+            <div class="kpi-sub">Linked to account</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+        <lightning-combobox
+          label="Filter by Status"
+          placeholder="All Statuses"
+          value="{statusFilter}"
+          options="{statusOptions}"
+          onchange="{handleStatusFilterChange}"
+        >
+        </lightning-combobox>
+      </div>
+
+      <template if:true="{hasWells}">
+        <div class="slds-p-around_medium">
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{wells}"
+              columns="{wellColumns}"
+              hide-checkbox-column
+              onrowselection="{handleWellSelect}"
+            >
+            </lightning-datatable>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasProduction}">
+        <div class="slds-p-around_medium">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            Production History
+          </h2>
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{productionData}"
+              columns="{productionColumns}"
+              hide-checkbox-column
+            >
+            </lightning-datatable>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasTelemetry}">
+        <div class="slds-p-around_medium">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            Real-Time Telemetry
+          </h2>
+          <div class="telemetry-grid">
+            <template for:each="{telemetryData}" for:item="t">
+              <div key="{t.Id}" class="telemetry-cell">
+                <div class="telemetry-time">{t.readingLabel}</div>
+                <div class="telemetry-type">{t.Measurement_Type__c}</div>
+                <div class="telemetry-value">{t.primaryLabel}</div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasWells}">
+        <template if:false="{hasTelemetry}">
+          <template if:true="{selectedWellId}">
+            <div class="slds-p-horizontal_medium slds-text-body_small slds-text-color_weak">
+              No recent telemetry for this well.
+            </div>
+          </template>
+        </template>
+      </template>
+    </template>
+  </lightning-card>
+</template>

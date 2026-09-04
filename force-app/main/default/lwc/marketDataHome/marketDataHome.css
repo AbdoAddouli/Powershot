@@ -1,0 +1,210 @@
+:host {
+  --bg: #0f1720;
+  --panel: #16212b;
+  --panel-raised: #1c2933;
+  --line: #26333e;
+  --text: #e7edf2;
+  --text-dim: #8ca0af;
+  --text-faint: #5b6c79;
+  --amber: #e8963c;
+  --amber-dim: #8a5a22;
+  --rust: #b5502c;
+  --teal: #4fa786;
+  --red: #d14343;
+  --blue: #4c8dbd;
+  --disp:
+    "Barlow Condensed", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  --body:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Courier New", monospace;
+
+  display: block;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+}
+
+lightning-card {
+  --slds-c-card-color-background: var(--panel);
+  --slds-c-card-color-border: var(--line);
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: var(--text);
+}
+
+.section-title {
+  font-family: var(--disp);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.75rem;
+}
+
+.as-of {
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.slds-text-color_weak {
+  color: var(--text-faint);
+}
+
+.chart {
+  margin: 0.5rem 0 1rem 0;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  gap: 12px;
+}
+
+.bar-label {
+  width: 90px;
+  text-align: right;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 18px;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber-dim) 0%, var(--amber) 100%);
+  border-radius: 5px;
+  min-width: 2%;
+}
+
+.bar-value {
+  width: 100px;
+  text-align: right;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.price-tile {
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  transition: border-color 0.15s ease;
+}
+
+.price-tile:hover {
+  border-color: var(--amber-dim);
+}
+
+.price-tile-label {
+  color: var(--text-faint);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.price-tile-value {
+  color: var(--amber);
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+.slds-box.slds-theme_error {
+  background: rgba(209, 67, 67, 0.12);
+  border: 1px solid var(--red);
+  color: var(--red);
+  border-radius: 8px;
+}
+
+.prod-table {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 12.5px;
+}
+
+.prod-table thead th {
+  background: var(--panel-raised);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.prod-table tbody td {
+  color: var(--text-dim);
+  border-top: 1px solid var(--line);
+}
+
+.prod-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+  color: var(--text);
+}
+
+.commodity-group {
+  margin-bottom: 1.5rem;
+}
+
+.commodity-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.25rem;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  border-left: 3px solid var(--amber);
+}
+
+.commodity-group-name {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--disp);
+}
+
+.commodity-group-spot {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.price-cell {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.variance-positive {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.variance-negative {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.variance-neutral {
+  color: var(--text-faint);
+  font-weight: 600;
+}

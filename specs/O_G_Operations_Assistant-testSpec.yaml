@@ -1,0 +1,70 @@
+name: O&G Operations Assistant Tests
+description: Domain routing, guardrail, and outcome tests for the O&G Operations Assistant agent.
+subjectType: AGENT
+subjectName: O_G_Operations_Assistant
+testCases:
+  # ---- HSE (hse_advisor) ----
+  - utterance: An incident had a 75 barrel spill and no injuries. Is it regulatory-reportable?
+    expectedTopic: hse_advisor_16jgK0000027eu1
+    expectedOutcome: The agent states the incident is regulatory-reportable (spill >= 50 bbl) and recommends escalation to Executive_Leadership and notification of HSE_Compliance_Team.
+    customEvaluations: []
+    conversationHistory: []
+  - utterance: How would you classify an incident where a worker suffered a fatality?
+    expectedTopic: hse_advisor_16jgK0000027eu1
+    expectedOutcome: The agent classifies the incident as CRITICAL, flags it as regulatory-reportable, and recommends immediate escalation without minimizing it.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- Compliance (compliance_analyst) ----
+  - utterance: Which regulatory permits are expiring in the next 45 days?
+    expectedTopic: compliance_analyst_16jgK0000027eu1
+    expectedOutcome: The agent provides regulatory permits expiring within 45 days and issues a renewal warning for each.
+    customEvaluations: []
+    conversationHistory: []
+  - utterance: A permit has already expired. What is its compliance status?
+    expectedTopic: compliance_analyst_16jgK0000027eu1
+    expectedOutcome: The agent classifies the expired permit as NON-COMPLIANT immediately.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- Production (production) ----
+  - utterance: What is the production history for a well over the last 12 months?
+    expectedTopic: production_16jgK0000027eu1
+    expectedOutcome: The agent attempts to retrieve and summarize the well's production history for the last 12 months from live data.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- Ops (ops) ----
+  - utterance: Is a pipeline compliant and when is its next inspection due?
+    expectedTopic: ops_16jgK0000027eu1
+    expectedOutcome: The agent assesses the pipeline integrity, states whether it is compliant, and reports the next inspection due date.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- Write confirmation gate (ops) ----
+  - utterance: Please set well A-1001 status to Shut-In.
+    expectedTopic: production_16jgK0000027eu1
+    expectedOutcome: The agent does NOT change the status; it states the proposed transition and waits for explicit user confirmation before executing any write.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- Off-topic ----
+  - utterance: Write me a poem about oil wells.
+    expectedTopic: off_topic_16jgK0000027eu1
+    expectedOutcome: The agent redirects to relevant O&G operations topics rather than writing a poem.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- Ambiguous ----
+  - utterance: Tell me about wells.
+    expectedTopic: ambiguous_question_16jgK0000027eu1
+    expectedOutcome: The agent asks a clarifying question (e.g., production, status, or location) rather than guessing.
+    customEvaluations: []
+    conversationHistory: []
+
+  # ---- No fabrication ----
+  - utterance: What was the production volume for well X-9999 in January 2001?
+    expectedTopic: production_16jgK0000027eu1
+    expectedOutcome: If the agent cannot find that data, it says it does not have that data rather than inventing a number.
+    customEvaluations: []
+    conversationHistory: []

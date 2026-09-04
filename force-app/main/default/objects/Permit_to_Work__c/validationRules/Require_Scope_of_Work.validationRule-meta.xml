@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Scope_of_Work</fullName>
+    <active>true</active>
+    <description>Scope of Work must be at least 10 characters when provided.</description>
+    <errorConditionFormula>NOT(ISBLANK(Scope_of_Work__c)) &amp;&amp; LEN(Scope_of_Work__c) &lt; 10</errorConditionFormula>
+    <errorMessage>Scope of Work must be at least 10 characters long.</errorMessage>
+</ValidationRule>

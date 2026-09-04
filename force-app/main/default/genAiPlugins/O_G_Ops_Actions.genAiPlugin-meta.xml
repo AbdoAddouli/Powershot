@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <canEscalate>false</canEscalate>
+    <description>Invocable actions for the Operations domain: permit-to-work status, inventory movements, and pipeline integrity.</description>
+    <developerName>O_G_Ops_Actions</developerName>
+    <genAiPluginInstructions>
+        <description>Use Get Pipeline Integrity Status to answer whether a pipeline is compliant and when inspection is due. Update Permit Status and Record Inventory Movement are WRITE actions: confirm every change with the user before executing. When a permit status update is blocked by missing requirements, surface them to the user.</description>
+        <developerName>instruction_og_ops_actions</developerName>
+        <language>en_US</language>
+        <masterLabel>O&amp;G Ops Actions Instructions</masterLabel>
+        <sortOrder>1</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>O_G_Ops_Actions</localDeveloperName>
+    <masterLabel>O&amp;G Ops Actions</masterLabel>
+    <pluginType>Topic</pluginType>
+</GenAiPlugin>

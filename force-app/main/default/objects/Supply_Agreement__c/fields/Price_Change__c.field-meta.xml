@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Price_Change__c</fullName>
+    <label>Price Change %</label>
+    <required>false</required>
+    <description>Percentage change from previous price to current price</description>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <formula>IF( AND( NOT(ISBLANK(Previous_Price__c)), NOT(ISBLANK(Current_Price__c)), Previous_Price__c &lt;&gt; 0 ), ((Current_Price__c - Previous_Price__c) / Previous_Price__c) * 100, NULL)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <precision>8</precision>
+    <scale>2</scale>
+</CustomField>

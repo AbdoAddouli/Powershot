@@ -1,0 +1,13 @@
+{
+    "required": ["daysAhead"],
+    "properties": {
+        "daysAhead": {
+            "title": "Days Ahead",
+            "description": "Look-ahead window in days for detecting permits nearing renewal (e.g., 45).",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

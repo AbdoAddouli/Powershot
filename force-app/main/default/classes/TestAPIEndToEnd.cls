@@ -28,7 +28,7 @@ public with sharing class TestAPIEndToEnd {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(COMMODITY_URL);
         req.setMethod('GET');
-        req.setHeader('Authorization', 'Token ' + API_Key_Settings__c.getOrgDefaults().OilPrice_API_Key__c);
+        req.setHeader('Authorization', 'Token {!$Credential.Password}');
         req.setTimeout(10000);
 
         try {

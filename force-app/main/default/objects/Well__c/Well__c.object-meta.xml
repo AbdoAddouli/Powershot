@@ -141,8 +141,9 @@
         <type>Default</type>
     </actionOverrides>
     <allowInChatterGroups>false</allowInChatterGroups>
-    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <compactLayoutAssignment>Well_Compact_Layout</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
+    <description>Represents oil and gas wells with lifecycle status tracking from permitted through drilling, producing, to abandonment.</description>
     <enableActivities>true</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>true</enableFeeds>
@@ -154,7 +155,6 @@
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>Private</externalSharingModel>
     <label>Well</label>
-    <description>Represents oil and gas wells with lifecycle status tracking from permitted through drilling, producing, to abandonment.</description>
     <nameField>
         <label>Well Name</label>
         <trackFeedHistory>false</trackFeedHistory>
@@ -162,6 +162,6 @@
     </nameField>
     <pluralLabel>Wells</pluralLabel>
     <searchLayouts></searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>Private</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

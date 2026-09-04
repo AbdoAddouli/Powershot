@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Measurement_Type__c</fullName>
+    <label>Measurement Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Oil Flow</fullName>
+                <default>false</default>
+                <label>Oil Flow</label>
+            </value>
+            <value>
+                <fullName>Gas Flow</fullName>
+                <default>false</default>
+                <label>Gas Flow</label>
+            </value>
+            <value>
+                <fullName>Water Flow</fullName>
+                <default>false</default>
+                <label>Water Flow</label>
+            </value>
+            <value>
+                <fullName>Pressure</fullName>
+                <default>false</default>
+                <label>Pressure</label>
+            </value>
+            <value>
+                <fullName>Temperature</fullName>
+                <default>false</default>
+                <label>Temperature</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

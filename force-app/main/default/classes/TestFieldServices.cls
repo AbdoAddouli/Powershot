@@ -53,7 +53,9 @@ public with sharing class TestFieldServices {
             Status__c = 'Active',
             Compliance_Status__c = 'Compliant',
             Last_Inspection_Date__c = Date.today().addMonths(-6),
-            Required_Inspection_Interval_Months__c = 12
+            Required_Inspection_Interval_Months__c = 12,
+            Diameter_inches__c = 24,
+            Capacity_bpd__c = 10000
         );
         insert pipeline;
 
@@ -206,6 +208,7 @@ public with sharing class TestFieldServices {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Gas_Test_Required__c = true;
         ptw.Gas_Test_Completed__c = true;
+        ptw.Gas_Test_Result__c = 'Pass';
         ptw.Oxygen_Level_Pct__c = 20.9;
         ptw.LEL_Pct__c = 5;
         ptw.H2S_Level_Ppm__c = 0;
@@ -223,6 +226,7 @@ public with sharing class TestFieldServices {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
         ptw.Gas_Test_Required__c = true;
         ptw.Gas_Test_Completed__c = true;
+        ptw.Gas_Test_Result__c = 'Pass';
         ptw.LEL_Pct__c = 15;
         update ptw;
 
@@ -263,7 +267,7 @@ public with sharing class TestFieldServices {
     @IsTest
     static void testGetMissingRequirements() {
         Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
-        ptw.Scope_of_Work__c = 'Short';
+        ptw.Scope_of_Work__c = null;
         ptw.Valid_From__c = null;
         ptw.PTW_Number__c = null;
         ptw.Issuing_Authority__c = null;
@@ -274,5 +278,26 @@ public with sharing class TestFieldServices {
         Test.stopTest();
 
         Assert.isTrue(missing.size() >= 3);
+    }
+
+    @IsTest
+    static void testInvocableUpdatePermitStatus() {
+        Permit_to_Work__c ptw = [SELECT Id FROM Permit_to_Work__c LIMIT 1];
+
+        PermitToWorkValidationService.PermitStatusUpdateRequest req =
+            new PermitToWorkValidationService.PermitStatusUpdateRequest();
+        req.permitId = ptw.Id;
+        req.newStatus = 'Completed';
+
+        Test.startTest();
+        List<PermitToWorkValidationService.PermitStatusUpdateResult> results =
+            PermitToWorkValidationService.updatePermitStatuses(new List<PermitToWorkValidationService.PermitStatusUpdateRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, results.size());
+        Assert.isTrue(results[0].success);
+        Assert.areEqual('Completed', results[0].newStatus);
+        Permit_to_Work__c updated = [SELECT Id, Status__c FROM Permit_to_Work__c WHERE Id = :ptw.Id];
+        Assert.areEqual('Completed', updated.Status__c);
     }
 }

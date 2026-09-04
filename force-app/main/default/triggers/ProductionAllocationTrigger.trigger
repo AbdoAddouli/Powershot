@@ -1,11 +1,12 @@
 /**
  * ProductionAllocationTrigger
  * ============================
- * Before-insert defaults numeric volume / interest fields to 0, then validates
- * that working interest across all allocations for the same well stays ≤ 100 %.
+* Before-insert defaults numeric volume / interest fields to 0, then validates
+ * that working interest across all allocations for the same well stays <= 100 %.
  * Before-update enforces that WI + NRI does not exceed 200 %.
+ * Derives Account__c from the parent Well__c so the portal sharing set works.
  *
- * Used by: ProductionAllocationService
+ * Used by: ProductionAllocationService, ProductionAllocationAccountService
  */
 trigger ProductionAllocationTrigger on Production_Allocation__c (before insert, before update) {
 
@@ -30,6 +31,8 @@ trigger ProductionAllocationTrigger on Production_Allocation__c (before insert, 
                 alloc.Days_On_Production__c = 0;
             }
         }
+
+        ProductionAllocationAccountService.populateAccount(Trigger.new);
 
         if (Trigger.isInsert) {
             ProductionAllocationService.validateWorkingInterest(Trigger.new);

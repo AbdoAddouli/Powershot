@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Price_Variance_Limit__c</fullName>
+    <label>Price Variance Limit %</label>
+    <required>false</required>
+    <description>Maximum allowed price variance percentage before alert triggers (e.g., 5.00 = 5%)</description>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <precision>5</precision>
+    <scale>2</scale>
+    <defaultValue>5</defaultValue>
+</CustomField>

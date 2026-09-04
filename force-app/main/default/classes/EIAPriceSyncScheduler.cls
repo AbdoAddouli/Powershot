@@ -8,7 +8,7 @@
  *   Schedule Trigger → Query Records → Sync Prices → Sync Stocks
  *
  * Schedule (recommended — EIA data releases Wednesday at 10:30 AM ET):
- *   System.schedule('EIA Weekly Sync', '0 30 14 * * 3', new EIAPriceSyncScheduler());
+ *   System.schedule('EIA Weekly Sync', '0 30 14 ? * 4', new EIAPriceSyncScheduler());
  */
 public with sharing class EIAPriceSyncScheduler implements Schedulable {
 

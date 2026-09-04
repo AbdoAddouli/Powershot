@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Operating_Pressure_Limits</fullName>
+    <active>true</active>
+    <description>Operating pressure must not exceed MAOP (Maximum Allowable Operating Pressure).</description>
+    <errorConditionFormula>NOT(ISBLANK(Operating_Pressure__c)) &amp;&amp; NOT(ISBLANK(MAOP__c)) &amp;&amp; Operating_Pressure__c &gt; MAOP__c</errorConditionFormula>
+    <errorMessage>Operating Pressure cannot exceed MAOP (Maximum Allowable Operating Pressure).</errorMessage>
+</ValidationRule>

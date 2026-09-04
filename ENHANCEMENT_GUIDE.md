@@ -14,6 +14,9 @@
 4. [Phase 4: Experience Cloud Portal (Week 8-12)](#phase-4-experience-cloud-portal-week-8-12)
 5. [Phase 5: Advanced Analytics (Week 10-14)](#phase-5-advanced-analytics-week-10-14)
 6. [Phase 6: Data Cloud & 360 (Week 12-16)](#phase-6-data-cloud--360-week-12-16)
+7. [Phase 7: Salesforce Clouds Expansion (Week 8-14)](#phase-7-salesforce-clouds-expansion-week-8-14)
+8. [Phase 8: Agentforce & Einstein AI (Week 12-18)](#phase-8-agentforce--einstein-ai-week-12-18)
+9. [Phase 9: Sustainability & IoT (Week 14-20)](#phase-9-sustainability--iot-week-14-20)
 
 ---
 
@@ -938,9 +941,590 @@ This query spans: `Production_Allocation__c` + `Measurement__c` + `Weather_Data_
 
 ---
 
-## Appendices
+## Phase 7: Salesforce Clouds Expansion (Week 8-14)
 
-### A. Apex Test Requirements
+### 7.1 Sales Cloud — Pipeline & Account Management
+
+Enhance opportunity management with O&G-specific sales stages and workflows.
+
+**Step 1: Create Sales Stages for O&G**
+
+| Stage | Description | Probability |
+|---|---|---|
+| Prospecting | Identify operator/JV partner | 10% |
+| Bid/Proposal | Submit tender or proposal | 25% |
+| Negotiation | Price/volume terms discussion | 50% |
+| Contract Review | Legal & credit review | 75% |
+| Won — Active | Contract executed, delivery active | 100% |
+| Lost/Expired | Deal lost or contract expired | 0% |
+
+**Step 2: Create Opportunity Record Types**
+
+- `Supply_Contract` — for term/spot supply agreements
+- `Service_Sale` — for drilling, well service, inspection contracts
+- `Equipment_Sale` — for valves, pumps, meters
+- `JV_Proposal` — for joint venture partnership proposals
+
+**Step 3: Path and Kanban for Pipeline Deals**
+
+```
+Setup → Path Settings → Opportunity
+  Add fields: Commodity_Type__c, Volume_MMBTU__c, Delivery_Point__c
+  Add guidance: "Ensure credit check completed before Contract Review stage"
+```
+
+### 7.2 Service Cloud — Field Service & Work Orders
+
+**Step 1: Enable Field Service**
+
+```
+Setup → Field Service → Settings
+  Enable Field Service
+  Set Service Territory: Oil & Gas Operations
+  Set Operating Hours: 24/7 Emergency, Business Hours (Mon-Fri 8-5)
+```
+
+**Step 2: Create Service Territory Hierarchy**
+
+```
+Service Territory: All Operations
+├── Region: Permian Basin
+│   ├── Territory: West Texas Wells
+│   └── Territory: Midland Pipelines
+├── Region: Eagle Ford
+│   ├── Territory: South Texas Wells
+│   └── Territory: Corpus Christi Terminal
+└── Region: Bakken
+    ├── Territory: North Dakota Wells
+    └── Territory: Williston Pipelines
+```
+
+**Step 3: Assign Service Resources**
+
+| Resource Type | Skills | Certifications |
+|---|---|---|
+| Field Technician | Wellhead maintenance, pipeline inspection | H2S, TWIC, Confined Space |
+| HSE Inspector | Safety audit, incident investigation | CSP, ASP |
+| Compliance Officer | Regulatory filing, permit management | None |
+| Pump Operator | Load/unload, tank gauging | DOT, HAZMAT |
+| Roustabout | General well/pipeline maintenance | H2S, Fall Protection |
+
+**Step 4: Configure Service Appointment Process**
+
+```
+Work Order Created
+  → Dispatch service resource via Skills Match
+  → Create Service Appointment
+  → Assign Service Crew
+  → Check PTW requirements (if Hot Work/Confined Space)
+  → Field technician mobile check-in
+  → Complete work, capture signature
+  → Check-out, update Inventory if parts used
+```
+
+**Step 5: Mobile LWC for Field Technicians**
+
+Extend existing LWCs for offline-capable mobile use:
+- `fieldServiceChecklist` — works offline, syncs on reconnect
+- `permitToWorkBoard` — read-only offline, permit creation requires connectivity
+- `inventoryTankGauge` — real-time gauge reading with photo capture
+
+### 7.3 Marketing Cloud — Customer & Partner Communications
+
+**Step 1: Enable Marketing Cloud Account Engagement (Pardot)**
+
+Integrate with Salesforce to segment and engage customers, partners, and regulators.
+
+**Use Cases:**
+
+| Campaign | Audience | Channel | Trigger |
+|---|---|---|---|
+| Regulatory Deadline Reminder | Compliance Officers | Email | 30 days before permit expiration |
+| Monthly Production Statement | JV Partners | Email + Portal | 1st of month |
+| HSE Safety Bulletin | All Field Staff | Email + SMS | New incident/alert |
+| Inventory Restock Alert | Retail Outlet Managers | SMS + In-App | Below threshold |
+| Contract Renewal Notice | Supply Customers | Email | 90 days before expiry |
+| Rig Availability Alert | Drilling Contractors | Email | Speculative campaign quarterly |
+
+**Step 2: Create Email Templates in Marketing Cloud**
+
+```html
+<!-- Regulatory Deadline Reminder -->
+<h2>Compliance Reminder</h2>
+<p>Dear %%Compliance_Officer_Name%%,</p>
+<p>Your <b>%%Permit_Type%%</b> (Permit #%%Permit_Number%%)
+   expires on <b>%%Expiration_Date%%</b>.</p>
+<p>Please submit renewal documents at least 30 days before expiry.</p>
+<a href="%%Portal_Login_URL%%">Login to O&G Partner Portal</a>
+```
+
+**Step 3: Automate with Journey Builder**
+
+```
+Journey: JV Monthly Statement
+  Entry: Scheduled (1st of month)
+  Audience: Contacts with JV Partner record type
+  Step 1: Send Email "Monthly Production Statement"
+  Step 2: Wait 3 days
+  Step 3: If not opened → Send SMS alert
+  Step 4: Wait 7 days
+  Step 5: If not viewed → Create Task for Account Manager
+```
+
+---
+
+## Phase 8: Agentforce & Einstein AI (Week 12-18)
+
+### 8.1 Agentforce — AI-Powered Sales & Service Agent
+
+Deploy Agentforce agents for field technicians, compliance officers, and partner self-service.
+
+**Step 1: Enable Agentforce**
+
+```
+Setup → Agentforce → Enable Agentforce
+  Service Agent: O&G Field Service Agent
+  Sales Agent: O&G Supply Sales Agent
+  Set Default Model: OpenAI GPT-4o (or Einstein Trust Layer)
+```
+
+**Step 2: Create Agentforce Topics & Actions**
+
+| Agent | Topic | Actions |
+|---|---|---|
+| **Field Service Agent** | Well status lookup | Query Well__c, return status, last production |
+| | PTW validation | Check Permit_to_Work__c validity, confirm isolation |
+| | HSE reporting | Create HSE_Incident__c from chat |
+| | Inventory check | Query Fuel_Inventory__c levels |
+| | Inspection history | Return recent Inspection__c results |
+| **Supply Sales Agent** | Contract terms | Query Supply_Agreement__c details |
+| | Pricing | Call CommodityPricingService for current price |
+| | Delivery status | Check Transportation_Nomination__c status |
+| **Compliance Agent** | Permit expiry check | Query Regulatory_Permit__c upcoming expirations |
+| | Report deadlines | Return Compliance_Report__c due dates |
+| | Regulatory filing | Guide user through EPA filing requirements |
+
+**Step 3: Configure Einstein Trust Layer**
+
+Ensure sensitive O&G data (prices, contract terms, incident details) is protected:
+
+```
+Setup → Einstein → Trust Layer
+  Data Masking: Enable for Pricing_Index__c, Contract_Value__c
+  Audit Logging: All conversations logged for compliance
+  PII Detection: Auto-redact personal data in agent transcripts
+  Retention Policy: 90 days
+```
+
+**Step 4: Embed Agent on Record Pages**
+
+Add the Agentforce chat component to key pages:
+
+- **Well__c** → "Ask about this well's production history"
+- **HSE_Incident__c** → "Report a new incident or check status"
+- **Permit_to_Work__c** → "Validate PTW requirements"
+- **Regulatory_Permit__c** → "Check renewal deadline"
+- **Partner Portal** → "Ask about JV production and revenue"
+
+**Step 5: Create Einstein Copilot Actions (Apex)**
+
+```apex
+public with sharing class AgentforceWellActions {
+    @InvocableMethod(label='Get Well Status Summary')
+    public static List<WellSummaryResult> getWellSummary(List<Id> wellIds) {
+        List<WellSummaryResult> results = new List<WellSummaryResult>();
+        if (wellIds.isEmpty()) return results;
+
+        Well__c well = [SELECT Id, Name, API_Number__c, Status__c,
+            Well_Type__c, Production_Status__c, Total_Depth__c
+            FROM Well__c WHERE Id = :wellIds[0] LIMIT 1];
+
+        AggregateResult agg = [SELECT SUM(Oil_Volume_bbls__c) totalOil,
+            SUM(Gas_Volume_MCF__c) totalGas
+            FROM Production_Allocation__c
+            WHERE Well__c = :wellIds[0]
+            AND Period_End__c = LAST_N_MONTHS:3];
+
+        WellSummaryResult r = new WellSummaryResult();
+        r.wellName = well.Name;
+        r.apiNumber = well.API_Number__c;
+        r.status = well.Status__c;
+        r.wellType = well.Well_Type__c;
+        r.productionStatus = well.Production_Status__c;
+        r.totalDepth = well.Total_Depth__c;
+        r.oilLast3Months = (Decimal) agg.get('totalOil');
+        r.gasLast3Months = (Decimal) agg.get('totalGas');
+        results.add(r);
+        return results;
+    }
+
+    public class WellSummaryResult {
+        public String wellName;
+        public String apiNumber;
+        public String status;
+        public String wellType;
+        public String productionStatus;
+        public Decimal totalDepth;
+        public Decimal oilLast3Months;
+        public Decimal gasLast3Months;
+    }
+}
+```
+
+**Step 6: Define Agent Prompt Templates**
+
+Create prompt templates for common agent interactions:
+
+```
+Template: Well Production Summary
+  "Summarize the production status for well {!Well__c.Name}
+   (API {!Well__c.API_Number__c}). Include the last 3 months
+   of oil and gas volumes, current status, and any recent
+   HSE incidents or inspections."
+
+Template: PTW Safety Check
+  "Validate permit to work {!Permit_to_Work__c.Name}.
+   Check: (1) Is the permit still valid? (2) Are isolation
+   requirements met? (3) Has gas testing been completed?
+   (4) Are all required signatures obtained?"
+```
+
+### 8.2 Einstein Next Best Action
+
+**Step 1: Define Recommendation Strategy**
+
+| Scenario | Action | Channel |
+|---|---|---|
+| Well production declining >20% | Suggest workover or stimulation | Field Service Agent |
+| Permit expiring within 30 days | Recommend renewal filing | Compliance Agent |
+| Inventory below threshold | Recommend restock order | Retail Manager |
+| Pipeline inspection overdue | Schedule inspection | Pipeline Engineer |
+| HSE incident frequency increasing | Recommend safety stand-down | HSE Director |
+
+**Step 2: Create Recommendation Objects**
+
+```
+Object: NBA_Recommendation__c
+  Fields:
+    Target_Object__c (Picklist: Well/Pipeline/Terminal/Retail_Outlet)
+    Target_Record_Id__c (Text)
+    Recommendation_Type__c (Picklist)
+    Priority__c (Picklist: Low/Medium/High/Critical)
+    Action_URL__c (URL)
+    Expiration_Date__c (Date)
+```
+
+**Step 3: Surface Recommendations in LWC**
+
+Extend existing record page LWCs to show Einstein NBA recommendations as contextual prompts.
+
+### 8.3 Einstein Bot for Partner Portal
+
+**Step 1: Create Einstein Bot**
+
+```
+Setup → Bots → New Bot
+  Name: O&G Partner Support Bot
+  Channel: Embedded Service (Experience Cloud)
+```
+
+**Step 2: Define Bot Dialogs**
+
+| User Intent | Dialog Flow |
+|---|---|
+| "Show my production" | Query JV → Query Production_Allocation → Return formatted table |
+| "When is my next royalty payment?" | Query Lease → Query Invoice → Return date and amount |
+| "Report a safety concern" | Create HSE_Observation → Return case number |
+| "Where is my delivery?" | Query Transportation_Nomination → Return status/location |
+| "How do I file a permit?" | Link to regulatory help article + Compliance Agent handoff |
+
+---
+
+## Phase 9: Sustainability & IoT (Week 14-20)
+
+### 9.1 Carbon & Emissions Tracking
+
+**Step 1: Create Carbon Tracking Objects**
+
+```xml
+<CustomObject>
+    <label>Carbon_ Emission__c</label>
+    <fields>
+        <field>Source__c</field>        <!-- Picklist: Flaring/Venting/Fugitive/Combustion/Purchased Power -->
+        <field>Scope__c</field>         <!-- Picklist: Scope 1/2/3 -->
+        <field>CO2e_MT__c</field>       <!-- Number: Metric tons CO2 equivalent -->
+        <field>CH4_MT__c</field>        <!-- Number: Methane metric tons -->
+        <field>N2O_MT__c</field>        <!-- Number: Nitrous oxide metric tons -->
+        <field>Reporting_Period__c</field> <!-- Picklist: Monthly/Quarterly/Annual -->
+        <field>Verified__c</field>      <!-- Checkbox -->
+        <field>Verification_Body__c</field> <!-- Text: e.g., SGS, Bureau Veritas -->
+        <field>Asset__c</field>         <!-- Lookup: Well__c, Pipeline__c, Refinery__c, Terminal__c -->
+    </fields>
+</CustomObject>
+```
+
+**Step 2: Calculate Emissions from Production Data**
+
+Create an Apex job that calculates estimated emissions from flared volumes:
+
+```apex
+global with sharing class EmissionCalculator implements Schedulable {
+    global void execute(SchedulableContext ctx) {
+        List<Production_Allocation__c> records = [
+            SELECT Id, Well__c, Period_End__c, Gas_Volume_MCF__c,
+                (SELECT Id, CO2e_MT__c, Reporting_Period__c
+                 FROM Carbon_Emissions__r
+                 WHERE Reporting_Period__c = 'Monthly')
+            FROM Production_Allocation__c
+            WHERE Period_End__c = LAST_MONTH
+        ];
+
+        List<Carbon_Emission__c> emissions = new List<Carbon_Emission__c>();
+        for (Production_Allocation__c pa : records) {
+            if (pa.Carbon_Emissions__r.isEmpty()) {
+                Decimal gasVolume = pa.Gas_Volume_MCF__c != null ? pa.Gas_Volume_MCF__c : 0;
+                Decimal flarePercent = 0.02; // assume 2% flared
+                Decimal co2e = gasVolume * flarePercent * 0.054; // EPA factor
+                emissions.add(new Carbon_Emission__c(
+                    Source__c = 'Flaring',
+                    Scope__c = 'Scope 1',
+                    CO2e_MT__c = co2e.setScale(2),
+                    Reporting_Period__c = 'Monthly',
+                    Asset__c = pa.Well__c
+                ));
+            }
+        }
+        if (!emissions.isEmpty()) insert emissions;
+    }
+}
+```
+
+**Step 3: Create Sustainability Dashboard**
+
+CRM Analytics dashboard for ESG reporting:
+
+| Widget | Metric | Source |
+|---|---|---|
+| Total CO2e (MT) | Sum by Scope | Carbon_Emission__c |
+| Emission by Asset | Group bar by Well/Pipeline/Refinery | Carbon_Emission__c |
+| Flare Volume Trend | Line chart by month | Production_Allocation__c |
+| Methane Leak Detection | Count of fugitive events | HSE_Incident__c (type = Fugitive) |
+| Intensity Ratio | CO2e per barrel produced | Carbon_Emission__c / Production_Allocation__c |
+| Regulatory Compliance | % emissions with verified status | Carbon_Emission__c.Verified__c |
+
+### 9.2 IoT Sensor Integration
+
+**Step 1: Connect IoT Sensors via Platform Events**
+
+```xml
+<PlatformEvent>
+    <label>Tank_Sensor_Reading__e</label>
+    <fields>
+        <field>Asset_Id__c</field>      <!-- Text: Tank/Sensor identifier -->
+        <field>Level_Percent__c</field>  <!-- Number: Tank fill level 0-100 -->
+        <field>Temperature_F__c</field>  <!-- Number -->
+        <field>Pressure_PSI__c</field>   <!-- Number -->
+        <field>Flow_Rate_bpd__c</field>  <!-- Number -->
+        <field>Battery_Level__c</field>  <!-- Number: Sensor battery 0-100 -->
+        <field>Reading_Timestamp__c</field> <!-- DateTime -->
+    </fields>
+</PlatformEvent>
+```
+
+**Step 2: Process IoT Events with Apex Trigger**
+
+```apex
+trigger TankSensorReadingTrigger on Tank_Sensor_Reading__e (after insert) {
+    List<Fuel_Inventory__c> inventoriesToUpdate = new List<Fuel_Inventory__c>();
+
+    for (Tank_Sensor_Reading__e event : Trigger.new) {
+        // Find matching inventory record
+        Fuel_Inventory__c inv = new Fuel_Inventory__c(
+            External_ID__c = event.Asset_Id__c + '_Current'
+        );
+        // Map level percent to current volume
+        // (Join with tank capacity from Asset or Fuel_Inventory.Capacity__c)
+        inventoriesToUpdate.add(inv);
+    }
+
+    // Use External_ID for upsert
+    Database.upsert(inventoriesToUpdate, Fuel_Inventory__c.External_ID__c, false);
+
+    // Fire alerts for anomalies
+    for (Tank_Sensor_Reading__e event : Trigger.new) {
+        if (event.Level_Percent__c < 10) {
+            // Publish inventory alert platform event
+            Inventory_Alert__e alert = new Inventory_Alert__e(
+                Tank_Id__c = event.Asset_Id__c,
+                Level_Percent__c = event.Level_Percent__c,
+                Alert_Type__c = 'Low Inventory',
+                Alert_Timestamp__c = System.now()
+            );
+            EventBus.publish(alert);
+        }
+    }
+}
+```
+
+**Step 3: Pipeline Leak Detection with IoT**
+
+Use pressure/flow data from Measurement__c to trigger leak alerts:
+
+| Condition | Alert | Action |
+|---|---|---|
+| Pressure drop >20% in 5 min | Potential leak | Create HSE_Incident → Slack alert |
+| Flow rate mismatch >5% (inlet vs outlet) | Theft or leak | Notify Pipeline Engineer |
+| Temperature anomaly >15°F | Equipment failure | Dispatch field service |
+| Vibration exceeds threshold | Pump bearing failure | Schedule maintenance |
+
+### 9.3 Sustainability Reporting — Automated ESG Filing
+
+**Step 1: Map ESG Data Sources**
+
+| ESG Category | Data Source | Frequency |
+|---|---|---|
+| GHG Emissions (Scope 1) | Carbon_Emission__c (Flaring, Venting) | Monthly |
+| GHG Emissions (Scope 2) | Purchased power records | Monthly |
+| GHG Emissions (Scope 3) | Supply chain estimates | Quarterly |
+| Water Usage | Injection volumes, disposal records | Monthly |
+| Spill Incidents | HSE_Incident__c (type = Spill) | Real-time |
+| Safety Metrics | HSE_Incident__c (LTI, Recordable) | Monthly |
+| Community Investment | Campaign records | Quarterly |
+
+**Step 2: Create ESG Report Template**
+
+```visualforce
+<apex:page standardController="Account" recordSetVar="accounts">
+    <h1>ESG Performance Report</h1>
+    <h2>Period: {!FROM} — {!TO}</h2>
+
+    <h3>GHG Emissions</h3>
+    <table>
+        <tr><th>Scope</th><th>CO2e (MT)</th><th>CH4 (MT)</th><th>N2O (MT)</th></tr>
+        <apex:repeat value="{!emissionsByScope}" var="scope">
+        <tr>
+            <td>{!scope.Scope__c}</td>
+            <td>{!scope.totalCO2e}</td>
+            <td>{!scope.totalCH4}</td>
+            <td>{!scope.totalN2O}</td>
+        </tr>
+        </apex:repeat>
+    </table>
+
+    <h3>Safety Statistics</h3>
+    <p>Total Recordable Incident Rate (TRIR): {!trir}</p>
+    <p>Lost Time Injury Frequency (LTIF): {!ltif}</p>
+    <p>Spill Incidents: {!spillCount}</p>
+</apex:page>
+```
+
+**Step 3: Schedule Quarterly ESG Report Generation**
+
+```
+Flow: Generate_ESG_Report
+  Schedule: Quarterly (Jan 15, Apr 15, Jul 15, Oct 15)
+  Actions:
+    1. Query Carbon_Emission__c (last quarter)
+    2. Query HSE_Incident__c (last quarter)
+    3. Calculate TRIR, LTIF, total emissions
+    4. Generate PDF via Visualforce
+    5. Email to ESG-Compliance@company.com
+    6. Attach to Account record (Operator)
+```
+
+### 9.4 Weather & Geospatial API Integration
+
+**Step 1: Create Weather Data Object**
+
+```
+Object: Weather_Reading__c
+  Fields:
+    Location__c (Geolocation)
+    Temperature_F__c (Number)
+    Wind_Speed_mph__c (Number)
+    Precipitation_in__c (Number)
+    Visibility_mi__c (Number)
+    Weather_Condition__c (Picklist: Clear/Rain/Snow/Ice/Fog/Storm)
+    Reading_DateTime__c (DateTime)
+    Asset__c (Lookup: Well__c, Pipeline__c, Terminal__c)
+```
+
+**Step 2: Create Named Credential for Weather API**
+
+```
+External Credential: WeatherAPI (Basic protocol)
+Named Credential:   WeatherAPI → https://api.weather.gov/points/
+```
+
+**Step 3: Schedule Weather Data Sync**
+
+```apex
+global class WeatherDataSync implements Schedulable {
+    global void execute(SchedulableContext ctx) {
+        // Sync weather for critical assets
+        List<Well__c> wells = [SELECT Id, Name, Latitude__c, Longitude__c
+                               FROM Well__c WHERE Status__c = 'Producing'];
+        for (Well__c w : wells) {
+            Weather_Reading__c reading = fetchWeather(w.Latitude__c, w.Longitude__c);
+            if (reading != null) {
+                reading.Asset__c = w.Id;
+                insert reading;
+            }
+        }
+    }
+
+    private Weather_Reading__c fetchWeather(Decimal lat, Decimal lon) {
+        Http http = new Http();
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('callout:WeatherAPI/' + lat + ',' + lon + '/forecast');
+        req.setMethod('GET');
+        req.setTimeout(5000);
+        try {
+            HttpResponse res = http.send(req);
+            if (res.getStatusCode() == 200) {
+                Map<String, Object> resp = (Map<String, Object>)
+                    JSON.deserializeUntyped(res.getBody());
+                Map<String, Object> props = (Map<String, Object>) resp.get('properties');
+                List<Object> periods = (List<Object>) props.get('periods');
+                Map<String, Object> current = (Map<String, Object>) periods[0];
+                return new Weather_Reading__c(
+                    Temperature_F__c = (Decimal) current.get('temperature'),
+                    Wind_Speed_mph__c = parseWindSpeed((String) current.get('windSpeed')),
+                    Weather_Condition__c = (String) current.get('shortForecast'),
+                    Reading_DateTime__c = System.now()
+                );
+            }
+        } catch (Exception e) {
+            System.debug('Weather fetch failed: ' + e.getMessage());
+        }
+        return null;
+    }
+}
+```
+
+### 9.5 ROI Matrix Update
+
+| Enhancement | Effort | Impact | Timeline |
+|---|---|---|---|
+| Slack HSE Alerts | Low | High (safety) | Week 1 |
+| Commodity Pricing | Low | Medium | Week 1 |
+| SCADA Integration | Medium | High (ops) | Week 3 |
+| Experience Cloud Portal | High | High (partners) | Week 8 |
+| Einstein Predictions | Medium | High | Week 7 |
+| Data Cloud | High | Transformative | Week 12 |
+| Regulatory API Filing | Medium | Medium (compliance) | Week 5 |
+| PDF Statements | Low | Medium | Week 2 |
+| **Sales Cloud (Stages/Pipelines)** | Low | Medium | Week 8 |
+| **Service Cloud (Field Service)** | High | High (ops efficiency) | Week 10 |
+| **Marketing Cloud (Journeys)** | Medium | Medium (engagement) | Week 10 |
+| **Agentforce Agent** | Medium | High (productivity) | Week 14 |
+| **Einstein Bots** | Medium | Medium (self-service) | Week 14 |
+| **Carbon Tracking** | Medium | High (ESG) | Week 15 |
+| **IoT Sensor Integration** | High | Transformative | Week 16 |
+| **Weather API Integration** | Low | Medium (safety) | Week 14 |
+| **ESG Automated Reporting** | Medium | High (compliance) | Week 18 |
+
+---
 
 Before deploying any Apex class, ensure >= 75% code coverage:
 
@@ -1029,3 +1613,12 @@ insert sea;
 | Data Cloud | High | Transformative | Week 12 |
 | Regulatory API Filing | Medium | Medium (compliance) | Week 5 |
 | PDF Statements | Low | Medium | Week 2 |
+| **Sales Cloud (Stages/Pipelines)** | Low | Medium | Week 8 |
+| **Service Cloud (Field Service)** | High | High (ops efficiency) | Week 10 |
+| **Marketing Cloud (Journeys)** | Medium | Medium (engagement) | Week 10 |
+| **Agentforce Agent** | Medium | High (productivity) | Week 14 |
+| **Einstein Bots** | Medium | Medium (self-service) | Week 14 |
+| **Carbon Tracking** | Medium | High (ESG) | Week 15 |
+| **IoT Sensor Integration** | High | Transformative | Week 16 |
+| **Weather API Integration** | Low | Medium (safety) | Week 14 |
+| **ESG Automated Reporting** | Medium | High (compliance) | Week 18 |

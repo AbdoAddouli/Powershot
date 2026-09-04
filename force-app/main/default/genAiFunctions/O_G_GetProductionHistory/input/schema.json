@@ -1,0 +1,20 @@
+{
+    "required": ["wellId"],
+    "properties": {
+        "wellId": {
+            "title": "Well Id",
+            "description": "The Well__c record to retrieve production history for.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "months": {
+            "title": "Months",
+            "description": "Look-back window in months. Defaults to 12.",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

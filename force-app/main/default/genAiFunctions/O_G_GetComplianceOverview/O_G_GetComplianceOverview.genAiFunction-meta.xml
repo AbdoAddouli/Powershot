@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Retrieve a compliance overview: regulatory permits expiring within a configurable number of days ahead, and any overdue compliance reports. Use when the user asks about permit renewals, permit expirations, compliance report deadlines, or overdue filings.</description>
+    <invocationTarget>ComplianceDueDateService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Get Compliance Overview</masterLabel>
+</GenAiFunction>

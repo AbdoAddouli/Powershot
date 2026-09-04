@@ -1,0 +1,213 @@
+:host {
+  --bg: #0f1720;
+  --panel: #16212b;
+  --panel-raised: #1c2933;
+  --line: #26333e;
+  --text: #e7edf2;
+  --text-dim: #8ca0af;
+  --text-faint: #5b6c79;
+  --amber: #e8963c;
+  --amber-dim: #8a5a22;
+  --rust: #b5502c;
+  --teal: #4fa786;
+  --red: #d14343;
+  --blue: #4c8dbd;
+  --disp:
+    "Barlow Condensed", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  --body:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Courier New", monospace;
+
+  display: block;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+}
+
+lightning-card {
+  --slds-c-card-color-background: var(--panel);
+  --slds-c-card-color-border: var(--line);
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: var(--text);
+}
+
+.section-title {
+  font-family: var(--disp);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.75rem;
+}
+
+.report-btn,
+.submit-btn {
+  --slds-c-button-color-background: var(--amber);
+  --slds-c-button-color-background-hover: #f0a44f;
+  --slds-c-button-color-border: transparent;
+  --slds-c-button-text-color: #1a1206;
+  --slds-c-button-text-color-hover: #1a1206;
+  --slds-c-button-radius-border: 5px;
+}
+
+.cancel-btn {
+  --slds-c-button-color-background: transparent;
+  --slds-c-button-color-border: var(--line);
+  --slds-c-button-text-color: var(--text-dim);
+  --slds-c-button-color-background-hover: rgba(255, 255, 255, 0.03);
+  --slds-c-button-text-color-hover: var(--text);
+  --slds-c-button-radius-border: 5px;
+}
+
+.sev-row {
+  display: flex;
+  gap: 12px;
+  padding: 0 20px;
+  margin-bottom: 18px;
+}
+
+.sev-chip {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 12px 14px;
+  background: var(--panel);
+}
+
+.sev-chip .n {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sev-chip .l {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.sev-high .n {
+  color: var(--red);
+}
+
+.sev-medium .n {
+  color: var(--amber);
+}
+
+.sev-low .n {
+  color: var(--teal);
+}
+
+.sev-closed .n {
+  color: var(--text-dim);
+}
+
+.form-panel,
+.detail-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.detail-panel {
+  margin: 0 20px;
+}
+
+.detail-panel p {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 0.5rem;
+}
+
+.detail-panel p strong {
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.field lightning-input,
+.field lightning-combobox,
+.field lightning-textarea {
+  width: 100%;
+}
+
+lightning-input,
+lightning-combobox,
+lightning-textarea {
+  --slds-c-input-color-background: var(--bg);
+  --slds-c-input-color-border: var(--line);
+  --slds-c-input-text-color: var(--text);
+  --slds-c-input-color-background-hover: var(--bg);
+  --slds-c-input-radius-border: 5px;
+  --slds-c-form-element-label-color: var(--text-faint);
+  --slds-c-form-element-label-font-size: 11px;
+  --slds-c-form-element-label-font-weight: 600;
+}
+
+.table-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.slds-box.slds-theme_error {
+  background: rgba(209, 67, 67, 0.12);
+  border: 1px solid var(--red);
+  color: var(--red);
+  border-radius: 8px;
+}
+
+.slds-theme_shade {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--line);
+  color: var(--text-dim);
+  border-radius: 8px;
+}
+
+lightning-datatable {
+  --slds-c-table-color-background: var(--panel);
+  --slds-c-table-color-background-header: var(--panel-raised);
+  --slds-c-table-color-text-header: var(--text-faint);
+  --slds-c-table-color-text-default: var(--text-dim);
+  --slds-c-table-color-border: var(--line);
+  --slds-c-table-color-border-header: var(--line);
+  --slds-c-table-color-background-row-hover: rgba(255, 255, 255, 0.02);
+  --slds-c-table-color-text-strong: var(--text);
+  --slds-c-table-radius-border: 8px;
+  --slds-c-table-header-font-size: 10px;
+  --slds-c-table-header-text-transform: uppercase;
+  --slds-c-table-header-letter-spacing: 0.06em;
+  --slds-c-table-cell-padding-block-start: 11px;
+  --slds-c-table-cell-padding-block-end: 11px;
+  --slds-c-table-cell-padding-inline: 12px;
+  overflow-x: auto;
+}
+
+@media (max-width: 860px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sev-row {
+    flex-wrap: wrap;
+  }
+}

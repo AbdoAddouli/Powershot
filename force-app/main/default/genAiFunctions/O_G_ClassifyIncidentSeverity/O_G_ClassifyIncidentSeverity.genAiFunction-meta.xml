@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Classify the HSE severity of a given HSE_Incident__c record (CRITICAL, HIGH, MEDIUM, or LOW) using the HSE severity matrix, and report whether the incident is regulatory-reportable. Use when the user asks to classify, triage, or assess the severity or reportability of an HSE incident.</description>
+    <invocationTarget>HSEIncidentService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Classify Incident Severity</masterLabel>
+</GenAiFunction>

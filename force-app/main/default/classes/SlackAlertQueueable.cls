@@ -48,16 +48,9 @@ public class SlackAlertQueueable implements Queueable, Database.AllowsCallouts {
     }
 
     private static void sendToSlack(Id incidentId, String messageJson) {
-        GTM_Config__c config = GTM_Config__c.getInstance();
-        String webhookUrl = config != null ? config.Slack_Webhook_URL__c : null;
-        if (String.isBlank(webhookUrl)) {
-            createErrorTask(incidentId, 'Slack webhook URL not configured in GTM_Config__c.Slack_Webhook_URL__c');
-            return;
-        }
-
         Http http = new Http();
         HttpRequest req = new HttpRequest();
-        req.setEndpoint(webhookUrl);
+        req.setEndpoint('callout:Slack_HSE_Webhook');
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json');
         req.setBody(messageJson);

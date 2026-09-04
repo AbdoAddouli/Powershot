@@ -68,6 +68,54 @@ public with sharing class PipelineIntegrityService {
      * @param pipelineId  The Pipeline__c Id
      * @return  The next due date
      */
+    /**
+     * Returns an integrity status summary for a single pipeline: whether the
+     * last inspection is compliant, the next required inspection date, and the
+     * current compliance status on the record.
+     * @param pipelineId  The Pipeline__c Id
+     * @return  PipelineIntegrityStatus view
+     */
+    public static PipelineIntegrityStatus getPipelineIntegrityStatus(Id pipelineId) {
+        Pipeline__c pipeline = [
+            SELECT Id, Name, Required_Inspection_Interval_Months__c,
+                   Last_Inspection_Date__c, Compliance_Status__c
+            FROM Pipeline__c
+            WHERE Id = :pipelineId
+            LIMIT 1
+        ];
+
+        Boolean compliant = isInspectionCompliant(pipelineId);
+        Date nextDue = calculateNextInspectionDueDate(pipelineId);
+
+        return new PipelineIntegrityStatus(
+            pipeline,
+            compliant,
+            nextDue
+        );
+    }
+
+    public class PipelineIntegrityStatus {
+        public Id pipelineId;
+        public String pipelineName;
+        public String complianceStatus;
+        public Boolean isCompliant;
+        public Date lastInspectionDate;
+        public Date nextInspectionDueDate;
+        public Integer requiredIntervalMonths;
+
+        public PipelineIntegrityStatus(Pipeline__c pipeline, Boolean compliant, Date nextDue) {
+            this.pipelineId = pipeline.Id;
+            this.pipelineName = pipeline.Name;
+            this.complianceStatus = pipeline.Compliance_Status__c;
+            this.isCompliant = compliant;
+            this.lastInspectionDate = pipeline.Last_Inspection_Date__c;
+            this.nextInspectionDueDate = nextDue;
+            this.requiredIntervalMonths = pipeline.Required_Inspection_Interval_Months__c != null
+                ? Integer.valueOf(pipeline.Required_Inspection_Interval_Months__c)
+                : null;
+        }
+    }
+
     public static Date calculateNextInspectionDueDate(Id pipelineId) {
         Pipeline__c pipeline = [
             SELECT Id, Last_Inspection_Date__c, Required_Inspection_Interval_Months__c

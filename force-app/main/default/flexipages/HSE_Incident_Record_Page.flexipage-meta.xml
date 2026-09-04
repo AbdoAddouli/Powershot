@@ -117,24 +117,7 @@
                 <identifier>flexipage_tabset</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>complianceCalendar</componentName>
-                <identifier>c_complianceCalendar</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>hseIncidentMap</componentName>
-                <identifier>c_hseIncidentMap</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>permitToWorkBoard</componentName>
-                <identifier>c_permitToWorkBoard</identifier>
-            </componentInstance>
-        </itemInstances>
+
         <mode>Replace</mode>
         <name>main</name>
         <type>Region</type>

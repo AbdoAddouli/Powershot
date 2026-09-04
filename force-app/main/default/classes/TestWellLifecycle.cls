@@ -87,6 +87,42 @@ public with sharing class TestWellLifecycle {
     }
 
     @IsTest
+    static void testInvocableTransitionWellStatusSuccess() {
+        Well__c well = [SELECT Id, Status__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
+        WellStatusService.WellStatusChangeRequest req = new WellStatusService.WellStatusChangeRequest();
+        req.wellId = well.Id;
+        req.newStatus = 'Drilling';
+
+        Test.startTest();
+        List<WellStatusService.WellStatusChangeResult> results =
+            WellStatusService.transitionWellStatuses(new List<WellStatusService.WellStatusChangeRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, results.size());
+        Assert.isTrue(results[0].success);
+        Assert.isTrue(results[0].message.contains('Drilling'));
+        Well__c updated = [SELECT Id, Status__c FROM Well__c WHERE Id = :well.Id];
+        Assert.areEqual('Drilling', updated.Status__c);
+    }
+
+    @IsTest
+    static void testInvocableTransitionWellStatusInvalid() {
+        Well__c well = [SELECT Id, Status__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
+        WellStatusService.WellStatusChangeRequest req = new WellStatusService.WellStatusChangeRequest();
+        req.wellId = well.Id;
+        req.newStatus = 'Abandoned';
+
+        Test.startTest();
+        List<WellStatusService.WellStatusChangeResult> results =
+            WellStatusService.transitionWellStatuses(new List<WellStatusService.WellStatusChangeRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, results.size());
+        Assert.isFalse(results[0].success);
+        Assert.isTrue(results[0].message.contains('Invalid status transition'));
+    }
+
+    @IsTest
     static void testCreateWellOperationOnStatusChange() {
         Well__c well = [SELECT Id, Name, Status__c, Status_Change_Date__c FROM Well__c WHERE Status__c = 'Permitted' LIMIT 1];
         well.Status__c = 'Drilling';

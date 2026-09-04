@@ -1,0 +1,142 @@
+<template>
+  <lightning-card title="Commodity Market Data" icon-name="standard:dashboard">
+    <template if:true="{hasError}">
+      <div class="slds-box slds-theme_error slds-m-around_medium">
+        <p>{errorMessage}</p>
+      </div>
+    </template>
+
+    <template if:false="{hasError}">
+      <div class="slds-p-around_medium">
+        <p
+          class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium as-of"
+        >
+          Data synced from OilPriceAPI and EIA. Last updated: {asOf}
+        </p>
+
+        <h2 class="slds-text-heading_medium slds-m-bottom_small section-title">
+          Spot Prices
+        </h2>
+        <template if:true="{hasPrices}">
+          <div class="chart">
+            <template for:each="{prices}" for:item="price">
+              <div key="{price.commodity}" class="bar-row">
+                <span class="bar-label">{price.commodity}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" style="width: {price.percent}%"></div>
+                </div>
+                <span class="bar-value">{price.formatted}</span>
+              </div>
+            </template>
+          </div>
+          <div class="slds-grid slds-wrap slds-gutters slds-m-top_medium">
+            <template for:each="{prices}" for:item="price">
+              <div
+                key="{price.commodity}"
+                class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3 slds-large-size_1-of-4 slds-p-around_x-small"
+              >
+                <div class="price-tile">
+                  <p
+                    class="slds-text-title_caps slds-text-color_weak price-tile-label"
+                  >
+                    {price.commodity}
+                  </p>
+                  <p class="slds-text-heading_large price-tile-value">
+                    {price.formatted}
+                  </p>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+        <template if:false="{hasPrices}">
+          <p class="slds-text-body_regular slds-text-color_weak">
+            No commodity prices synced yet.
+          </p>
+        </template>
+
+        <template if:true="{hasCommodityGroups}">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small slds-m-top_medium section-title"
+          >
+            Supply Agreement Pricing
+          </h2>
+          <template for:each="{commodityGroups}" for:item="group">
+            <div key="{group.commodity}" class="commodity-group">
+              <div class="commodity-group-header">
+                <span class="commodity-group-name">{group.commodity}</span>
+                <span class="commodity-group-spot"
+                  >Spot: {group.spotPrice}</span
+                >
+              </div>
+              <table
+                class="slds-table slds-table_cell-buffer slds-table_bordered prod-table"
+              >
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th class="slds-text-title_caps" scope="col">Agreement</th>
+                    <th class="slds-text-title_caps" scope="col">Account</th>
+                    <th class="slds-text-title_caps" scope="col">
+                      Current Price
+                    </th>
+                    <th class="slds-text-title_caps" scope="col">Spot</th>
+                    <th class="slds-text-title_caps" scope="col">Variance</th>
+                    <th class="slds-text-title_caps" scope="col">Change</th>
+                    <th class="slds-text-title_caps" scope="col">Benchmark</th>
+                    <th class="slds-text-title_caps" scope="col">Source</th>
+                    <th class="slds-text-title_caps" scope="col">Last Sync</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each="{group.agreements}" for:item="ag">
+                    <tr key="{ag.id}">
+                      <td>{ag.name}</td>
+                      <td>{ag.account}</td>
+                      <td class="price-cell">{ag.currentPrice}</td>
+                      <td>{ag.spotPrice}</td>
+                      <td class="{ag.varianceClass}">{ag.variance}</td>
+                      <td class="{ag.priceChangeClass}">{ag.priceChange}</td>
+                      <td>{ag.benchmark}</td>
+                      <td>{ag.source}</td>
+                      <td>{ag.lastSync}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+        </template>
+
+        <template if:true="{hasStocks}">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small slds-m-top_medium section-title"
+          >
+            National Inventory Benchmarks (EIA)
+          </h2>
+          <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered prod-table"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th class="slds-text-title_caps" scope="col">Product</th>
+                <th class="slds-text-title_caps" scope="col">
+                  US National Stock (MBBL)
+                </th>
+                <th class="slds-text-title_caps" scope="col">Local Volume</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each="{stocks}" for:item="stock">
+                <tr key="{stock.product}">
+                  <td>{stock.product}</td>
+                  <td>{stock.nationalStock}</td>
+                  <td>{stock.localVolume}</td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+      </div>
+    </template>
+  </lightning-card>
+</template>

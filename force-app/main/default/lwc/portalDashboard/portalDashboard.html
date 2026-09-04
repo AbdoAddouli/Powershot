@@ -1,0 +1,118 @@
+<template>
+  <lightning-card title="O&G Portal Dashboard" icon-name="custom:custom63">
+    <template if:true="{hasError}">
+      <div class="slds-box slds-theme_error slds-m-around_medium">
+        <p>{errorMessage}</p>
+      </div>
+    </template>
+
+    <template if:false="{hasError}">
+      <div class="kpi-row">
+        <div class="kpi stat-blue">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{totalWells}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Total Wells</div>
+            <div class="kpi-sub">{activePipelines} active pipelines</div>
+          </div>
+        </div>
+        <div class="kpi stat-teal">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{activeIncidents}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Active Incidents</div>
+            <div class="kpi-sub warn">{criticalIncidents} critical</div>
+          </div>
+        </div>
+        <div class="kpi stat-red">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{criticalIncidents}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Critical Incidents</div>
+            <div class="kpi-sub">High severity</div>
+          </div>
+        </div>
+        <div class="kpi stat-orange">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{upcomingDeadlinesCount}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Permits Due (60d)</div>
+            <div class="kpi-sub warn">Next 60 days</div>
+          </div>
+        </div>
+      </div>
+
+      <template if:true="{hasIncidents}">
+        <div class="slds-p-around_medium">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            Recent HSE Incidents
+          </h2>
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{recentIncidents}"
+              columns="{incidentColumns}"
+              hide-checkbox-column
+            >
+            </lightning-datatable>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasDeadlines}">
+        <div class="slds-p-around_medium">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            Upcoming Compliance Deadlines
+          </h2>
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{upcomingDeadlines}"
+              columns="{deadlineColumns}"
+              hide-checkbox-column
+            >
+            </lightning-datatable>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasProduction}">
+        <div class="slds-p-around_medium">
+          <h2
+            class="slds-text-heading_medium slds-m-bottom_small section-title"
+          >
+            Production Summary (6 Months)
+          </h2>
+          <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered prod-table"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th class="slds-text-title_caps" scope="col">Well</th>
+                <th class="slds-text-title_caps" scope="col">Oil (bbls)</th>
+                <th class="slds-text-title_caps" scope="col">Gas (MCF)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each="{productionSummary}" for:item="row">
+                <tr key="{row.wellName}">
+                  <td>{row.wellName}</td>
+                  <td>{row.oilBbls}</td>
+                  <td>{row.gasMcf}</td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </template>
+    </template>
+  </lightning-card>
+</template>

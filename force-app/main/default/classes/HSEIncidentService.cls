@@ -61,6 +61,47 @@ public with sharing class HSEIncidentService {
     }
 
     /**
+     * @InvocableMethod Agent/Flow/MCP-facing wrapper for classifying HSE incident severity.
+     * @param requests  List of @InvocableVariable HSEIncidentClassifyRequest
+     */
+    @InvocableMethod(
+        label='Classify HSE Incident Severity'
+        description='Evaluates an HSE incident and sets its severity (Critical / High / Medium / Low).'
+    )
+    public static List<HSEIncidentClassifyResult> classifyIncidentSeverities(List<HSEIncidentClassifyRequest> requests) {
+        List<HSEIncidentClassifyResult> results = new List<HSEIncidentClassifyResult>();
+        List<Id> ids = new List<Id>();
+        for (HSEIncidentClassifyRequest req : requests) {
+            ids.add(req.incidentId);
+        }
+        try {
+            classifySeverities(ids);
+        } catch (Exception ex) {
+            for (HSEIncidentClassifyRequest req : requests) {
+                HSEIncidentClassifyResult result = new HSEIncidentClassifyResult();
+                result.incidentId = req.incidentId;
+                result.success = false;
+                result.message = ex.getMessage();
+                results.add(result);
+            }
+            return results;
+        }
+        Map<Id, HSE_Incident__c> classified = new Map<Id, HSE_Incident__c>([
+            SELECT Id, Severity__c FROM HSE_Incident__c WHERE Id IN :ids
+        ]);
+        for (HSEIncidentClassifyRequest req : requests) {
+            HSEIncidentClassifyResult result = new HSEIncidentClassifyResult();
+            result.incidentId = req.incidentId;
+            result.success = true;
+            HSE_Incident__c updated = classified.get(req.incidentId);
+            result.severity = updated != null ? updated.Severity__c : null;
+            result.message = 'Incident severity classified as "' + result.severity + '".';
+            results.add(result);
+        }
+        return results;
+    }
+
+    /**
      * Determines whether an incident meets regulatory reporting thresholds
      * (fatality, Critical/High severity, spill >= 50 bbl, lost-time or life-threatening injury).
      * @param incidentId  The HSE_Incident__c to evaluate
@@ -244,5 +285,21 @@ public with sharing class HSEIncidentService {
         if (!tasks.isEmpty()) {
             insert tasks;
         }
+    }
+
+    public class HSEIncidentClassifyRequest {
+        @InvocableVariable(label='Incident Id' required=true description='The HSE_Incident__c to classify.')
+        public Id incidentId;
+    }
+
+    public class HSEIncidentClassifyResult {
+        @InvocableVariable(label='Incident Id')
+        public Id incidentId;
+        @InvocableVariable(label='Success')
+        public Boolean success;
+        @InvocableVariable(label='Severity')
+        public String severity;
+        @InvocableVariable(label='Message')
+        public String message;
     }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Record an inventory movement (a volume change with a movement type, e.g. Consumption or Restock) against an inventory record and return the new tracked volume. WRITE action - only execute after the user explicitly confirms the adjustment.</description>
+    <invocationTarget>InventoryBalanceService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>true</isConfirmationRequired>
+    <masterLabel>Record Inventory Movement</masterLabel>
+</GenAiFunction>

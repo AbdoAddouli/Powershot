@@ -119,5 +119,45 @@ public with sharing class WellStatusService {
         ];
     }
 
+    /**
+     * @InvocableMethod Agent/Flow/MCP-facing wrapper for transitioning a well status.
+     * Exposes the write path so an agent can update a well's lifecycle state.
+     * @param requests  List of @InvocableVariable WellStatusChangeRequest
+     */
+    @InvocableMethod(
+        label='Transition Well Status'
+        description='Validates and applies a well lifecycle status transition (e.g. Producing to Shut-In).'
+    )
+    public static List<WellStatusChangeResult> transitionWellStatuses(List<WellStatusChangeRequest> requests) {
+        List<WellStatusChangeResult> results = new List<WellStatusChangeResult>();
+        for (WellStatusChangeRequest req : requests) {
+            WellStatusChangeResult result = new WellStatusChangeResult();
+            result.success = true;
+            try {
+                transitionWellStatus(req.wellId, req.newStatus);
+                result.message = 'Well status updated to "' + req.newStatus + '".';
+            } catch (Exception ex) {
+                result.success = false;
+                result.message = ex.getMessage();
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
+    public class WellStatusChangeRequest {
+        @InvocableVariable(label='Well Id' required=true description='The Well__c record to transition.')
+        public Id wellId;
+        @InvocableVariable(label='New Status' required=true description='Target status value, e.g. Producing, Shut-In, Plugged.')
+        public String newStatus;
+    }
+
+    public class WellStatusChangeResult {
+        @InvocableVariable(label='Success')
+        public Boolean success;
+        @InvocableVariable(label='Message')
+        public String message;
+    }
+
     public class WellStatusException extends Exception {}
 }

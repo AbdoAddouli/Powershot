@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Diameter_And_Capacity</fullName>
+    <active>true</active>
+    <description>Pipeline must have diameter and capacity specified.</description>
+    <errorConditionFormula>ISBLANK(Diameter_inches__c) || ISBLANK(Capacity_bpd__c)</errorConditionFormula>
+    <errorMessage>Pipeline Diameter and Capacity are required fields.</errorMessage>
+</ValidationRule>

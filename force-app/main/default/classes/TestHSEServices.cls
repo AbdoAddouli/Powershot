@@ -30,6 +30,7 @@ public with sharing class TestHSEServices {
             Incident_Date__c = Date.today(),
             Well__c = well.Id,
             Fatality_Occurred__c = true,
+            Spill_Volume__c = 100,
             Regulatory_Reportable__c = true
         );
         insert incident;
@@ -41,7 +42,7 @@ public with sharing class TestHSEServices {
         inc.Fatality_Occurred__c = true;
         inc.Injury_Type__c = null;
         inc.Environmental_Impact__c = null;
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         update inc;
 
         Test.startTest();
@@ -75,7 +76,7 @@ public with sharing class TestHSEServices {
         inc.Fatality_Occurred__c = false;
         inc.Injury_Type__c = 'Medical Treatment';
         inc.Environmental_Impact__c = null;
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         update inc;
 
         Test.startTest();
@@ -92,7 +93,7 @@ public with sharing class TestHSEServices {
         inc.Fatality_Occurred__c = false;
         inc.Injury_Type__c = null;
         inc.Environmental_Impact__c = null;
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         update inc;
 
         Test.startTest();
@@ -143,6 +144,48 @@ public with sharing class TestHSEServices {
     }
 
     @IsTest
+    static void testInvocableClassifyIncidentSeverity() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+        inc.Fatality_Occurred__c = false;
+        inc.Injury_Type__c = null;
+        inc.Environmental_Impact__c = null;
+        inc.Spill_Volume__c = 0;
+        update inc;
+
+        HSEIncidentService.HSEIncidentClassifyRequest req = new HSEIncidentService.HSEIncidentClassifyRequest();
+        req.incidentId = inc.Id;
+
+        Test.startTest();
+        List<HSEIncidentService.HSEIncidentClassifyResult> results =
+            HSEIncidentService.classifyIncidentSeverities(new List<HSEIncidentService.HSEIncidentClassifyRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, results.size());
+        Assert.isTrue(results[0].success);
+        Assert.areEqual('Low', results[0].severity);
+        HSE_Incident__c updated = [SELECT Id, Severity__c FROM HSE_Incident__c WHERE Id = :inc.Id];
+        Assert.areEqual('Low', updated.Severity__c);
+    }
+
+    @IsTest
+    static void testInvocableClassifyIncidentSeverityCritical() {
+        HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
+        inc.Fatality_Occurred__c = true;
+        update inc;
+
+        HSEIncidentService.HSEIncidentClassifyRequest req = new HSEIncidentService.HSEIncidentClassifyRequest();
+        req.incidentId = inc.Id;
+
+        Test.startTest();
+        List<HSEIncidentService.HSEIncidentClassifyResult> results =
+            HSEIncidentService.classifyIncidentSeverities(new List<HSEIncidentService.HSEIncidentClassifyRequest>{ req });
+        Test.stopTest();
+
+        Assert.isTrue(results[0].success);
+        Assert.areEqual('Critical', results[0].severity);
+    }
+
+    @IsTest
     static void testComplianceDueDateServiceUpcomingRenewals() {
         Regulatory_Permit__c permit = new Regulatory_Permit__c(
             Name = 'Test Permit',
@@ -157,6 +200,38 @@ public with sharing class TestHSEServices {
 
         Assert.isFalse(renewals.isEmpty());
         Assert.areEqual(permit.Id, renewals[0].Id);
+    }
+
+    @IsTest
+    static void testInvocableComplianceOverview() {
+        Regulatory_Permit__c permit = new Regulatory_Permit__c(
+            Name = 'Overview Permit',
+            Status__c = 'Active',
+            Expiration_Date__c = Date.today().addDays(30)
+        );
+        insert permit;
+
+        Compliance_Report__c report = new Compliance_Report__c(
+            Report_Type__c = 'Environmental Impact',
+            Due_Date__c = Date.today().addDays(-5),
+            Regulatory_Body__c = 'EPA',
+            Status__c = 'Pending'
+        );
+        insert report;
+
+        ComplianceDueDateService.ComplianceOverviewRequest req = new ComplianceDueDateService.ComplianceOverviewRequest();
+        req.daysAhead = 60;
+
+        Test.startTest();
+        List<ComplianceDueDateService.ComplianceOverview> overviews =
+            ComplianceDueDateService.getComplianceOverview(new List<ComplianceDueDateService.ComplianceOverviewRequest>{ req });
+        Test.stopTest();
+
+        Assert.areEqual(1, overviews.size());
+        Assert.isTrue(overviews[0].success);
+        Assert.isFalse(overviews[0].upcomingRenewals.isEmpty());
+        Assert.isFalse(overviews[0].overdueReports.isEmpty());
+        Assert.isTrue(overviews[0].message.contains('60 days'));
     }
 
     @IsTest
@@ -233,7 +308,7 @@ public with sharing class TestHSEServices {
         inc.Fatality_Occurred__c = false;
         inc.Injury_Type__c = 'Life-Threatening';
         inc.Environmental_Impact__c = null;
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         update inc;
         Test.startTest();
         HSEIncidentService.classifySeverity(inc.Id);
@@ -248,7 +323,7 @@ public with sharing class TestHSEServices {
         inc.Fatality_Occurred__c = false;
         inc.Injury_Type__c = 'Lost Time';
         inc.Environmental_Impact__c = null;
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         update inc;
         Test.startTest();
         HSEIncidentService.classifySeverity(inc.Id);
@@ -263,7 +338,7 @@ public with sharing class TestHSEServices {
         inc.Fatality_Occurred__c = false;
         inc.Injury_Type__c = null;
         inc.Environmental_Impact__c = 'Moderate';
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         update inc;
         Test.startTest();
         HSEIncidentService.classifySeverity(inc.Id);
@@ -448,7 +523,7 @@ public with sharing class TestHSEServices {
     static void testIsRegulatoryReportableByInjuryLostTime() {
         HSE_Incident__c inc = [SELECT Id FROM HSE_Incident__c LIMIT 1];
         inc.Fatality_Occurred__c = false;
-        inc.Spill_Volume__c = null;
+        inc.Spill_Volume__c = 0;
         inc.Injury_Type__c = 'Lost Time';
         inc.Environmental_Impact__c = null;
         update inc;

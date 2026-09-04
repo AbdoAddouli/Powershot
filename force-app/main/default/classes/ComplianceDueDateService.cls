@@ -174,4 +174,51 @@ public with sharing class ComplianceDueDateService {
             update upcoming;
         }
     }
+
+    /**
+     * @InvocableMethod Agent/Flow/MCP-facing wrapper returning an overview of
+     * upcoming permit renewals and overdue compliance reports.
+     * @param requests  List of @InvocableVariable ComplianceOverviewRequest
+     */
+    @InvocableMethod(
+        label='Get Compliance Overview'
+        description='Returns permits expiring soon and compliance reports that are overdue.'
+    )
+    public static List<ComplianceOverview> getComplianceOverview(List<ComplianceOverviewRequest> requests) {
+        List<ComplianceOverview> overviews = new List<ComplianceOverview>();
+        for (ComplianceOverviewRequest req : requests) {
+            ComplianceOverview overview = new ComplianceOverview();
+            Integer daysAhead = req.daysAhead != null ? req.daysAhead : 30;
+            try {
+                overview.upcomingRenewals = getUpcomingRenewals(daysAhead);
+                overview.overdueReports = getOverdueReports();
+                overview.success = true;
+                overview.message = 'Found ' + overview.upcomingRenewals.size() +
+                    ' permit(s) expiring within ' + daysAhead + ' days and ' +
+                    overview.overdueReports.size() + ' overdue report(s).';
+            } catch (Exception ex) {
+                overview.success = false;
+                overview.message = ex.getMessage();
+            }
+            overviews.add(overview);
+        }
+        return overviews;
+    }
+
+    public class ComplianceOverviewRequest {
+        @InvocableVariable(label='Days Ahead'
+            description='Look-ahead window in days for expiring permits. Defaults to 30.')
+        public Integer daysAhead;
+    }
+
+    public class ComplianceOverview {
+        @InvocableVariable(label='Upcoming Renewals')
+        public List<Regulatory_Permit__c> upcomingRenewals;
+        @InvocableVariable(label='Overdue Reports')
+        public List<Compliance_Report__c> overdueReports;
+        @InvocableVariable(label='Success')
+        public Boolean success;
+        @InvocableVariable(label='Message')
+        public String message;
+    }
 }

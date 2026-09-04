@@ -1,0 +1,141 @@
+<template>
+  <lightning-card title="Compliance" icon-name="custom:custom57">
+    <template if:true="{hasError}">
+      <div class="slds-box slds-theme_error slds-m-around_medium">
+        <p>{errorMessage}</p>
+      </div>
+    </template>
+
+    <template if:false="{hasError}">
+      <div class="kpi-row">
+        <div class="kpi stat-blue">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{activePermits}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Active Permits</div>
+            <div class="kpi-sub">Current &amp; valid</div>
+          </div>
+        </div>
+        <div class="kpi stat-orange">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{permitsExpiring30Days}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Expiring (30d)</div>
+            <div class="kpi-sub warn">Renew soon</div>
+          </div>
+        </div>
+        <div class="kpi stat-red">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{expiredPermits}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Expired</div>
+            <div class="kpi-sub">Action required</div>
+          </div>
+        </div>
+        <div class="kpi stat-teal">
+          <div class="kpi-gauge">
+            <span class="kpi-val">{overdueReports}</span>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Overdue Reports</div>
+            <div class="kpi-sub">Filing past due</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-p-around_medium">
+        <h2 class="slds-text-heading_medium slds-m-bottom_small section-title">
+          Upcoming Deadlines
+        </h2>
+        <template if:true="{hasDeadlines}">
+          <div class="cal-strip">
+            <template for:each="{deadlines}" for:item="dn">
+              <div
+                key="{dn.id}"
+                class="cal-day {dn.due ? 'due' : ''}"
+                title="{dn.title}"
+              >
+                <div class="d-date">{dn.type}</div>
+                <div class="d-count">{dn.daysLeft}d</div>
+                <div class="d-lbl">{dn.status}</div>
+                <div class="d-title">{dn.title}</div>
+              </div>
+            </template>
+          </div>
+        </template>
+        <template if:false="{hasDeadlines}">
+          <div class="slds-box slds-theme_shade slds-m-top_small">
+            <p>No upcoming deadlines.</p>
+          </div>
+        </template>
+      </div>
+
+      <div class="slds-p-around_medium">
+        <div class="filter-row">
+          <lightning-combobox
+            label="Permit Status"
+            value="{permitStatusFilter}"
+            options="{permitStatusOptions}"
+            onchange="{handlePermitStatusChange}"
+          >
+          </lightning-combobox>
+        </div>
+
+        <h2 class="slds-text-heading_medium slds-m-bottom_small section-title">
+          Permits
+        </h2>
+        <template if:true="{hasPermits}">
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{permits}"
+              columns="{permitColumns}"
+              hide-checkbox-column
+            >
+            </lightning-datatable>
+          </div>
+        </template>
+        <template if:false="{hasPermits}">
+          <div class="slds-box slds-theme_shade slds-m-top_small">
+            <p>No permits found.</p>
+          </div>
+        </template>
+      </div>
+
+      <div class="slds-p-around_medium">
+        <div class="filter-row">
+          <lightning-combobox
+            label="Report Status"
+            value="{reportStatusFilter}"
+            options="{reportStatusOptions}"
+            onchange="{handleReportStatusChange}"
+          >
+          </lightning-combobox>
+        </div>
+
+        <h2 class="slds-text-heading_medium slds-m-bottom_small section-title">
+          Compliance Reports
+        </h2>
+        <template if:true="{hasReports}">
+          <div class="table-card">
+            <lightning-datatable
+              key-field="Id"
+              data="{reports}"
+              columns="{reportColumns}"
+              hide-checkbox-column
+            >
+            </lightning-datatable>
+          </div>
+        </template>
+        <template if:false="{hasReports}">
+          <div class="slds-box slds-theme_shade slds-m-top_small">
+            <p>No compliance reports found.</p>
+          </div>
+        </template>
+      </div>
+    </template>
+  </lightning-card>
+</template>

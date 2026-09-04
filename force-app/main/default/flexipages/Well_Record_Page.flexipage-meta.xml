@@ -119,12 +119,6 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentName>complianceCalendar</componentName>
-                <identifier>c_complianceCalendar</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
                 <componentName>fieldServiceChecklist</componentName>
                 <identifier>c_fieldServiceChecklist</identifier>
             </componentInstance>
@@ -133,12 +127,6 @@
             <componentInstance>
                 <componentName>hseIncidentMap</componentName>
                 <identifier>c_hseIncidentMap</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>inventoryTankGauge</componentName>
-                <identifier>c_inventoryTankGauge</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

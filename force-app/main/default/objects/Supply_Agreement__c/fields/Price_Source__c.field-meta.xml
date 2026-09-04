@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Price_Source__c</fullName>
+    <label>Price Source</label>
+    <required>false</required>
+    <description>Which API or source provided the current price</description>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OilPriceAPI</fullName>
+                <default>false</default>
+                <label>OilPriceAPI</label>
+            </value>
+            <value>
+                <fullName>EIA</fullName>
+                <default>false</default>
+                <label>EIA (Energy Information Administration)</label>
+            </value>
+            <value>
+                <fullName>Manual</fullName>
+                <default>false</default>
+                <label>Manual Entry</label>
+            </value>
+            <value>
+                <fullName>Platts</fullName>
+                <default>false</default>
+                <label>S&amp;P Global Platts</label>
+            </value>
+            <value>
+                <fullName>OPIS</fullName>
+                <default>false</default>
+                <label>OPIS (Oil Price Information Service)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

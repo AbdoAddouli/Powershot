@@ -175,6 +175,54 @@ public with sharing class PermitToWorkValidationService {
     }
 
     /**
+     * @InvocableMethod Agent/Flow/MCP-facing wrapper for updating a permit status.
+     * @param requests  List of @InvocableVariable PermitStatusUpdateRequest
+     */
+    @InvocableMethod(
+        label='Update Permit-to-Work Status'
+        description='Updates a permit-to-work record status and returns the missing requirements, if any.'
+    )
+    public static List<PermitStatusUpdateResult> updatePermitStatuses(List<PermitStatusUpdateRequest> requests) {
+        List<PermitStatusUpdateResult> results = new List<PermitStatusUpdateResult>();
+        for (PermitStatusUpdateRequest req : requests) {
+            PermitStatusUpdateResult result = new PermitStatusUpdateResult();
+            result.permitId = req.permitId;
+            result.success = true;
+            try {
+                updatePermitStatus(req.permitId, req.newStatus);
+                result.newStatus = req.newStatus;
+                result.missingRequirements = getMissingRequirements(req.permitId);
+                result.message = 'Permit status updated to "' + req.newStatus + '".';
+            } catch (Exception ex) {
+                result.success = false;
+                result.message = ex.getMessage();
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
+    public class PermitStatusUpdateRequest {
+        @InvocableVariable(label='Permit Id' required=true description='The Permit_to_Work__c to update.')
+        public Id permitId;
+        @InvocableVariable(label='New Status' required=true description='Target status value.')
+        public String newStatus;
+    }
+
+    public class PermitStatusUpdateResult {
+        @InvocableVariable(label='Permit Id')
+        public Id permitId;
+        @InvocableVariable(label='Success')
+        public Boolean success;
+        @InvocableVariable(label='New Status')
+        public String newStatus;
+        @InvocableVariable(label='Missing Requirements')
+        public List<String> missingRequirements;
+        @InvocableVariable(label='Message')
+        public String message;
+    }
+
+    /**
      * Returns a list of all missing or incomplete requirements for a permit,
      * including scope of work, dates, isolation, gas test, and authorizations.
      * @param permitId  The Permit_to_Work__c Id
