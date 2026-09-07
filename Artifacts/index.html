@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Project Artifacts</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f1a; color: #e0e0e0; min-height: 100vh; }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, #0c2461 0%, #1e3799 50%, #0c2461 100%); padding: 60px 40px; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 30px 30px; }
+        .hero h1 { font-size: 36px; font-weight: 700; color: #fff; position: relative; }
+        .hero h1 span { color: #74b9ff; }
+        .hero p { font-size: 16px; color: rgba(255,255,255,0.7); margin-top: 12px; position: relative; }
+        .hero .badge { display: inline-block; margin-top: 16px; padding: 6px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px; color: rgba(255,255,255,0.8); position: relative; }
+
+        /* Stats */
+        .stats { display: flex; justify-content: center; gap: 40px; padding: 30px 40px; background: #141428; border-bottom: 1px solid #2d2d4a; }
+        .stat { text-align: center; }
+        .stat .num { font-size: 28px; font-weight: 700; color: #74b9ff; }
+        .stat .lbl { font-size: 12px; color: #636e72; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+        /* Cards Grid */
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .card { background: #1a1a2e; border: 1px solid #2d2d4a; border-radius: 12px; padding: 28px; transition: all 0.3s ease; cursor: pointer; text-decoration: none; color: inherit; display: block; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-4px); border-color: #74b9ff; box-shadow: 0 8px 30px rgba(116,185,255,0.15); }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; border-radius: 4px 0 0 4px; }
+        .card:nth-child(1)::before { background: #e17055; }
+        .card:nth-child(2)::before { background: #0984e3; }
+        .card:nth-child(3)::before { background: #6c5ce7; }
+        .card:nth-child(4)::before { background: #00b894; }
+        .card:nth-child(5)::before { background: #fdcb6e; }
+        .card:nth-child(6)::before { background: #e17055; }
+        .card:nth-child(7)::before { background: #74b9ff; }
+        .card:nth-child(8)::before { background: #d63031; }
+        .card:nth-child(9)::before { background: #00cec9; }
+        .card:nth-child(10)::before { background: #a29bfe; }
+
+        .card-num { font-size: 42px; font-weight: 800; color: rgba(255,255,255,0.05); position: absolute; top: 10px; right: 20px; }
+        .card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .card-desc { font-size: 13px; color: #636e72; line-height: 1.5; }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+        .card-tag { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .tag-objects { background: rgba(225,112,85,0.15); color: #e17055; }
+        .tag-roles { background: rgba(9,132,227,0.15); color: #0984e3; }
+        .tag-arch { background: rgba(108,92,231,0.15); color: #a29bfe; }
+        .tag-data { background: rgba(253,203,110,0.15); color: #fdcb6e; }
+        .tag-int { background: rgba(0,184,148,0.15); color: #00b894; }
+        .tag-sec { background: rgba(214,48,49,0.15); color: #ff7675; }
+        .tag-dev { background: rgba(0,206,201,0.15); color: #00cec9; }
+        .tag-gov { background: rgba(162,155,254,0.15); color: #a29bfe; }
+        .card-arrow { position: absolute; bottom: 20px; right: 20px; font-size: 18px; color: #636e72; transition: all 0.3s; }
+        .card:hover .card-arrow { color: #74b9ff; transform: translateX(4px); }
+
+        /* Footer */
+        .footer { text-align: center; padding: 40px; color: #636e72; font-size: 12px; border-top: 1px solid #2d2d4a; margin-top: 40px; }
+        .footer a { color: #74b9ff; text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .cards { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 26px; }
+            .stats { flex-wrap: wrap; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>PowerShot — <span>Project Artifacts</span></h1>
+        <p>Oil &amp; Gas Salesforce Solution — Visual Architecture Documentation</p>
+        <div class="badge">API v66.0 &bull; September 2026 &bull; Confidential</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><div class="num">31</div><div class="lbl">Custom Objects</div></div>
+        <div class="stat"><div class="num">60</div><div class="lbl">Apex Classes</div></div>
+        <div class="stat"><div class="num">11</div><div class="lbl">Flows</div></div>
+        <div class="stat"><div class="num">15</div><div class="lbl">LWC Components</div></div>
+        <div class="stat"><div class="num">20</div><div class="lbl">Permission Sets</div></div>
+        <div class="stat"><div class="num">9</div><div class="lbl">Integrations</div></div>
+    </div>
+
+    <div class="container">
+        <div class="cards">
+            <a class="card" href="01-company-overview.html">
+                <div class="card-num">01</div>
+                <div class="card-title">Company / Org Overview</div>
+                <div class="card-desc">Full value chain coverage across 4 business segments — Upstream, Midstream, Downstream, and Corporate. Shows the end-to-end flow from land acquisition to retail fuel sales.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-objects">31 Objects</span>
+                    <span class="card-tag tag-arch">Value Chain</span>
+                    <span class="card-tag tag-int">9 Integrations</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="02-actors-licenses.html">
+                <div class="card-num">02</div>
+                <div class="card-title">Actors &amp; Licenses</div>
+                <div class="card-desc">16 user roles mapped to 3 license types (Salesforce, Customer Community Plus, Integration). Full permission set matrix showing object-level CRUD access per role.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-roles">16 Roles</span>
+                    <span class="card-tag tag-roles">3 Licenses</span>
+                    <span class="card-tag tag-sec">20 Permission Sets</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="03-role-hierarchy.html">
+                <div class="card-num">03</div>
+                <div class="card-title">Role Hierarchy</div>
+                <div class="card-desc">5-level Salesforce role hierarchy showing how record visibility flows upward. Includes OWD table for all 26 objects and the relationship between hierarchy and Private sharing model.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-roles">5-Level Hierarchy</span>
+                    <span class="card-tag tag-sec">9 Private Objects</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="04-system-landscape.html">
+                <div class="card-num">04</div>
+                <div class="card-title">System Landscape Diagram</div>
+                <div class="card-desc">5-layer technical architecture — Presentation (LWC, Portal, Bot), Application (Apex, Triggers, Flows), Platform (Objects, Settings), Integration (APIs, Credentials), External Systems.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-arch">5 Layers</span>
+                    <span class="card-tag tag-arch">15 LWCs</span>
+                    <span class="card-tag tag-arch">Agentforce Bot</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="05-data-model-erd.html">
+                <div class="card-num">05</div>
+                <div class="card-title">Data Model (ERD)</div>
+                <div class="card-desc">Complete entity-relationship diagram for all 30 custom objects with fields and 71 relationships. Grouped by business domain with Master-Detail and Lookup relationship mapping.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-data">30 Objects</span>
+                    <span class="card-tag tag-data">71 Relationships</span>
+                    <span class="card-tag tag-data">1 Master-Detail</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="06-integration-architecture.html">
+                <div class="card-num">06</div>
+                <div class="card-title">Integration Architecture</div>
+                <div class="card-desc">Hub-and-spoke model with 10 external systems — SCADA/PI, OilPriceAPI, EIA, Petrel, WhatsApp, Slack, EPA CDX, GA4/GTM, Shopify, GitHub. Auth methods and integration patterns.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-int">10 Systems</span>
+                    <span class="card-tag tag-int">9 Named Credentials</span>
+                    <span class="card-tag tag-int">6 Auth Providers</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="07-data-migration-strategy.html">
+                <div class="card-num">07</div>
+                <div class="card-title">Data Migration Strategy</div>
+                <div class="card-desc">5-phase deployment timeline with dependency ordering — Objects → Classes → Flows → UI → Security → Integrations → Agentforce → Experience Cloud. Data volume estimates and migration tools.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-dev">5 Phases</span>
+                    <span class="card-tag tag-dev">17 Manual Steps</span>
+                    <span class="card-tag tag-data">Data Volumes</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="08-governance-model.html">
+                <div class="card-num">08</div>
+                <div class="card-title">Governance Model</div>
+                <div class="card-desc">Organizational governance with 4 domains — Steering Committee, Technical, Operational, Security. RACI matrix, change management flow, SLA tiers, and governance cadence.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-gov">RACI Matrix</span>
+                    <span class="card-tag tag-gov">SLA Tiers</span>
+                    <span class="card-tag tag-gov">Change Management</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="09-dev-deployment-strategy.html">
+                <div class="card-num">09</div>
+                <div class="card-title">Dev &amp; Deployment Strategy</div>
+                <div class="card-desc">2-org environment strategy, deployment pipeline, 8-phase dependency-ordered deployment with CLI commands, and 17 manual post-deployment steps.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-dev">2 Orgs</span>
+                    <span class="card-tag tag-dev">8 Phases</span>
+                    <span class="card-tag tag-dev">CLI Commands</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+
+            <a class="card" href="10-security-model.html">
+                <div class="card-num">10</div>
+                <div class="card-title">Security Model</div>
+                <div class="card-desc">6-layer defense-in-depth security — OWD, Role Hierarchy, Sharing Rules, Sharing Sets, Permission Sets, Apex Class Access. Full CRUD matrix and known security gaps.</div>
+                <div class="card-tags">
+                    <span class="card-tag tag-sec">6 Layers</span>
+                    <span class="card-tag tag-sec">9 Private Objects</span>
+                    <span class="card-tag tag-sec">20 Permission Sets</span>
+                </div>
+                <div class="card-arrow">→</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</p>
+        <p style="margin-top:6px;">Source: <a href="https://github.com/AbdoAddouli/Powershot" target="_blank">github.com/AbdoAddouli/Powershot</a></p>
+    </div>
+</body>
+</html>
