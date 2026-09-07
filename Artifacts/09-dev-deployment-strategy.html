@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Development &amp; Deployment Strategy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Environment Pipeline */
+        .pipeline { display: flex; align-items: center; gap: 0; margin: 30px 0; flex-wrap: wrap; justify-content: center; }
+        .pipe-stage { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); min-width: 180px; text-align: center; border-top: 4px solid #dfe6e9; }
+        .pipe-stage .ps-icon { font-size: 28px; margin-bottom: 6px; }
+        .pipe-stage .ps-name { font-size: 14px; font-weight: 700; }
+        .pipe-stage .ps-desc { font-size: 11px; color: #636e72; margin-top: 4px; }
+        .pipe-stage .ps-detail { font-size: 10px; color: #0984e3; margin-top: 6px; }
+        .pipe-arrow { font-size: 24px; color: #b2bec3; margin: 0 4px; }
+
+        .pipe-dev { border-top-color: #0984e3; }
+        .pipe-test { border-top-color: #e17055; }
+        .pipe-staging { border-top-color: #fdcb6e; }
+        .pipe-prod { border-top-color: #00b894; }
+
+        /* Org Comparison */
+        .org-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+        .org-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .org-card .org-name { font-size: 16px; font-weight: 700; }
+        .org-card .org-alias { font-size: 12px; color: #636e72; margin-top: 2px; }
+        .org-card .org-purpose { font-size: 12px; color: #0984e3; margin-top: 6px; }
+        .org-card .org-details { margin-top: 10px; font-size: 12px; color: #636e72; }
+        .org-card .org-details strong { color: #2d3436; }
+        .org-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 8px 12px; font-size: 11px; color: #856404; margin-top: 10px; }
+
+        /* Deployment Commands */
+        .cmd-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; margin: 24px 0; }
+        .cmd-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: left; }
+        .cmd-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; vertical-align: top; }
+        .cmd-table tr:hover { background: #f8f9fa; }
+        .cmd-code { background: #2d3436; color: #55efc4; padding: 4px 8px; border-radius: 4px; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; display: inline-block; margin-top: 4px; }
+
+        /* Phased Deployment */
+        .phase-list { display: flex; flex-direction: column; gap: 10px; margin: 24px 0; }
+        .phase-item { background: #fff; border-radius: 8px; padding: 14px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; }
+        .phase-num { background: #0c2461; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+        .phase-content { flex: 1; }
+        .phase-name { font-size: 13px; font-weight: 700; }
+        .phase-obj { font-size: 11px; color: #636e72; margin-top: 2px; }
+        .phase-cmd { font-size: 10px; color: #0984e3; margin-top: 4px; }
+
+        /* Manual Steps */
+        .manual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+        .manual-step { background: #fff; border-radius: 6px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 11px; border-left: 3px solid #e17055; }
+        .manual-step .ms-num { font-weight: 700; color: #e17055; }
+
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; }
+        .note strong { color: #856404; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media (max-width: 800px) { .org-grid { grid-template-columns: 1fr; } .manual-grid { grid-template-columns: 1fr; } .pipeline { flex-direction: column; } .pipe-arrow { transform: rotate(90deg); } }
+        @media print { .nav { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Development &amp; Deployment Strategy</div>
+        </div>
+        <div class="badge">2 Orgs &bull; 8-Phase Pipeline</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a class="active" href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Environment Strategy</h2>
+            <p>PowerShot uses two Salesforce orgs. <strong>Do not confuse them.</strong> All development and deployment targets the main Energy project org.</p>
+        </div>
+
+        <!-- Org Cards -->
+        <div class="org-grid">
+            <div class="org-card">
+                <div class="org-name">Main Energy Project Org</div>
+                <div class="org-alias">Alias: <code>ouil gas</code></div>
+                <div class="org-purpose">Primary deployment target — all O&amp;G objects, Apex, triggers, LWCs, permission sets, flows, apps deployed here</div>
+                <div class="org-details">
+                    <strong>Username:</strong> addouliabdo9.76deae143000@agentforce.com<br>
+                    <strong>API Version:</strong> 66.0<br>
+                    <strong>Purpose:</strong> Full PowerShot platform
+                </div>
+            </div>
+            <div class="org-card">
+                <div class="org-name">Agentforce Org</div>
+                <div class="org-alias">Alias: <code>agentforce</code></div>
+                <div class="org-purpose">Separate org — used for Agentforce/Einstein features only</div>
+                <div class="org-details">
+                    <strong>Username:</strong> addouli@agentfoece.com<br>
+                    <strong>API Version:</strong> 66.0<br>
+                    <strong>Purpose:</strong> Agentforce development
+                </div>
+                <div class="org-warning">⚠️ Do NOT deploy Energy project objects to this org. Different purpose, different data.</div>
+            </div>
+        </div>
+
+        <!-- Deployment Pipeline -->
+        <div class="title-bar">
+            <h2>Deployment Pipeline</h2>
+        </div>
+
+        <div class="pipeline">
+            <div class="pipe-stage pipe-dev">
+                <div class="ps-icon">💻</div>
+                <div class="ps-name">Local Dev</div>
+                <div class="ps-desc">SFDX Source Format<br>force-app/main/default/</div>
+                <div class="ps-detail">Git + VS Code</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-stage pipe-dev">
+                <div class="ps-icon">🔐</div>
+                <div class="ps-name">Authenticate</div>
+                <div class="ps-desc">sf org login web<br>Alias-based auth</div>
+                <div class="ps-detail">OAuth 2.0 JWT/Browser</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-stage pipe-test">
+                <div class="ps-icon">🧪</div>
+                <div class="ps-name">Test</div>
+                <div class="ps-desc">sf apex run test<br>Static analysis</div>
+                <div class="ps-detail">14 test classes, 75% coverage target</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-stage pipe-staging">
+                <div class="ps-icon">📦</div>
+                <div class="ps-name">Deploy</div>
+                <div class="ps-desc">sf project deploy start<br>Phased deployment</div>
+                <div class="ps-detail">8 phases, dependency-ordered</div>
+            </div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-stage pipe-prod">
+                <div class="ps-icon">✅</div>
+                <div class="ps-name">Verify</div>
+                <div class="ps-desc">Post-deploy validation<br>17 manual steps</div>
+                <div class="ps-detail">Sign-off by System Admin</div>
+            </div>
+        </div>
+
+        <!-- Deployment Commands -->
+        <div class="title-bar">
+            <h2>Key Deployment Commands</h2>
+        </div>
+
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>Command</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Authenticate</strong></td>
+                    <td><span class="cmd-code">sf org login web -o "ouil gas" -d</span></td>
+                    <td>Authorize the main Energy project org and set as default</td>
+                </tr>
+                <tr>
+                    <td><strong>Deploy Full</strong></td>
+                    <td><span class="cmd-code">sf project deploy start -d "force-app\main\default" -o "ouil gas" --wait 60</span></td>
+                    <td>Deploy all metadata to the org (full deployment)</td>
+                </tr>
+                <tr>
+                    <td><strong>Deploy Single Path</strong></td>
+                    <td><span class="cmd-code">sf project deploy start -d "force-app\main\default\PATH" -o "ouil gas"</span></td>
+                    <td>Deploy a specific component or directory</td>
+                </tr>
+                <tr>
+                    <td><strong>Run Tests</strong></td>
+                    <td><span class="cmd-code">sf apex run test -o "ouil gas" --result-format human --code-coverage</span></td>
+                    <td>Run all Apex tests with code coverage report</td>
+                </tr>
+                <tr>
+                    <td><strong>Static Analysis</strong></td>
+                    <td><span class="cmd-code">sf code-analyzer run --config-file code-analyzer.yml --workspace .</span></td>
+                    <td>Run PMD/CPD static analysis on Apex code</td>
+                </tr>
+                <tr>
+                    <td><strong>Check Deploy Status</strong></td>
+                    <td><span class="cmd-code">sf project deploy report</span></td>
+                    <td>Check the status of a recent deployment</td>
+                </tr>
+                <tr>
+                    <td><strong>Package Manifest Deploy</strong></td>
+                    <td><span class="cmd-code">sf project deploy start -x "manifest/package-full.xml" -o "ouil gas"</span></td>
+                    <td>Deploy using package.xml manifest (12 manifests available)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Phased Deployment Order -->
+        <div class="title-bar">
+            <h2>Dependency-Ordered Deployment Phases</h2>
+            <p>Each phase must complete successfully before the next begins. The order follows Salesforce metadata dependencies.</p>
+        </div>
+
+        <div class="phase-list">
+            <div class="phase-item"><div class="phase-num">1</div><div class="phase-content"><div class="phase-name">Objects &amp; Fields</div><div class="phase-obj">30 custom objects, 4 custom settings, 1 platform event, 25 layouts, 25 tabs, custom app</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\objects" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">2</div><div class="phase-content"><div class="phase-name">Apex Classes &amp; Triggers</div><div class="phase-obj">60 Apex classes (services, controllers, batch, queueable, test) + 9 triggers</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\classes" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">3</div><div class="phase-content"><div class="phase-name">Flows</div><div class="phase-obj">11 flows (7 scheduled + 4 record-triggered)</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\flows" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">4</div><div class="phase-content"><div class="phase-name">User Interface</div><div class="phase-obj">15 LWC components, 8 FlexiPages, 25 layouts</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\lwc" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">5</div><div class="phase-content"><div class="phase-name">Security</div><div class="phase-obj">20 permission sets, sharing rules, sharing sets, profiles</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\permissionsets" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">6</div><div class="phase-content"><div class="phase-name">Integrations</div><div class="phase-obj">9 named credentials, 7 external credentials, 5 remote sites, 6 auth providers</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\namedCredentials" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">7</div><div class="phase-content"><div class="phase-name">Agentforce</div><div class="phase-obj">1 bot, 8 GenAI functions, 12 plugins, 1 planner bundle, 1 eval definition</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\bots" -o "ouil gas"</div></div></div>
+            <div class="phase-item"><div class="phase-num">8</div><div class="phase-content"><div class="phase-name">Experience Cloud</div><div class="phase-obj">2 networks, 2 sites, sharing sets, portal controllers</div><div class="phase-cmd">sf project deploy start -d "force-app\main\default\networks" -o "ouil gas"</div></div></div>
+        </div>
+
+        <!-- Manual Post-Deploy Steps -->
+        <div class="title-bar">
+            <h2>17 Manual Post-Deployment Steps</h2>
+            <p>These steps cannot be automated via CLI and must be performed manually in the Salesforce Setup UI after deployment.</p>
+        </div>
+
+        <div class="manual-grid">
+            <div class="manual-step"><span class="ms-num">1.</span> Configure Slack webhook URL in Named Credential</div>
+            <div class="manual-step"><span class="ms-num">2.</span> Configure WhatsApp Cloud API token in Named Credential</div>
+            <div class="manual-step"><span class="ms-num">3.</span> Configure GA4 measurement ID in GTM_Config__c</div>
+            <div class="manual-step"><span class="ms-num">4.</span> Configure GTM container ID in GTM_Config__c</div>
+            <div class="manual-step"><span class="ms-num">5.</span> Activate HSE_Incident_Escalation flow (deploys as Draft)</div>
+            <div class="manual-step"><span class="ms-num">6.</span> Configure SCADA bridge secret in SCADA_Config__c</div>
+            <div class="manual-step"><span class="ms-num">7.</span> Assign page layouts to profiles</div>
+            <div class="manual-step"><span class="ms-num">8.</span> Wire Agentforce subagent bindings in Agentforce Builder UI</div>
+            <div class="manual-step"><span class="ms-num">9.</span> Configure Experience Cloud branding and theme</div>
+            <div class="manual-step"><span class="ms-num">10.</span> Set up JV_Partner_Sharing sharing set activation</div>
+            <div class="manual-step"><span class="ms-num">11.</span> Configure OilPriceAPI key in Named Credential</div>
+            <div class="manual-step"><span class="ms-num">12.</span> Configure EIA API key in Named Credential</div>
+            <div class="manual-step"><span class="ms-num">13.</span> Configure Petrel API credentials in Named Credential</div>
+            <div class="manual-step"><span class="ms-num">14.</span> Configure EPA CDX credentials in Named Credential</div>
+            <div class="manual-step"><span class="ms-num">15.</span> Assign permission sets to initial users</div>
+            <div class="manual-step"><span class="ms-num">16.</span> Create Public Groups (Executive Leadership, HSE Compliance Team)</div>
+            <div class="manual-step"><span class="ms-num">17.</span> Activate scheduled flows and verify cron jobs</div>
+        </div>
+
+        <div class="note">
+            <strong>Known Gap:</strong> Apex test coverage is currently ~39% (75% required for production deployment). All 14 test classes must pass, and additional test coverage must be written before production deployment.
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Company / Org Overview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Value Chain */
+        .value-chain { display: flex; align-items: center; justify-content: center; gap: 0; margin: 30px 0; flex-wrap: wrap; }
+        .vc-step { background: #fff; border-radius: 8px; padding: 14px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); min-width: 120px; position: relative; }
+        .vc-step .icon { font-size: 28px; margin-bottom: 6px; }
+        .vc-step .label { font-size: 12px; font-weight: 600; color: #2d3436; }
+        .vc-arrow { font-size: 24px; color: #b2bec3; margin: 0 4px; }
+
+        /* Segment Cards */
+        .segments { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }
+        .segment { border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); background: #fff; }
+        .segment-header { padding: 16px 20px; color: #fff; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+        .segment-header .seg-icon { font-size: 22px; }
+        .segment-body { padding: 16px 20px; }
+        .segment-body h4 { font-size: 12px; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .obj-list { list-style: none; }
+        .obj-list li { font-size: 13px; padding: 4px 0; border-bottom: 1px solid #f1f2f6; display: flex; align-items: center; gap: 6px; }
+        .obj-list li:last-child { border-bottom: none; }
+        .obj-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        .upstream .segment-header { background: linear-gradient(135deg, #e17055, #d63031); }
+        .upstream .obj-dot { background: #e17055; }
+        .midstream .segment-header { background: linear-gradient(135deg, #0984e3, #0652DD); }
+        .midstream .obj-dot { background: #0984e3; }
+        .downstream .segment-header { background: linear-gradient(135deg, #00b894, #009432); }
+        .downstream .obj-dot { background: #00b894; }
+        .corporate .segment-header { background: linear-gradient(135deg, #d63031, #b71540); }
+        .corporate .obj-dot { background: #d63031; }
+
+        /* Stats */
+        .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin: 30px 0; }
+        .stat-card { background: #fff; border-radius: 8px; padding: 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .stat-card .num { font-size: 28px; font-weight: 700; color: #0c2461; }
+        .stat-card .lbl { font-size: 11px; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+
+        @media (max-width: 900px) { .segments { grid-template-columns: repeat(2, 1fr); } .stats { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .segments { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } .value-chain { flex-direction: column; } .vc-arrow { transform: rotate(90deg); } }
+        @media print { .nav { display: none; } .header { background: #2d3436 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Company / Org Overview</div>
+        </div>
+        <div class="badge">API v66.0 &bull; September 2026</div>
+    </div>
+
+    <div class="nav">
+        <a class="active" href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Full Value Chain Coverage</h2>
+            <p>PowerShot manages the complete Oil &amp; Gas lifecycle — from mineral rights acquisition to retail fuel sales — across four integrated business segments on a single Salesforce platform.</p>
+        </div>
+
+        <!-- Value Chain Flow -->
+        <div class="value-chain">
+            <div class="vc-step"><div class="icon">🏔️</div><div class="label">Land Acquisition</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">📄</div><div class="label">Lease</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">⛽</div><div class="label">Well Permitting</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🔧</div><div class="label">Drilling</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🛢️</div><div class="label">Production</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🔄</div><div class="label">Allocation</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🔀</div><div class="label">Pipeline</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🏭</div><div class="label">Refinery</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🏗️</div><div class="label">Terminal</div></div>
+            <div class="vc-arrow">→</div>
+            <div class="vc-step"><div class="icon">🏪</div><div class="label">Retail</div></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card"><div class="num">31</div><div class="lbl">Custom Objects</div></div>
+            <div class="stat-card"><div class="num">60</div><div class="lbl">Apex Classes</div></div>
+            <div class="stat-card"><div class="num">11</div><div class="lbl">Flows</div></div>
+            <div class="stat-card"><div class="num">15</div><div class="lbl">LWC Components</div></div>
+            <div class="stat-card"><div class="num">20</div><div class="lbl">Permission Sets</div></div>
+            <div class="stat-card"><div class="num">9</div><div class="lbl">External Integrations</div></div>
+        </div>
+
+        <!-- Business Segments -->
+        <div class="segments">
+            <!-- Upstream -->
+            <div class="segment upstream">
+                <div class="segment-header"><span class="seg-icon">⛰️</span> Upstream</div>
+                <div class="segment-body">
+                    <h4>Drilling &amp; Production</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>Well__c</li>
+                        <li><span class="obj-dot"></span>Well_Operation__c</li>
+                        <li><span class="obj-dot"></span>Lease__c</li>
+                        <li><span class="obj-dot"></span>Land_Parcel__c</li>
+                        <li><span class="obj-dot"></span>Production_Allocation__c</li>
+                        <li><span class="obj-dot"></span>Joint_Venture__c</li>
+                    </ul>
+                    <h4 style="margin-top:12px">Key Automations</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>WellStatusService</li>
+                        <li><span class="obj-dot"></span>ProductionAllocationService</li>
+                        <li><span class="obj-dot"></span>RoyaltyCalculationService</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Midstream -->
+            <div class="segment midstream">
+                <div class="segment-header"><span class="seg-icon">🔗</span> Midstream</div>
+                <div class="segment-body">
+                    <h4>Pipelines &amp; Transport</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>Pipeline__c</li>
+                        <li><span class="obj-dot"></span>Pipeline_Station__c</li>
+                        <li><span class="obj-dot"></span>Measurement__c</li>
+                        <li><span class="obj-dot"></span>Transportation_Nomination__c</li>
+                    </ul>
+                    <h4 style="margin-top:12px">Key Automations</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>PipelineIntegrityService</li>
+                        <li><span class="obj-dot"></span>SCADAIngestionAPI</li>
+                        <li><span class="obj-dot"></span>PipelineIntegrityBatch</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Downstream -->
+            <div class="segment downstream">
+                <div class="segment-header"><span class="seg-icon">🏭</span> Downstream</div>
+                <div class="segment-body">
+                    <h4>Refining &amp; Retail</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>Refinery__c</li>
+                        <li><span class="obj-dot"></span>Terminal__c</li>
+                        <li><span class="obj-dot"></span>Retail_Outlet__c</li>
+                        <li><span class="obj-dot"></span>Fuel_Inventory__c</li>
+                        <li><span class="obj-dot"></span>Inventory_Transaction__c</li>
+                        <li><span class="obj-dot"></span>Supply_Agreement__c</li>
+                    </ul>
+                    <h4 style="margin-top:12px">Key Automations</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>InventoryBalanceService</li>
+                        <li><span class="obj-dot"></span>Retail_Inventory_Alert Flow</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Corporate -->
+            <div class="segment corporate">
+                <div class="segment-header"><span class="seg-icon">🏢</span> Corporate</div>
+                <div class="segment-body">
+                    <h4>HSE &amp; Compliance</h4>
+                    <ul class="obj-list">
+                        <li><span class="obj-dot"></span>HSE_Incident__c</li>
+                        <li><span class="obj-dot"></span>HSE_Observation__c</li>
+                        <li><span class="obj-dot"></span>Permit_to_Work__c</li>
+                        <li><span class="obj-dot"></span>Regulatory_Permit__c</li>
+                        <li><span class="obj-dot"></span>Compliance_Report__c</li>
+                        <li><span class="obj-dot"></span>Inspection__c</li>
+                        <li><span class="obj-dot"></span>Invoice__c</li>
+                        <li><span class="obj-dot"></span>Service_Contract__c</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Info -->
+        <div class="title-bar">
+            <h2>Platform Highlights</h2>
+            <p style="margin-top:10px">
+                <strong>Agentforce Bot:</strong> O&amp;G Operations Assistant — multi-agent orchestration with 8 GenAI functions, 12 plugins, and confirmation-gated write actions.<br>
+                <strong>Experience Cloud:</strong> JV Partner Portal with Account-matched sharing set for read-only access to wells, invoices, production allocations, and HSE incidents.<br>
+                <strong>External Integrations:</strong> SCADA/PI telemetry, commodity pricing, EIA data, Petrel well sync, WhatsApp Cloud API, Slack HSE alerts, EPA CDX regulatory filing, GA4/GTM analytics.
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>

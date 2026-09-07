@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Governance Model</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Org Chart */
+        .org-chart { display: flex; flex-direction: column; align-items: center; margin: 30px 0; }
+        .org-level { display: flex; gap: 16px; justify-content: center; margin-bottom: 8px; }
+        .org-connector { width: 2px; height: 20px; background: #b2bec3; }
+        .org-node { background: #fff; border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; min-width: 160px; border-top: 3px solid #dfe6e9; }
+        .org-node .on-title { font-size: 13px; font-weight: 700; }
+        .org-node .on-desc { font-size: 11px; color: #636e72; margin-top: 4px; }
+
+        .on-steering { border-top-color: #2d3436; }
+        .on-tech { border-top-color: #0984e3; }
+        .on-ops { border-top-color: #00b894; }
+        .on-security { border-top-color: #d63031; }
+
+        /* RACI Table */
+        .raci-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; margin: 24px 0; }
+        .raci-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: center; }
+        .raci-table th:first-child { text-align: left; }
+        .raci-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; text-align: center; }
+        .raci-table td:first-child { text-align: left; font-weight: 600; }
+        .raci-table tr:hover { background: #f8f9fa; }
+        .r { background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .a { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .c { background: #fff3e0; color: #e65100; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .i { background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+
+        /* Change Management */
+        .cm-flow { display: flex; align-items: center; gap: 0; margin: 24px 0; flex-wrap: wrap; justify-content: center; }
+        .cm-step { background: #fff; border-radius: 8px; padding: 12px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); text-align: center; min-width: 120px; }
+        .cm-step .cm-num { font-size: 20px; font-weight: 700; color: #0c2461; }
+        .cm-step .cm-label { font-size: 11px; color: #636e72; margin-top: 4px; }
+        .cm-arrow { font-size: 20px; color: #b2bec3; }
+
+        /* SLA Table */
+        .sla-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; margin: 24px 0; }
+        .sla-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: left; }
+        .sla-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; }
+        .sla-table tr:hover { background: #f8f9fa; }
+        .sla-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+        .sla-critical { background: #ffebee; color: #c62828; }
+        .sla-high { background: #fff3e0; color: #e65100; }
+        .sla-medium { background: #fff8e1; color: #f57f17; }
+        .sla-low { background: #e8f5e9; color: #2e7d32; }
+
+        /* Groups */
+        .groups-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 24px 0; }
+        .group-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .group-card .grp-name { font-size: 15px; font-weight: 700; }
+        .group-card .grp-purpose { font-size: 12px; color: #636e72; margin-top: 4px; }
+        .group-card .grp-members { margin-top: 8px; font-size: 12px; }
+        .group-card .grp-members strong { color: #0984e3; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media (max-width: 800px) { .groups-grid { grid-template-columns: 1fr; } .cm-flow { flex-direction: column; } .cm-arrow { transform: rotate(90deg); } }
+        @media print { .nav { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Governance Model</div>
+        </div>
+        <div class="badge">4 Governance Domains &bull; RACI Matrix</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a class="active" href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Organizational Governance Structure</h2>
+            <p>PowerShot governance is organized into four domains: Strategic Steering, Technical Governance, Operational Governance, and Security Governance. Each domain has clear ownership, decision rights, and escalation paths.</p>
+        </div>
+
+        <!-- Org Chart -->
+        <div class="org-chart">
+            <div class="org-level">
+                <div class="org-node on-steering">
+                    <div class="on-title">Steering Committee</div>
+                    <div class="on-desc">Executive Leadership<br>Strategic direction &amp; budget</div>
+                </div>
+            </div>
+            <div class="org-connector"></div>
+            <div class="org-level">
+                <div class="org-node on-tech">
+                    <div class="on-title">Technical Governance</div>
+                    <div class="on-desc">Platform Admin + Dev Team<br>Architecture, code, deployments</div>
+                </div>
+                <div class="org-node on-ops">
+                    <div class="on-title">Operational Governance</div>
+                    <div class="on-desc">HSE Compliance Team<br>Incident management, compliance</div>
+                </div>
+                <div class="org-node on-security">
+                    <div class="on-title">Security Governance</div>
+                    <div class="on-desc">System Admin<br>Access, sharing, data protection</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Public Groups -->
+        <div class="title-bar">
+            <h2>Public Groups</h2>
+        </div>
+
+        <div class="groups-grid">
+            <div class="group-card">
+                <div class="grp-name">Executive Leadership</div>
+                <div class="grp-purpose">Receives escalation emails for Critical-severity HSE incidents. Approves major platform changes and budget decisions.</div>
+                <div class="grp-members"><strong>Members:</strong> CEO, VPs, C-Suite executives</div>
+            </div>
+            <div class="group-card">
+                <div class="grp-name">HSE Compliance Team</div>
+                <div class="grp-purpose">Receives regulatory notification emails for reportable HSE incidents. Monitors compliance report deadlines and permit renewals.</div>
+                <div class="grp-members"><strong>Members:</strong> HSE Advisors, Compliance Analysts, Regulatory staff</div>
+            </div>
+        </div>
+
+        <!-- RACI Matrix -->
+        <div class="title-bar">
+            <h2>RACI Matrix — Decision Rights</h2>
+            <p><strong>R</strong> = Responsible (does the work) &nbsp; <strong>A</strong> = Accountable (owns the decision) &nbsp; <strong>C</strong> = Consulted (provides input) &nbsp; <strong>I</strong> = Informed (kept updated)</p>
+        </div>
+
+        <table class="raci-table">
+            <thead>
+                <tr>
+                    <th>Activity</th>
+                    <th>System Admin</th>
+                    <th>Dev Team</th>
+                    <th>HSE Advisor</th>
+                    <th>Compliance Analyst</th>
+                    <th>Executive</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Data Model Changes</td><td><span class="a">A</span></td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="c">C</span></td><td><span class="i">I</span></td></tr>
+                <tr><td>Apex Code Changes</td><td><span class="a">A</span></td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td></tr>
+                <tr><td>Flow Changes</td><td><span class="a">A</span></td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="c">C</span></td><td><span class="i">I</span></td></tr>
+                <tr><td>Security Model Changes</td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>Permission Set Changes</td><td><span class="r">R</span></td><td><span class="i">I</span></td><td><span class="c">C</span></td><td><span class="c">C</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>Integration Configuration</td><td><span class="a">A</span></td><td><span class="r">R</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td></tr>
+                <tr><td>HSE Incident Response</td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>Regulatory Filing</td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="c">C</span></td><td><span class="r">R</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>Production Deployment</td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>User Onboarding</td><td><span class="r">R</span></td><td><span class="i">I</span></td><td><span class="c">C</span></td><td><span class="c">C</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>Budget Approval</td><td><span class="c">C</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="i">I</span></td><td><span class="a">A</span></td></tr>
+                <tr><td>Data Migration</td><td><span class="r">R</span></td><td><span class="r">R</span></td><td><span class="c">C</span></td><td><span class="c">C</span></td><td><span class="a">A</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- Change Management Flow -->
+        <div class="title-bar">
+            <h2>Change Management Process</h2>
+        </div>
+
+        <div class="cm-flow">
+            <div class="cm-step">
+                <div class="cm-num">1</div>
+                <div class="cm-label">Request<br>Submitted</div>
+            </div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-step">
+                <div class="cm-num">2</div>
+                <div class="cm-label">Impact<br>Assessment</div>
+            </div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-step">
+                <div class="cm-num">3</div>
+                <div class="cm-label">Technical<br>Review</div>
+            </div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-step">
+                <div class="cm-num">4</div>
+                <div class="cm-label">Approval<br>Gate</div>
+            </div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-step">
+                <div class="cm-num">5</div>
+                <div class="cm-label">Test in<br>Sandbox</div>
+            </div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-step">
+                <div class="cm-num">6</div>
+                <div class="cm-label">Deploy to<br>Production</div>
+            </div>
+            <div class="cm-arrow">→</div>
+            <div class="cm-step">
+                <div class="cm-num">7</div>
+                <div class="cm-label">Verify &amp;<br>Sign Off</div>
+            </div>
+        </div>
+
+        <!-- SLA Tiers -->
+        <div class="title-bar">
+            <h2>Service Level Agreements (SLA)</h2>
+        </div>
+
+        <table class="sla-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Example</th>
+                    <th>Response Time</th>
+                    <th>Resolution Time</th>
+                    <th>Escalation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="sla-badge sla-critical">Critical</span></td>
+                    <td>Platform outage, data breach, Critical HSE incident</td>
+                    <td>1 hour</td>
+                    <td>4 hours</td>
+                    <td>Immediate → Executive Leadership</td>
+                </tr>
+                <tr>
+                    <td><span class="sla-badge sla-high">High</span></td>
+                    <td>Integration failure, flow error, permission issue blocking users</td>
+                    <td>4 hours</td>
+                    <td>1 business day</td>
+                    <td>System Admin → VP</td>
+                </tr>
+                <tr>
+                    <td><span class="sla-badge sla-medium">Medium</span></td>
+                    <td>Non-critical bug, report request, minor UI change</td>
+                    <td>1 business day</td>
+                    <td>5 business days</td>
+                    <td>System Admin</td>
+                </tr>
+                <tr>
+                    <td><span class="sla-badge sla-low">Low</span></td>
+                    <td>Enhancement request, documentation update, cosmetic change</td>
+                    <td>3 business days</td>
+                    <td>Sprint cycle</td>
+                    <td>Backlog grooming</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Governance Cadence -->
+        <div class="title-bar">
+            <h2>Governance Cadence</h2>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin:16px 0;">
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Weekly</div>
+                <div style="font-size:12px; color:#636e72;">
+                    • Sprint standup (dev team)<br>
+                    • Incident review (HSE team)<br>
+                    • Deployment coordination
+                </div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Monthly</div>
+                <div style="font-size:12px; color:#636e72;">
+                    • Platform health review<br>
+                    • Security audit<br>
+                    • Integration monitoring report<br>
+                    • Permission set review
+                </div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Quarterly</div>
+                <div style="font-size:12px; color:#636e72;">
+                    • Steering committee review<br>
+                    • Roadmap planning<br>
+                    • License audit<br>
+                    • Compliance certification
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>

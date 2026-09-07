@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Role Hierarchy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Hierarchy Tree */
+        .hierarchy { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .level { display: flex; justify-content: center; gap: 16px; margin-bottom: 8px; position: relative; }
+        .connector { width: 2px; height: 24px; background: #b2bec3; margin: 0 auto; }
+        .h-connector { display: flex; justify-content: center; margin-bottom: 8px; }
+        .h-line { height: 2px; background: #b2bec3; align-self: flex-start; }
+
+        .role-node { background: #fff; border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; min-width: 150px; position: relative; border-top: 3px solid #dfe6e9; }
+        .role-node .role-title { font-size: 13px; font-weight: 700; color: #2d3436; }
+        .role-node .role-license { font-size: 10px; color: #636e72; margin-top: 2px; }
+        .role-node .role-objects { font-size: 10px; color: #0984e3; margin-top: 4px; }
+
+        .role-ceo { border-top-color: #2d3436; }
+        .role-vp { border-top-color: #6c5ce7; }
+        .role-dir { border-top-color: #0984e3; }
+        .role-mgr { border-top-color: #00b894; }
+        .role-user { border-top-color: #fdcb6e; }
+        .role-portal { border-top-color: #e17055; }
+
+        .segment-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: 12px; margin-bottom: 10px; display: inline-block; }
+        .seg-up { background: #ffeaa7; color: #d35400; }
+        .seg-mid { background: #74b9ff; color: #0c2461; }
+        .seg-down { background: #55efc4; color: #006266; }
+        .seg-corp { background: #fab1a0; color: #c0392b; }
+
+        /* OWD Table */
+        .owd-section { margin: 30px 0; }
+        .owd-section h3 { font-size: 16px; margin-bottom: 12px; }
+        .owd-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; }
+        .owd-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: left; }
+        .owd-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; }
+        .owd-table tr:hover { background: #f8f9fa; }
+        .owd-private { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .owd-rw { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .owd-controlled { background: #fff3e0; color: #e65100; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; }
+        .note strong { color: #856404; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media print { .nav { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Role Hierarchy &amp; Record Visibility</div>
+        </div>
+        <div class="badge">5-Level Hierarchy &bull; 20 Permission Sets</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a class="active" href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Salesforce Role Hierarchy</h2>
+            <p>The role hierarchy controls record visibility for objects with <strong>Private</strong> sharing model. Users higher in the hierarchy can view/edit records owned by users below them. This hierarchy works in conjunction with OWD settings, sharing rules, and permission sets.</p>
+        </div>
+
+        <!-- Hierarchy Tree -->
+        <div class="hierarchy">
+            <!-- Level 1: CEO -->
+            <div class="level">
+                <div class="role-node role-ceo">
+                    <div class="role-title">CEO / System Admin</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">O_G_All_Access — Full CRUD + ViewAll + ModifyAll</div>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <!-- Level 2: VPs -->
+            <div class="level">
+                <div class="role-node role-vp">
+                    <div class="role-title">VP Upstream</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">O_G_Executive — Read all upstream objects</div>
+                </div>
+                <div class="role-node role-vp">
+                    <div class="role-title">VP Midstream</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">O_G_Executive — Read all midstream objects</div>
+                </div>
+                <div class="role-node role-vp">
+                    <div class="role-title">VP Downstream</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">O_G_Executive — Read all downstream objects</div>
+                </div>
+                <div class="role-node role-vp">
+                    <div class="role-title">VP HSE &amp; Compliance</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">O_G_Executive — Read all compliance objects</div>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <!-- Level 3: Directors / Managers -->
+            <div class="level">
+                <div class="role-node role-dir">
+                    <div class="role-title">Drilling Engineer</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Well__c, Well_Operation__c, Lease__c (R)</div>
+                </div>
+                <div class="role-node role-dir">
+                    <div class="role-title">Production Engineer</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Well__c, Production_Allocation__c</div>
+                </div>
+                <div class="role-node role-dir">
+                    <div class="role-title">Pipeline Engineer</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Pipeline__c, Station__c, Measurement__c, Inspection__c</div>
+                </div>
+                <div class="role-node role-dir">
+                    <div class="role-title">HSE Advisor</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">HSE_Incident__c, HSE_Observation__c, PTW__c</div>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <!-- Level 4: Operational Roles -->
+            <div class="level">
+                <div class="role-node role-mgr">
+                    <div class="role-title">Landman</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Lease__c, Land_Parcel__c, Joint_Venture__c</div>
+                </div>
+                <div class="role-node role-mgr">
+                    <div class="role-title">Compliance Analyst</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Regulatory_Permit__c, Compliance_Report__c</div>
+                </div>
+                <div class="role-node role-mgr">
+                    <div class="role-title">Refinery Manager</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Refinery__c, Supply_Agreement__c</div>
+                </div>
+                <div class="role-node role-mgr">
+                    <div class="role-title">Retail Manager</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Retail_Outlet__c, Fuel_Inventory__c</div>
+                </div>
+                <div class="role-node role-mgr">
+                    <div class="role-title">Terminal Operator</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Terminal__c, Fuel_Inventory__c, Measurement__c</div>
+                </div>
+                <div class="role-node role-mgr">
+                    <div class="role-title">Supply Chain</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Service_Contract__c, Fuel_Inventory__c (R)</div>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <!-- Level 5: Field / Portal -->
+            <div class="level">
+                <div class="role-node role-user">
+                    <div class="role-title">Field Technician</div>
+                    <div class="role-license">Salesforce License</div>
+                    <div class="role-objects">Inspection__c, Permit_to_Work__c</div>
+                </div>
+                <div class="role-node role-portal">
+                    <div class="role-title">JV Partner</div>
+                    <div class="role-license">Customer Community Plus</div>
+                    <div class="role-objects">Read-only via JV_Partner_Sharing set</div>
+                </div>
+                <div class="role-node role-portal">
+                    <div class="role-title">Field Worker</div>
+                    <div class="role-license">Customer Community Plus</div>
+                    <div class="role-objects">Inspection__c, PTW__c, HSE_Incident__c</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>Important:</strong> The role hierarchy grants visibility based on record ownership, not the permission set. A user with O_G_Executive (read-only) can still see records owned by users below them in the hierarchy — but they can only <em>read</em> them, not edit, because the permission set restricts CRUD. The hierarchy and permission sets work together: hierarchy controls <strong>who can see</strong>, permission sets control <strong>what they can do</strong>.
+        </div>
+
+        <!-- OWD Table -->
+        <div class="owd-section">
+            <h3>Org-Wide Defaults (OWD) — Sharing Model per Object</h3>
+            <table class="owd-table">
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>OWD Setting</th>
+                        <th>Effect</th>
+                        <th>Overridden By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Well__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, sharing rules (stubs)</td></tr>
+                    <tr><td><strong>Well_Operation__c</strong></td><td><span class="owd-controlled">ControlledByParent</span></td><td>Inherits sharing from Well__c (Master-Detail)</td><td>Well__c sharing</td></tr>
+                    <tr><td><strong>HSE_Incident__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, sharing rules (stubs)</td></tr>
+                    <tr><td><strong>Production_Allocation__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, sharing rules (stubs)</td></tr>
+                    <tr><td><strong>Regulatory_Permit__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, sharing rules (stubs)</td></tr>
+                    <tr><td><strong>Compliance_Report__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, JV_Partner_Sharing</td></tr>
+                    <tr><td><strong>Invoice__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, JV_Partner_Sharing</td></tr>
+                    <tr><td><strong>Joint_Venture__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, JV_Partner_Sharing</td></tr>
+                    <tr><td><strong>Lease__c</strong></td><td><span class="owd-private">Private</span></td><td>Only owner + hierarchy can see records</td><td>Role hierarchy, JV_Partner_Sharing</td></tr>
+                    <tr><td><strong>Pipeline__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Pipeline_Station__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Measurement__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Terminal__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Refinery__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Retail_Outlet__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Fuel_Inventory__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Inventory_Transaction__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Inspection__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Permit_to_Work__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Supply_Agreement__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Service_Contract__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Transportation_Nomination__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>HSE_Observation__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Land_Parcel__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>Store__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                    <tr><td><strong>WhatsApp_Message__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all records</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="note">
+            <strong>Key Observation:</strong> 9 objects use <strong>Private</strong> OWD — these are the most sensitive business objects (wells, production, financial, compliance). For these, the role hierarchy is the primary mechanism for granting upward visibility. The 10 sharing rules in the project are currently <strong>empty stubs</strong> — this is a known gap that should be addressed before production deployment.
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>

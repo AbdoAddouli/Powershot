@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Integration Architecture</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Hub and Spoke */
+        .hub-spoke { display: flex; justify-content: center; align-items: center; margin: 30px 0; position: relative; min-height: 600px; }
+        .sf-hub { width: 200px; height: 200px; background: linear-gradient(135deg, #0984e3, #74b9ff); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; z-index: 2; box-shadow: 0 4px 20px rgba(9,132,227,0.3); }
+        .sf-hub .sf-icon { font-size: 36px; }
+        .sf-hub .sf-name { font-size: 16px; font-weight: 700; margin-top: 6px; }
+        .sf-hub .sf-detail { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+        .spokes { position: absolute; width: 100%; height: 100%; }
+        .spoke { position: absolute; display: flex; align-items: center; gap: 8px; }
+        .spoke-line { width: 60px; height: 2px; }
+        .spoke-card { background: #fff; border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); min-width: 200px; border-top: 3px solid #dfe6e9; }
+        .spoke-card .spoke-name { font-size: 14px; font-weight: 700; }
+        .spoke-card .spoke-dir { font-size: 11px; margin-top: 2px; }
+        .spoke-card .spoke-auth { font-size: 10px; color: #636e72; margin-top: 4px; }
+        .spoke-card .spoke-apex { font-size: 10px; color: #0984e3; margin-top: 2px; }
+        .spoke-card .spoke-nc { font-size: 10px; color: #6c5ce7; margin-top: 2px; }
+
+        .dir-in { color: #00b894; }
+        .dir-out { color: #e17055; }
+        .dir-bi { color: #6c5ce7; }
+
+        /* Integration Table */
+        .int-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; margin: 24px 0; }
+        .int-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: left; }
+        .int-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; vertical-align: top; }
+        .int-table tr:hover { background: #f8f9fa; }
+
+        .int-tag { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+        .int-in { background: #e8f5e9; color: #2e7d32; }
+        .int-out { background: #fff3e0; color: #e65100; }
+        .int-bi { background: #ede7f6; color: #4527a0; }
+
+        .auth-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; background: #f1f2f6; color: #636e72; margin: 1px; }
+
+        /* Auth Methods */
+        .auth-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 24px 0; }
+        .auth-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .auth-card .auth-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+        .auth-card .auth-desc { font-size: 12px; color: #636e72; }
+        .auth-card .auth-used { font-size: 11px; color: #0984e3; margin-top: 6px; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media (max-width: 800px) { .auth-grid { grid-template-columns: repeat(2, 1fr); } .hub-spoke { min-height: auto; flex-direction: column; } .spokes { position: static; display: flex; flex-direction: column; gap: 12px; } .spoke { position: static; } .spoke-line { display: none; } }
+        @media print { .nav { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Integration Architecture</div>
+        </div>
+        <div class="badge">10 External Systems &bull; 9 Named Credentials</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a class="active" href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Hub-and-Spoke Integration Model</h2>
+            <p>Salesforce acts as the central hub, connecting to 10 external systems via REST APIs, webhooks, platform events, and named credentials. All integrations use the principle of least privilege — each Named Credential grants only the minimum API access required.</p>
+        </div>
+
+        <!-- Hub and Spoke Diagram -->
+        <div style="background:#fff; border-radius:10px; padding:30px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin:24px 0;">
+            <div style="display:grid; grid-template-columns: 1fr 200px 1fr; gap:20px; align-items:center;">
+                <!-- Left Column -->
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="spoke-card" style="border-top-color:#00b894;">
+                        <div class="spoke-name">SCADA / PI System</div>
+                        <div class="spoke-dir dir-in">Inbound — Real-time telemetry</div>
+                        <div class="spoke-auth"><span class="auth-tag">HMAC-SHA256</span> Signed REST API</div>
+                        <div class="spoke-apex">SCADAIngestionAPI → SCADAMeasurementProcessor</div>
+                        <div class="spoke-nc">Remote: bridge endpoint</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#6c5ce7;">
+                        <div class="spoke-name">Petrel (Geological)</div>
+                        <div class="spoke-dir dir-bi">Bidirectional — Well data sync</div>
+                        <div class="spoke-auth"><span class="auth-tag">OAuth 2.0</span></div>
+                        <div class="spoke-apex">PetrelWellSync → PetrelWellSyncQueueable</div>
+                        <div class="spoke-nc">Named Credential: PetrelAPI</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#e17055;">
+                        <div class="spoke-name">OilPriceAPI</div>
+                        <div class="spoke-dir dir-out">Outbound — Commodity pricing</div>
+                        <div class="spoke-auth"><span class="auth-tag">API Key</span></div>
+                        <div class="spoke-apex">CommodityPricingService → CommodityPriceSyncQueueable</div>
+                        <div class="spoke-nc">Named Credential: CommodityPricing</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#e17055;">
+                        <div class="spoke-name">EIA Open Data API</div>
+                        <div class="spoke-dir dir-out">Outbound — Energy pricing</div>
+                        <div class="spoke-auth"><span class="auth-tag">API Key</span></div>
+                        <div class="spoke-apex">EIAPricingService → EIAQueueable → EIAPriceSyncScheduler</div>
+                        <div class="spoke-nc">Named Credential: EIA_API</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#e17055;">
+                        <div class="spoke-name">EPA CDX</div>
+                        <div class="spoke-dir dir-out">Outbound — Regulatory filing</div>
+                        <div class="spoke-auth"><span class="auth-tag">OAuth 2.0</span></div>
+                        <div class="spoke-apex">RegulatoryFilingService</div>
+                        <div class="spoke-nc">Named Credential: EPA_CDX_API</div>
+                    </div>
+                </div>
+
+                <!-- Center Hub -->
+                <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+                    <div style="width:180px; height:180px; background:linear-gradient(135deg, #0984e3, #74b9ff); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; box-shadow:0 4px 20px rgba(9,132,227,0.3);">
+                        <div style="font-size:32px;">☁️</div>
+                        <div style="font-size:16px; font-weight:700; margin-top:6px;">Salesforce Org</div>
+                        <div style="font-size:11px; opacity:0.8; margin-top:2px;">PowerShot Platform</div>
+                        <div style="font-size:10px; opacity:0.7; margin-top:2px;">API v66.0</div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="spoke-card" style="border-top-color:#6c5ce7;">
+                        <div class="spoke-name">WhatsApp Cloud API</div>
+                        <div class="spoke-dir dir-bi">Bidirectional — Messaging</div>
+                        <div class="spoke-auth"><span class="auth-tag">OAuth 2.0</span> + <span class="auth-tag">HMAC</span></div>
+                        <div class="spoke-apex">WhatsAppWebhookHandler (in) → WhatsAppMessageService (out)</div>
+                        <div class="spoke-nc">Named Credential: WhatsApp_API + Auth Provider</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#e17055;">
+                        <div class="spoke-name">Slack</div>
+                        <div class="spoke-dir dir-out">Outbound — HSE alerts</div>
+                        <div class="spoke-auth"><span class="auth-tag">Webhook URL</span></div>
+                        <div class="spoke-apex">Slack_Alert__e → SlackAlertQueueable → SlackAlertService</div>
+                        <div class="spoke-nc">Named Credential: Slack_HSE_Webhook</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#e17055;">
+                        <div class="spoke-name">GA4 / Google Tag Manager</div>
+                        <div class="spoke-dir dir-out">Outbound — Store analytics</div>
+                        <div class="spoke-auth"><span class="auth-tag">OAuth 2.0</span></div>
+                        <div class="spoke-apex">GA4AdminService, GTMService → GAEventsController, GTMPixelBuilder</div>
+                        <div class="spoke-nc">Named Credentials: GA4_Admin, GTM_API, GTM_TagManager</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#6c5ce7;">
+                        <div class="spoke-name">Shopify</div>
+                        <div class="spoke-dir dir-bi">Bidirectional — Store provisioning</div>
+                        <div class="spoke-auth"><span class="auth-tag">API Key</span></div>
+                        <div class="spoke-apex">ProvisioningService → ProvisioningQueueable</div>
+                        <div class="spoke-nc">Remote Site: Shopify_Admin</div>
+                    </div>
+                    <div class="spoke-card" style="border-top-color:#636e72;">
+                        <div class="spoke-name">GitHub / Bitbucket</div>
+                        <div class="spoke-dir dir-bi">Bidirectional — Source control</div>
+                        <div class="spoke-auth"><span class="auth-tag">OAuth 2.0</span></div>
+                        <div class="spoke-apex">DevOps Center integration</div>
+                        <div class="spoke-nc">Auth Providers: DEVOPS_CENTER_GITHUB, DEVOPS_CENTER_BITBUCKET</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Integration Table -->
+        <div class="title-bar">
+            <h2>Integration Detail Matrix</h2>
+        </div>
+
+        <table class="int-table">
+            <thead>
+                <tr>
+                    <th>System</th>
+                    <th>Direction</th>
+                    <th>Protocol</th>
+                    <th>Auth Method</th>
+                    <th>Salesforce Components</th>
+                    <th>Named Credential</th>
+                    <th>Data Volume</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>SCADA / PI</strong></td>
+                    <td><span class="int-tag int-in">Inbound</span></td>
+                    <td>REST API (signed)</td>
+                    <td><span class="auth-tag">HMAC-SHA256</span></td>
+                    <td>SCADAIngestionAPI, SCADAMeasurementProcessor, WellProductionTelemetryRollupBatch</td>
+                    <td>— (On-prem bridge)</td>
+                    <td>High — real-time telemetry</td>
+                </tr>
+                <tr>
+                    <td><strong>Petrel</strong></td>
+                    <td><span class="int-tag int-bi">Bidirectional</span></td>
+                    <td>REST API</td>
+                    <td><span class="auth-tag">OAuth 2.0</span></td>
+                    <td>PetrelWellSync, PetrelWellSyncQueueable</td>
+                    <td>PetrelAPI</td>
+                    <td>Medium — geological data sync</td>
+                </tr>
+                <tr>
+                    <td><strong>OilPriceAPI</strong></td>
+                    <td><span class="int-tag int-out">Outbound</span></td>
+                    <td>REST API</td>
+                    <td><span class="auth-tag">API Key</span></td>
+                    <td>CommodityPricingService, CommodityPriceSyncQueueable, CommodityPriceSyncScheduler</td>
+                    <td>CommodityPricing</td>
+                    <td>Low — daily price sync</td>
+                </tr>
+                <tr>
+                    <td><strong>EIA API</strong></td>
+                    <td><span class="int-tag int-out">Outbound</span></td>
+                    <td>REST API</td>
+                    <td><span class="auth-tag">API Key</span></td>
+                    <td>EIAPricingService, EIAQueueable, EIAPriceSyncScheduler</td>
+                    <td>EIA_API</td>
+                    <td>Low — daily price sync</td>
+                </tr>
+                <tr>
+                    <td><strong>EPA CDX</strong></td>
+                    <td><span class="int-tag int-out">Outbound</span></td>
+                    <td>REST API</td>
+                    <td><span class="auth-tag">OAuth 2.0</span></td>
+                    <td>RegulatoryFilingService</td>
+                    <td>EPA_CDX_API</td>
+                    <td>Low — periodic filing</td>
+                </tr>
+                <tr>
+                    <td><strong>WhatsApp Cloud</strong></td>
+                    <td><span class="int-tag int-bi">Bidirectional</span></td>
+                    <td>REST Webhook</td>
+                    <td><span class="auth-tag">OAuth 2.0</span> <span class="auth-tag">HMAC</span></td>
+                    <td>WhatsAppWebhookHandler (GET verify + POST), WhatsAppMessageService</td>
+                    <td>WhatsApp_API</td>
+                    <td>Medium — messaging</td>
+                </tr>
+                <tr>
+                    <td><strong>Slack</strong></td>
+                    <td><span class="int-tag int-out">Outbound</span></td>
+                    <td>Webhook</td>
+                    <td><span class="auth-tag">Webhook URL</span></td>
+                    <td>Slack_Alert__e → SlackAlertQueueable → SlackAlertService (Invocable)</td>
+                    <td>Slack_HSE_Webhook</td>
+                    <td>Low — critical alerts only</td>
+                </tr>
+                <tr>
+                    <td><strong>GA4 / GTM</strong></td>
+                    <td><span class="int-tag int-out">Outbound</span></td>
+                    <td>REST API</td>
+                    <td><span class="auth-tag">OAuth 2.0</span></td>
+                    <td>GA4AdminService, GTMService, GAEventsController, GTMPixelBuilder</td>
+                    <td>GA4_Admin, GTM_API, GTM_TagManager</td>
+                    <td>Low — analytics config</td>
+                </tr>
+                <tr>
+                    <td><strong>Shopify</strong></td>
+                    <td><span class="int-tag int-bi">Bidirectional</span></td>
+                    <td>REST API</td>
+                    <td><span class="auth-tag">API Key</span></td>
+                    <td>ProvisioningService, ProvisioningQueueable, StoreController</td>
+                    <td>— (Remote Site)</td>
+                    <td>Low — store provisioning</td>
+                </tr>
+                <tr>
+                    <td><strong>GitHub / Bitbucket</strong></td>
+                    <td><span class="int-tag int-bi">Bidirectional</span></td>
+                    <td>Git Protocol</td>
+                    <td><span class="auth-tag">OAuth 2.0</span></td>
+                    <td>DevOps Center (built-in)</td>
+                    <td>— (Auth Providers)</td>
+                    <td>Low — source control</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Auth Methods -->
+        <div class="title-bar">
+            <h2>Authentication Methods</h2>
+        </div>
+
+        <div class="auth-grid">
+            <div class="auth-card">
+                <div class="auth-name">HMAC-SHA256</div>
+                <div class="auth-desc">Hash-based Message Authentication Code — each request is signed with a shared secret to prove authenticity and prevent tampering.</div>
+                <div class="auth-used">Used by: SCADA/PI Ingestion API, WhatsApp Webhook</div>
+            </div>
+            <div class="auth-card">
+                <div class="auth-name">OAuth 2.0</div>
+                <div class="auth-desc">Industry-standard authorization framework — Salesforce acts as OAuth client, exchanging tokens with external providers.</div>
+                <div class="auth-used">Used by: Petrel, EPA CDX, WhatsApp, GA4, GTM, DevOps Center</div>
+            </div>
+            <div class="auth-card">
+                <div class="auth-name">Named Credentials</div>
+                <div class="auth-desc">Salesforce-managed authentication store — credentials are encrypted and never exposed in Apex code. Supports OAuth, Basic, and API Key auth.</div>
+                <div class="auth-used">Used by: 9 Named Credentials across all outbound integrations</div>
+            </div>
+            <div class="auth-card">
+                <div class="auth-name">Webhook URL</div>
+                <div class="auth-desc">Simple URL-based integration — the webhook URL itself serves as the authentication token. Used for lightweight outbound notifications.</div>
+                <div class="auth-used">Used by: Slack HSE Alert webhook</div>
+            </div>
+        </div>
+
+        <!-- Integration Patterns -->
+        <div class="title-bar">
+            <h2>Integration Patterns</h2>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin:16px 0;">
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Request-Reply</div>
+                <div style="font-size:12px; color:#636e72;">Synchronous REST callouts from Apex to external APIs. Used for real-time data lookups.</div>
+                <div style="font-size:11px; color:#0984e3; margin-top:6px;">SCADAIngestionAPI, WhatsAppWebhookHandler, CommodityPricingService</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Async Queueable</div>
+                <div style="font-size:12px; color:#636e72;">Asynchronous processing via Queueable Apex — decouples long-running integrations from user transactions.</div>
+                <div style="font-size:11px; color:#0984e3; margin-top:6px;">PetrelWellSyncQueueable, CommodityPriceSyncQueueable, SlackAlertQueueable, EIAQueueable, ProvisioningQueueable, RenewalReminderQueueable</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Platform Event</div>
+                <div style="font-size:12px; color:#636e72;">Event-driven architecture — platform events decouple publishers from subscribers. Used for cross-boundary alerting.</div>
+                <div style="font-size:11px; color:#0984e3; margin-top:6px;">Slack_Alert__e → SlackAlertEventTrigger → SlackAlertQueueable</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Scheduled Batch</div>
+                <div style="font-size:12px; color:#636e72;">Batch Apex for bulk data processing — rollups, integrity checks, reconciliation of large datasets.</div>
+                <div style="font-size:11px; color:#0984e3; margin-top:6px;">PipelineIntegrityBatch, WellProductionRollupBatch, WellProductionTelemetryRollupBatch</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Scheduled Apex</div>
+                <div style="font-size:12px; color:#636e72;">Time-based triggers — schedulers run at defined intervals to sync external data or trigger notifications.</div>
+                <div style="font-size:11px; color:#0984e3; margin-top:6px;">CommodityPriceSyncScheduler, EIAPriceSyncScheduler</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+                <div style="font-size:14px; font-weight:700; margin-bottom:8px;">Webhook (Inbound)</div>
+                <div class="auth-desc" style="font-size:12px; color:#636e72;">REST endpoint exposed by Salesforce — external systems POST data to Apex REST classes.</div>
+                <div style="font-size:11px; color:#0984e3; margin-top:6px;">SCADAIngestionAPI (@RestResource), WhatsAppWebhookHandler</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>

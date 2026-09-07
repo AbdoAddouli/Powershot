@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Actors &amp; Licenses</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Actor Cards */
+        .actors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+        .actor-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #dfe6e9; transition: transform 0.2s; }
+        .actor-card:hover { transform: translateY(-2px); }
+        .actor-card .actor-icon { font-size: 32px; margin-bottom: 8px; }
+        .actor-card .actor-name { font-size: 15px; font-weight: 700; color: #2d3436; }
+        .actor-card .actor-role { font-size: 12px; color: #636e72; margin-top: 2px; }
+        .actor-card .actor-license { display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .actor-card .actor-objects { margin-top: 10px; font-size: 12px; color: #636e72; }
+        .actor-card .actor-objects strong { color: #2d3436; }
+
+        .license-sf { background: #e8f5e9; color: #2e7d32; }
+        .license-cpp { background: #e3f2fd; color: #1565c0; }
+        .license-partner { background: #fce4ec; color: #c62828; }
+
+        .seg-upstream { border-left-color: #e17055; }
+        .seg-midstream { border-left-color: #0984e3; }
+        .seg-downstream { border-left-color: #00b894; }
+        .seg-corporate { border-left-color: #d63031; }
+        .seg-portal { border-left-color: #6c5ce7; }
+        .seg-system { border-left-color: #636e72; }
+
+        /* License Summary */
+        .license-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+        .license-box { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+        .license-box .lic-icon { font-size: 36px; margin-bottom: 8px; }
+        .license-box .lic-name { font-size: 16px; font-weight: 700; }
+        .license-box .lic-count { font-size: 28px; font-weight: 700; color: #0c2461; margin-top: 6px; }
+        .license-box .lic-desc { font-size: 12px; color: #636e72; margin-top: 4px; }
+        .license-box .lic-users { margin-top: 10px; text-align: left; font-size: 12px; color: #636e72; }
+        .license-box .lic-users span { display: block; padding: 2px 0; }
+
+        /* Matrix */
+        .matrix-section { margin: 30px 0; }
+        .matrix-section h3 { font-size: 16px; margin-bottom: 12px; color: #2d3436; }
+        .matrix-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; }
+        .matrix-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: left; font-weight: 600; }
+        .matrix-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; }
+        .matrix-table tr:hover { background: #f8f9fa; }
+        .perm-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; margin: 1px; }
+        .perm-rw { background: #e8f5e9; color: #2e7d32; }
+        .perm-ro { background: #fff3e0; color: #e65100; }
+        .perm-na { background: #f5f5f5; color: #9e9e9e; }
+        .perm-full { background: #e3f2fd; color: #1565c0; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media (max-width: 900px) { .actors-grid, .license-summary { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .actors-grid, .license-summary { grid-template-columns: 1fr; } }
+        @media print { .nav { display: none; } .actor-card { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Actors &amp; Licenses</div>
+        </div>
+        <div class="badge">16 User Roles &bull; 3 License Types</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a class="active" href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>License Summary</h2>
+            <p>PowerShot requires three Salesforce license types to support internal operators, external partners, and integration users.</p>
+        </div>
+
+        <!-- License Boxes -->
+        <div class="license-summary">
+            <div class="license-box">
+                <div class="lic-icon">💼</div>
+                <div class="lic-name">Salesforce</div>
+                <div class="lic-count">13</div>
+                <div class="lic-desc">Internal Full Users</div>
+                <div class="lic-users">
+                    <span>System Administrator</span>
+                    <span>Executive</span>
+                    <span>Drilling Engineer</span>
+                    <span>Production Engineer</span>
+                    <span>Pipeline Engineer</span>
+                    <span>HSE Advisor</span>
+                    <span>Compliance Analyst</span>
+                    <span>Field Technician</span>
+                    <span>Landman</span>
+                    <span>Refinery Manager</span>
+                    <span>Retail Manager</span>
+                    <span>Terminal Operator</span>
+                    <span>Supply Chain</span>
+                </div>
+            </div>
+            <div class="license-box">
+                <div class="lic-icon">🌐</div>
+                <div class="lic-name">Customer Community Plus</div>
+                <div class="lic-count">2</div>
+                <div class="lic-desc">External Portal Users</div>
+                <div class="lic-users">
+                    <span>JV Partner (read-only portal)</span>
+                    <span>Field Worker (limited CRUD portal)</span>
+                </div>
+            </div>
+            <div class="license-box">
+                <div class="lic-icon">🤖</div>
+                <div class="lic-name">Integration / System</div>
+                <div class="lic-count">1</div>
+                <div class="lic-desc">API &amp; Automation Users</div>
+                <div class="lic-users">
+                    <span>WhatsApp Webhook Profile</span>
+                    <span>SCADA API Integration</span>
+                    <span>Agentforce Bot</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actor Cards -->
+        <div class="title-bar">
+            <h2>Actor Profiles</h2>
+            <p>Each actor is assigned one or more permission sets that grant object-level and field-level access aligned to their business responsibilities.</p>
+        </div>
+
+        <div class="actors-grid">
+            <!-- Upstream -->
+            <div class="actor-card seg-upstream">
+                <div class="actor-icon">👷</div>
+                <div class="actor-name">Drilling Engineer</div>
+                <div class="actor-role">Upstream — Well Operations</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Drilling_Engineer</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Well__c, Well_Operation__c, Lease__c (read), Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-upstream">
+                <div class="actor-icon">📊</div>
+                <div class="actor-name">Production Engineer</div>
+                <div class="actor-role">Upstream — Production &amp; Allocation</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Production_Engineer</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Well__c, Production_Allocation__c, Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-upstream">
+                <div class="actor-icon">📋</div>
+                <div class="actor-name">Landman</div>
+                <div class="actor-role">Upstream — Land &amp; Leasing</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Landman</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Lease__c, Land_Parcel__c, Joint_Venture__c, Well__c (read), Invoice__c</div>
+            </div>
+
+            <!-- Midstream -->
+            <div class="actor-card seg-midstream">
+                <div class="actor-icon">🔧</div>
+                <div class="actor-name">Pipeline Engineer</div>
+                <div class="actor-role">Midstream — Pipeline &amp; Measurement</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Pipeline_Engineer</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Pipeline__c, Pipeline_Station__c, Measurement__c, Inspection__c, Invoice__c</div>
+            </div>
+
+            <!-- Downstream -->
+            <div class="actor-card seg-downstream">
+                <div class="actor-icon">🏭</div>
+                <div class="actor-name">Refinery Manager</div>
+                <div class="actor-role">Downstream — Refining Operations</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Refinery_Manager</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Refinery__c, Supply_Agreement__c, Terminal__c (read), Pipeline__c (read), Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-downstream">
+                <div class="actor-icon">⛽</div>
+                <div class="actor-name">Retail Manager</div>
+                <div class="actor-role">Downstream — Retail Fuel Sales</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Retail_Manager</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Retail_Outlet__c, Fuel_Inventory__c, Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-downstream">
+                <div class="actor-icon">🏗️</div>
+                <div class="actor-name">Terminal Operator</div>
+                <div class="actor-role">Downstream — Storage &amp; Inventory</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Terminal_Operator</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Terminal__c, Fuel_Inventory__c, Measurement__c, Invoice__c</div>
+            </div>
+
+            <!-- Corporate -->
+            <div class="actor-card seg-corporate">
+                <div class="actor-icon">🛡️</div>
+                <div class="actor-name">HSE Advisor</div>
+                <div class="actor-role">Corporate — Health, Safety &amp; Environment</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_HSE_Advisor</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> HSE_Incident__c, HSE_Observation__c, Permit_to_Work__c, Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-corporate">
+                <div class="actor-icon">📑</div>
+                <div class="actor-name">Compliance Analyst</div>
+                <div class="actor-role">Corporate — Regulatory Compliance</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Compliance_Analyst</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Regulatory_Permit__c, Compliance_Report__c, HSE_Incident__c (read), Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-corporate">
+                <div class="actor-icon">🔩</div>
+                <div class="actor-name">Field Technician</div>
+                <div class="actor-role">Corporate — Inspections &amp; Field Work</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Field_Technician</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Inspection__c, Permit_to_Work__c, Pipeline__c (read), Well__c (read), Asset (read), Invoice__c</div>
+            </div>
+
+            <div class="actor-card seg-corporate">
+                <div class="actor-icon">💰</div>
+                <div class="actor-name">Supply Chain</div>
+                <div class="actor-role">Corporate — Procurement &amp; Contracts</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Supply_Chain</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Service_Contract__c, Fuel_Inventory__c (read), Invoice__c, Product2 (read)</div>
+            </div>
+
+            <div class="actor-card seg-system">
+                <div class="actor-icon">👔</div>
+                <div class="actor-name">Executive</div>
+                <div class="actor-role">Corporate — C-Suite / Leadership</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Executive</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Read-only across 16 objects, full access to Invoice__c</div>
+            </div>
+
+            <!-- Portal -->
+            <div class="actor-card seg-portal">
+                <div class="actor-icon">🤝</div>
+                <div class="actor-name">JV Partner</div>
+                <div class="actor-role">External — Joint Venture Partner</div>
+                <span class="actor-license license-cpp">Customer Community Plus</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Portal_Access</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Read-only via JV_Partner_Sharing set — Well, Invoice, Production Allocation, HSE Incident, Compliance Report, Lease, Joint Venture, Regulatory Permit</div>
+            </div>
+
+            <div class="actor-card seg-portal">
+                <div class="actor-icon">👷‍♂️</div>
+                <div class="actor-name">Field Worker</div>
+                <div class="actor-role">External — Field Operations Portal</div>
+                <span class="actor-license license-cpp">Customer Community Plus</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_Field_Portal_Access</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Inspection__c, Permit_to_Work__c, HSE_Incident__c, HSE_Observation__c, Pipeline__c (read), Well__c (read)</div>
+            </div>
+
+            <div class="actor-card seg-system">
+                <div class="actor-icon">⚙️</div>
+                <div class="actor-name">System Administrator</div>
+                <div class="actor-role">Platform — Full Access</div>
+                <span class="actor-license license-sf">Salesforce License</span>
+                <div class="actor-objects"><strong>Permission Sets:</strong> O_G_All_Access</div>
+                <div class="actor-objects"><strong>Key Objects:</strong> Full CRUD + ViewAll + ModifyAll on all 31 custom objects</div>
+            </div>
+        </div>
+
+        <!-- Permission Set Matrix -->
+        <div class="matrix-section">
+            <h3>Permission Set — Object Access Matrix</h3>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Permission Set</th>
+                        <th>Well__c</th>
+                        <th>Pipeline__c</th>
+                        <th>HSE_Incident__c</th>
+                        <th>Production_Allocation__c</th>
+                        <th>Regulatory_Permit__c</th>
+                        <th>Invoice__c</th>
+                        <th>Fuel_Inventory__c</th>
+                        <th>Inspection__c</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>O_G_All_Access</strong></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td><td><span class="perm-tag perm-full">Full + ModifyAll</span></td></tr>
+                    <tr><td><strong>O_G_Executive</strong></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td></tr>
+                    <tr><td><strong>O_G_Drilling_Engineer</strong></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Production_Engineer</strong></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Pipeline_Engineer</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td></tr>
+                    <tr><td><strong>O_G_HSE_Advisor</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Compliance_Analyst</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Field_Technician</strong></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td></tr>
+                    <tr><td><strong>O_G_Landman</strong></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Refinery_Manager</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Retail_Manager</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Terminal_Operator</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Supply_Chain</strong></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-na">—</span></td></tr>
+                    <tr><td><strong>O_G_Portal_Access</strong></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td></tr>
+                    <tr><td><strong>O_G_Field_Portal_Access</strong></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-ro">Read Only</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-na">—</span></td><td><span class="perm-tag perm-rw">Full CRUD</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>
