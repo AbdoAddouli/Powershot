@@ -9,7 +9,7 @@ PowerShot is an integrated **Oil & Gas Salesforce platform** covering the full v
 ![Value Chain](https://img.shields.io/badge/Upstream-Drilling%20%26%20Production-orange) ![Value Chain](https://img.shields.io/badge/Midstream-Pipelines%20%26%20Transport-blue) ![Value Chain](https://img.shields.io/badge/Downstream-Refining%20%26%20Retail-green) ![Value Chain](https://img.shields.io/badge/Corporate-HSE%20%26%20Compliance-red)
 
 ---
-
+## Discover the Architecture in a better visual Design : https://abdoaddouli.github.io/Powershot/
 ## Table of Contents
 
 1. [Business Domains](#1-business-domains)
