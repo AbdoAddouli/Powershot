@@ -1,0 +1,64 @@
+<template>
+    <div class="provision-container">
+        <div class="header">
+            <h2 class="title">Add Your Store</h2>
+        </div>
+        <div class="content-card">
+            <div class="card-padding">
+                <p style="font-size:14px;color:#6B7280;margin:0 0 20px 0;">
+                    We'll automatically create a Google Tag Manager container and Google Analytics property.
+                </p>
+                <lightning-layout horizontal-align="spread" multiple-rows>
+                    <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                        <div class="form-group">
+                            <lightning-input
+                                label="Store Name"
+                                value={storeName}
+                                onchange={handleNameChange}
+                                required
+                                placeholder="e.g. My TikTok Shop">
+                            </lightning-input>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                        <div class="form-group">
+                            <lightning-combobox
+                                label="Store Type"
+                                placeholder="Select type"
+                                value={storeType}
+                                onchange={handleTypeChange}
+                                options={typeOptions}
+                                required>
+                            </lightning-combobox>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                        <div class="form-group">
+                            <lightning-input
+                                label="Website URL"
+                                type="url"
+                                value={websiteUrl}
+                                onchange={handleUrlChange}
+                                placeholder="https://example.com"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+            <div class="footer">
+                <button class="btn-secondary" onclick={handleCancelForm}>Cancel</button>
+                <button class="btn-primary" onclick={handleProvision} disabled={isProvisioning}>
+                    <lightning-icon icon-name="utility:new_direct_account" size="x-small"></lightning-icon>
+                    Create Store
+                </button>
+            </div>
+            <template if:true={isProvisioning}>
+                <div class="spinner-row">
+                    <lightning-spinner alternative-text="Provisioning..." size="small"></lightning-spinner>
+                    <span class="spinner-text">Initiating store creation...</span>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,191 @@
+<template>
+  <lightning-card icon-name="custom:custom56">
+    <h2 class="card-title" slot="title">HSE Incidents</h2>
+    <template if:true="{hasError}">
+      <div class="error-box">
+        <p>{errorMessage}</p>
+      </div>
+    </template>
+
+    <template if:false="{hasError}">
+      <div class="toolbar">
+        <button
+          class="ps-btn ps-btn-primary"
+          onclick={handleNewIncident}
+        >
+          Report New Incident
+        </button>
+      </div>
+
+      <div class="sev-row">
+        <div class="sev-chip sev-high">
+          <div class="n">{highOpen}</div>
+          <div class="l">High Severity Open</div>
+        </div>
+        <div class="sev-chip sev-medium">
+          <div class="n">{mediumOpen}</div>
+          <div class="l">Medium Severity Open</div>
+        </div>
+        <div class="sev-chip sev-low">
+          <div class="n">{lowOpen}</div>
+          <div class="l">Low Severity Open</div>
+        </div>
+        <div class="sev-chip sev-closed">
+          <div class="n">{closedCount}</div>
+          <div class="l">Closed</div>
+        </div>
+      </div>
+
+      <template if:true="{showForm}">
+        <div class="form-panel">
+          <h2 class="section-title">New HSE Incident</h2>
+
+          <div class="form-grid">
+            <div class="field">
+              <label class="ps-label" for="incident-type">Incident Type</label>
+              <select
+                id="incident-type"
+                class="ps-input ps-select"
+                class:ps-input-error={incidentTypeError}
+                data-field="incidentType"
+                value={incidentType}
+                onchange={handleFieldChange}
+              >
+                <option value="">Select type…</option>
+                <template for:each={incidentTypeOptions} for:item="opt">
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                </template>
+              </select>
+              <template if:true={incidentTypeError}>
+                <span class="ps-error">{incidentTypeError}</span>
+              </template>
+            </div>
+
+            <div class="field">
+              <label class="ps-label" for="incident-date">Incident Date</label>
+              <input
+                id="incident-date"
+                class="ps-input"
+                type="date"
+                data-field="incidentDate"
+                value={incidentDate}
+                onchange={handleFieldChange}
+              />
+            </div>
+
+            <div class="field">
+              <label class="ps-label" for="severity">Severity</label>
+              <select
+                id="severity"
+                class="ps-input ps-select"
+                class:ps-input-error={severityError}
+                data-field="severity"
+                value={severity}
+                onchange={handleFieldChange}
+              >
+                <option value="">Select severity…</option>
+                <template for:each={severityOptions} for:item="opt">
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                </template>
+              </select>
+              <template if:true={severityError}>
+                <span class="ps-error">{severityError}</span>
+              </template>
+            </div>
+
+            <div class="field">
+              <label class="ps-label" for="location">Location</label>
+              <input
+                id="location"
+                class="ps-input"
+                type="text"
+                data-field="location"
+                value={location}
+                onchange={handleFieldChange}
+              />
+            </div>
+
+            <div class="field full">
+              <label class="ps-label" for="description">Description</label>
+              <textarea
+                id="description"
+                class="ps-input ps-textarea"
+                class:ps-input-error={descriptionError}
+                data-field="description"
+                value={description}
+                onchange={handleFieldChange}
+              ></textarea>
+              <template if:true={descriptionError}>
+                <span class="ps-error">{descriptionError}</span>
+              </template>
+            </div>
+
+            <div class="field full">
+              <label class="ps-label" for="spill-volume">Spill Volume (bbls)</label>
+              <input
+                id="spill-volume"
+                class="ps-input"
+                class:ps-input-error={spillVolumeError}
+                type="number"
+                min="0"
+                step="any"
+                data-field="spillVolume"
+                value={spillVolume}
+                onchange={handleFieldChange}
+              />
+              <template if:true={spillVolumeError}>
+                <span class="ps-error">{spillVolumeError}</span>
+              </template>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button
+              class="ps-btn ps-btn-primary"
+              onclick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {submitLabel}
+            </button>
+            <button class="ps-btn ps-btn-ghost" onclick={handleCancel}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{hasIncidents}">
+        <div class="table-wrap">
+          <div class="table-card">
+            <c-portal-data-table
+              records="{incidents}"
+              columns="{columns}"
+              key-field="Id"
+            ></c-portal-data-table>
+          </div>
+        </div>
+      </template>
+
+      <template if:true="{incidentDetail}">
+        <div class="detail-panel">
+          <h2 class="section-title">{incidentDetail.Name}</h2>
+          <p><strong>Type:</strong> {incidentDetail.Incident_Type__c}</p>
+          <p><strong>Date:</strong> {incidentDetail.Incident_Date__c}</p>
+          <p><strong>Severity:</strong> {incidentDetail.Severity__c}</p>
+          <p><strong>Status:</strong> {incidentDetail.Status__c}</p>
+          <p><strong>Location:</strong> {incidentDetail.Location__c}</p>
+          <p><strong>Description:</strong> {incidentDetail.Description__c}</p>
+          <template if:true="{incidentDetail.Well__r}">
+            <p><strong>Well:</strong> {incidentDetail.Well__r.Name}</p>
+          </template>
+          <template if:true="{incidentDetail.Corrective_Action__c}">
+            <p>
+              <strong>Corrective Action:</strong>
+              {incidentDetail.Corrective_Action__c}
+            </p>
+          </template>
+        </div>
+      </template>
+    </template>
+  </lightning-card>
+</template>

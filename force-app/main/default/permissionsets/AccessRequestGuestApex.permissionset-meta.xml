@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Portal - Guest Access Request Apex</label>
+    <description>Accorde au guest user le seul accès a la classe Apex AccessRequestService. Aucune permission objet/systeme : les droits Create/FLS restent sur le guest profile.</description>
+    <classAccesses>
+        <apexClass>AccessRequestService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+</PermissionSet>

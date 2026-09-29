@@ -1,0 +1,341 @@
+<template>
+  <div class="auth-shell">
+    <c-custom-brand-panel variant="oil"></c-custom-brand-panel>
+
+    <template lwc:if={checking}>
+      <div class="auth-checking" role="status">
+        <span class="spinner"></span>
+        <span class="checking-text">Loading…</span>
+      </div>
+    </template>
+
+    <template lwc:else>
+      <main class="auth-main">
+      <div class="auth-card reg-card">
+        <button class="ps-back" onclick={goBack}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+          </svg>
+          Back to sign in
+        </button>
+
+        <div class="header-section">
+          <span class="ps-badge">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="badge-icon"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Partner Access Request
+          </span>
+          <h2 class="ps-title">Request partner access</h2>
+        </div>
+
+        <form onsubmit={handleSubmit} novalidate>
+          <!-- Name pair -->
+          <div class="ps-grid">
+            <div class="ps-field">
+              <label class="ps-label" for="firstName"
+                >First name <span class="req">*</span></label
+              >
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                autocomplete="given-name"
+                placeholder="Jordan"
+                class={firstNameClass}
+                value={form.firstName}
+                oninput={handleInput}
+                data-field="firstName"
+                aria-required="true"
+                aria-invalid={firstNameInvalid}
+                aria-describedby="firstName-error"
+              />
+              <p id="firstName-error" class="ps-error-text" role="alert">
+                <template lwc:if={errors.firstName}
+                  >{errors.firstName}</template
+                >
+              </p>
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="lastName"
+                >Last name <span class="req">*</span></label
+              >
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                autocomplete="family-name"
+                placeholder="Rivera"
+                class={lastNameClass}
+                value={form.lastName}
+                oninput={handleInput}
+                data-field="lastName"
+                aria-required="true"
+                aria-invalid={lastNameInvalid}
+                aria-describedby="lastName-error"
+              />
+              <p id="lastName-error" class="ps-error-text" role="alert">
+                <template lwc:if={errors.lastName}>{errors.lastName}</template>
+              </p>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="ps-field">
+            <label class="ps-label" for="email"
+              >Work email <span class="req">*</span></label
+            >
+            <div class="input-wrap">
+              <span class="leading-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+              </span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@company.com"
+                class={emailClass}
+                value={form.email}
+                oninput={handleInput}
+                data-field="email"
+                aria-required="true"
+                aria-invalid={emailInvalid}
+                aria-describedby="email-error"
+              />
+            </div>
+            <p id="email-error" class="ps-error-text" role="alert">
+              <template lwc:if={errors.email}>{errors.email}</template>
+            </p>
+          </div>
+
+          <!-- Company -->
+          <div class="ps-field">
+            <label class="ps-label" for="company"
+              >Company / Account name <span class="req">*</span></label
+            >
+            <div class="input-wrap">
+              <span class="leading-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 21h18" />
+                  <path d="M5 21V7l8-4v18" />
+                  <path d="M19 21V11l-6-4" />
+                  <path d="M9 9v.01" />
+                  <path d="M9 12v.01" />
+                  <path d="M9 15v.01" />
+                  <path d="M9 18v.01" />
+                </svg>
+              </span>
+              <input
+                id="company"
+                name="company"
+                type="text"
+                autocomplete="organization"
+                placeholder="Helios Energy Partners"
+                class={companyClass}
+                value={form.company}
+                oninput={handleInput}
+                data-field="company"
+                aria-required="true"
+                aria-invalid={companyInvalid}
+                aria-describedby="company-error"
+              />
+            </div>
+            <p id="company-error" class="ps-error-text" role="alert">
+              <template lwc:if={errors.company}>{errors.company}</template>
+            </p>
+          </div>
+
+          <!-- Phone + Role pair -->
+          <div class="ps-grid">
+            <div class="ps-field">
+              <label class="ps-label" for="phone">Phone number</label>
+              <div class="input-wrap">
+                <span class="leading-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+                    <path d="M12 18h.01" />
+                  </svg>
+                </span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel"
+                  placeholder="+1 555 010 2030"
+                  class={phoneClass}
+                  value={form.phone}
+                  oninput={handleInput}
+                  data-field="phone"
+                  aria-invalid={phoneInvalid}
+                  aria-describedby="phone-error"
+                />
+              </div>
+              <p id="phone-error" class="ps-error-text" role="alert">
+                <template lwc:if={errors.phone}>{errors.phone}</template>
+              </p>
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="jobTitle"
+                >Position / Role in the Companym</label
+              >
+              <div class="input-wrap">
+                <span class="leading-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    <rect width="20" height="14" x="2" y="6" rx="2" />
+                  </svg>
+                </span>
+                <input
+                  id="jobTitle"
+                  name="jobTitle"
+                  type="text"
+                  placeholder="ex. Project Manager"
+                  class={jobTitleClass}
+                  value={form.jobTitle}
+                  oninput={handleInput}
+                  data-field="jobTitle"
+                  aria-invalid={jobTitleInvalid}
+                  aria-describedby="jobTitle-error"
+                />
+              </div>
+              <p id="jobTitle-error" class="ps-error-text" role="alert">
+                <template lwc:if={errors.jobTitle}>{errors.jobTitle}</template>
+              </p>
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div class="ps-field">
+            <label class="ps-terms">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onchange={handleAgreed}
+                data-field="agreed"
+                aria-invalid={agreedInvalid}
+                aria-describedby="terms-error"
+              />
+              <span class="ps-check-visible"></span>
+              <span
+                >I agree to the PowerShot
+                <span class="terms-link">Partner Terms</span> and
+                <span class="terms-link">Data Processing Policy</span>.</span
+              >
+            </label>
+            <p id="terms-error" class="ps-error-text" role="alert">
+              <template lwc:if={errors.agreed}>{errors.agreed}</template>
+            </p>
+          </div>
+
+          <!-- Server error -->
+          <template lwc:if={serverError}>
+            <div class="ps-alert" role="alert">
+              <span class="alert-icon">!</span>
+              <span>{serverError}</span>
+            </div>
+          </template>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="ps-btn ps-btn-primary"
+            disabled={loading}
+          >
+            <template lwc:if={loading}>
+              <span class="spinner"></span>
+              Submitting request…
+            </template>
+            <template lwc:else>Submit access request</template>
+          </button>
+
+          <!-- Notes -->
+          <!-- <div class="ps-note-row">
+            <span class="ps-note">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="note-icon-green"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <path d="m9 11 3 3L22 4" />
+              </svg>
+              Reviewed within 1 business day
+            </span>
+            <span class="ps-note">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="note-icon-blue"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+              </svg>
+              No payment required to apply
+            </span>
+          </div> -->
+        </form>
+      </div>
+      </main>
+    </template>
+  </div>
+</template>  

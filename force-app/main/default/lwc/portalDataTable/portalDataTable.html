@@ -1,0 +1,111 @@
+<template>
+  <div class="ps-container">
+    <template if:true={hasFilters}>
+      <div class="ps-toolbar">
+    <button class="ps-filter-btn" onclick={handleToggleFilter}>
+      <span class="ps-filter-icon" aria-hidden="true">&#9662;</span>
+      {filterButtonLabel}
+    </button>
+    <div class="ps-toolbar-spacer"></div>
+    <template if:true={hasActiveFilter}>
+      <button class="ps-filter-btn" onclick={handleClearFilters}>
+        Clear ({recordsCount})
+      </button>
+    </template>
+    </div>
+  </template>
+
+  <table class="slds-table slds-table_cell-buffer slds-table_bordered ps-table">
+    <thead>
+      <tr class="slds-line-height_reset">
+        <template for:each={normalizedColumns} for:item="col">
+          <th
+            key={col.label}
+            class="slds-text-title_caps ps-th"
+            scope="col"
+          >{col.label}</th>
+        </template>
+      </tr>
+      <template if:true={filterActive}>
+        <tr class="ps-filters">
+          <template for:each={normalizedColumns} for:item="col">
+            <th key={col.filterKey} class="ps-th ps-filter-cell">
+              <template if:true={col.useDropdown}>
+                <select
+                  data-field={col.fieldName}
+                  value={col.filterValue}
+                  onchange={handleFilterChange}
+                  class="ps-filter-input ps-filter-select"
+                  title={col.filterTitle}
+                >
+                  <option value="">All</option>
+                  <template for:each={col.filterOptions} for:item="opt">
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  </template>
+                </select>
+              </template>
+              <template if:false={col.useDropdown}>
+                <input
+                  data-field={col.fieldName}
+                  value={col.filterValue}
+                  oninput={handleFilterChange}
+                  class="ps-filter-input"
+                  placeholder="Filter…"
+                  title={col.filterTitle}
+                />
+              </template>
+            </th>
+          </template>
+        </tr>
+      </template>
+    </thead>
+    <tbody>
+      <template for:each="{displayRecords}" for:item="rec">
+        <tr
+          key={rec.key}
+          class={rec.rowClass}
+          data-key={rec.keyString}
+          onclick={handleRowClick}
+        >
+          <template for:each="{rec.cells}" for:item="cell">
+            <td
+              key={cell.index}
+              class="{cell.cellClass}"
+            >{cell.value}</td>
+          </template>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <template if:true={hasEmptyFilters}>
+    <div class="ps-empty">
+      No matching records found.
+    </div>
+  </template>
+
+  <template if:true="{hasPagination}">
+    <div class="ps-pagination">
+      <button
+        class="ps-page-btn"
+        disabled={isFirstPage}
+        onclick={handlePrevPage}
+        title="Previous page"
+      >
+        Previous
+      </button>
+      <span class="ps-page-info">
+        Page {page} of {pageCount} · {recordsCount} records
+      </span>
+      <button
+        class="ps-page-btn"
+        disabled={isLastPage}
+        onclick={handleNextPage}
+        title="Next page"
+      >
+        Next
+      </button>
+    </div>
+  </template>
+  </div>
+</template>

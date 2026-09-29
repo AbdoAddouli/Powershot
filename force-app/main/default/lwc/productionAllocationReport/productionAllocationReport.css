@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+lightning-card {
+  --slds-c-card-color-background: #162c4b;
+  --slds-c-card-color-border: #24405e;
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: #ffffff;
+}
+
+.card-title {
+  color: #ffffff;
+  margin: 0;
+}
+
+lightning-datatable {
+  --slds-c-table-color-background: #162c4b;
+  --slds-c-table-color-background-header: #1b365d;
+  --slds-c-table-color-text-header: #7d97b8;
+  --slds-c-table-color-text-default: #adc5e1;
+  --slds-c-table-color-border: #24405e;
+  --slds-c-table-color-border-header: #24405e;
+  --slds-c-table-color-background-row-hover: rgba(255, 255, 255, 0.02);
+  --slds-c-table-color-text-strong: #ffffff;
+  --slds-c-table-radius-border: 8px;
+  --slds-c-table-header-font-size: 10px;
+  --slds-c-table-header-text-transform: uppercase;
+  --slds-c-table-header-letter-spacing: 0.06em;
+  --lwc-colorBackgroundAlt: #162c4b;
+  --lwc-colorBackgroundRowHover: rgba(255, 255, 255, 0.02);
+  --lwc-colorBackgroundRowSelected: #1b365d;
+  --lwc-colorTextDefault: #adc5e1;
+  --lwc-colorTextActionLabelActive: #7d97b8;
+  --lwc-colorBorderSeparator: #24405e;
+  overflow-x: auto;
+}
+
+lightning-combobox {
+  --slds-c-input-color-background: #0f1d33;
+  --slds-c-input-color-border: #24405e;
+  --slds-c-input-text-color: #ffffff;
+  --slds-c-input-color-background-hover: #0f1d33;
+  --slds-c-input-radius-border: 5px;
+  --slds-c-form-element-label-color: #7d97b8;
+  --slds-c-form-element-label-font-size: 11px;
+  --slds-c-form-element-label-font-weight: 600;
+}
+
+.slds-theme_default,
+.slds-theme_info,
+.slds-theme_success {
+  border-radius: 8px;
+}
+
+.slds-box.slds-theme_error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  border-radius: 8px;
+}
+
+.slds-illustration__header,
+.slds-illustration__body {
+  color: #adc5e1;
+}

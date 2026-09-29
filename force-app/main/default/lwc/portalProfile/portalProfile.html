@@ -1,0 +1,233 @@
+<template>
+  <div class="ps-profile">
+    <div class="center-note" lwc:if={loading}>Loading your profile…</div>
+
+    <div class="load-error" lwc:if={loadError} role="alert">
+      <p>Unable to load your profile.</p>
+      <code>{loadError}</code>
+      <button class="ps-btn ps-btn-secondary ps-btn-inline" onclick={retryProfile}>
+        Retry
+      </button>
+    </div>
+
+    <template lwc:if={ready}>
+      <!-- Header -->
+      <lightning-card icon-name="standard:user">
+        <h2 class="card-title" slot="title">{profileTitle}</h2>
+        <div class="profile-head">
+          <div class="avatar" aria-hidden="true">{initial}</div>
+          <div class="head-info">
+            <p class="head-name">{displayName}</p>
+            <p class="head-meta">{title}</p>
+            <p class="head-meta">{companyName}</p>
+          </div>
+          <div class="head-actions">
+            <button
+              class="ps-btn ps-btn-primary"
+              onclick={saveChanges}
+              disabled={saving}
+            >
+              <template lwc:if={saving}>Saving…</template>
+              <template lwc:else>Save Changes</template>
+            </button>
+            <button
+              class="ps-btn ps-btn-ghost"
+              onclick={cancelChanges}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+        <p class="ps-error-text" lwc:if={error} role="alert">{error}</p>
+        <p class="ps-success-text" lwc:if={savedMessage}>{savedMessage}</p>
+      </lightning-card>
+
+      <!-- Personal information -->
+      <lightning-card icon-name="standard:contact">
+        <h2 class="card-title" slot="title">Personal Information</h2>
+        <div class="ps-card-body">
+          <form class="ps-grid" onsubmit={saveChanges}>
+            <div class="ps-field">
+              <label class="ps-label" for="firstName"
+                >First name <span class="req">*</span></label
+              >
+              <input
+                id="firstName"
+                class="ps-input"
+                data-field="firstName"
+                value={form.firstName}
+                oninput={handleInput}
+                autocomplete="given-name"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="lastName"
+                >Last name <span class="req">*</span></label
+              >
+              <input
+                id="lastName"
+                class="ps-input"
+                data-field="lastName"
+                value={form.lastName}
+                oninput={handleInput}
+                autocomplete="family-name"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="title">Job title</label>
+              <input
+                id="title"
+                class="ps-input"
+                data-field="title"
+                value={form.title}
+                oninput={handleInput}
+                autocomplete="organization-title"
+                placeholder="e.g. Operations Manager"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="email"
+                >Email <span class="req">*</span></label
+              >
+              <input
+                id="email"
+                class="ps-input"
+                type="email"
+                data-field="email"
+                value={form.email}
+                oninput={handleInput}
+                autocomplete="email"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="phone">Phone</label>
+              <input
+                id="phone"
+                class="ps-input"
+                data-field="phone"
+                value={form.phone}
+                oninput={handleInput}
+                autocomplete="tel"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="mobilePhone">Mobile</label>
+              <input
+                id="mobilePhone"
+                class="ps-input"
+                data-field="mobilePhone"
+                value={form.mobilePhone}
+                oninput={handleInput}
+                autocomplete="tel"
+              />
+            </div>
+            <div class="ps-field ps-field-span">
+              <label class="ps-label" for="mailingStreet">Street address</label>
+              <input
+                id="mailingStreet"
+                class="ps-input"
+                data-field="mailingStreet"
+                value={form.mailingStreet}
+                oninput={handleInput}
+                autocomplete="street-address"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="mailingCity">City</label>
+              <input
+                id="mailingCity"
+                class="ps-input"
+                data-field="mailingCity"
+                value={form.mailingCity}
+                oninput={handleInput}
+                autocomplete="address-level2"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="mailingState"
+                >State / Province</label
+              >
+              <input
+                id="mailingState"
+                class="ps-input"
+                data-field="mailingState"
+                value={form.mailingState}
+                oninput={handleInput}
+                autocomplete="address-level1"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="mailingPostalCode"
+                >Postal code</label
+              >
+              <input
+                id="mailingPostalCode"
+                class="ps-input"
+                data-field="mailingPostalCode"
+                value={form.mailingPostalCode}
+                oninput={handleInput}
+                autocomplete="postal-code"
+              />
+            </div>
+            <div class="ps-field">
+              <label class="ps-label" for="mailingCountry">Country</label>
+              <input
+                id="mailingCountry"
+                class="ps-input"
+                data-field="mailingCountry"
+                value={form.mailingCountry}
+                oninput={handleInput}
+                autocomplete="country-name"
+              />
+            </div>
+          </form>
+        </div>
+      </lightning-card>
+
+      <!-- Organization -->
+      <lightning-card icon-name="standard:account">
+        <h2 class="card-title" slot="title">Organization</h2>
+        <div class="ps-card-body">
+          <div class="ps-info-grid">
+            <div class="ps-info-item">
+              <span class="ps-info-label">Company</span>
+              <span class="ps-info-value">{companyName}</span>
+            </div>
+            <div class="ps-info-item">
+              <span class="ps-info-label">Phone</span>
+              <span class="ps-info-value">{companyPhone}</span>
+            </div>
+            <div class="ps-info-item ps-info-span">
+              <span class="ps-info-label">Billing address</span>
+              <span class="ps-info-value">{companyAddress}</span>
+            </div>
+          </div>
+        </div>
+      </lightning-card>
+
+      <!-- Security & Login -->
+      <lightning-card icon-name="standard:password">
+        <h2 class="card-title" slot="title">Security &amp; Login</h2>
+        <div class="ps-card-body">
+          <div class="ps-info-grid">
+            <div class="ps-info-item">
+              <span class="ps-info-label">Username</span>
+              <span class="ps-info-value">{username}</span>
+            </div>
+            <div class="ps-info-item">
+              <span class="ps-info-label">Last login</span>
+              <span class="ps-info-value">{lastLoginLabel}</span>
+            </div>
+          </div>
+          <button
+            class="ps-btn ps-btn-secondary ps-btn-inline"
+            onclick={goForgot}
+          >
+            Change password
+          </button>
+        </div>
+      </lightning-card>
+    </template>
+  </div>
+</template>

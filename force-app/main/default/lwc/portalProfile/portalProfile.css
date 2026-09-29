@@ -1,0 +1,298 @@
+:host {
+  --bg: #0f1d33;
+  --panel: #162c4b;
+  --panel-raised: #1b365d;
+  --line: #24405e;
+  --text: #ffffff;
+  --text-dim: #adc5e1;
+  --text-faint: #7d97b8;
+  --green: #008542;
+  --green-dim: #2aa061;
+  --red: #ef4444;
+  --blue: #4c8dbd;
+  --disp:
+    "Barlow Condensed", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  --body:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  display: block;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  padding: 0;
+}
+
+/* Card ----------------------------------------------------------- */
+lightning-card {
+  --slds-c-card-color-background: var(--panel);
+  --slds-c-card-color-border: var(--line);
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: var(--text);
+  --slds-c-card-body-spacing-block-start: 0;
+  --slds-c-card-body-spacing-block-end: 0;
+  margin-bottom: 18px;
+}
+
+.card-title {
+  color: var(--text);
+  margin: 0;
+}
+
+/* Centre loader ------------------------------------------------- */
+.center-note {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 3rem 1rem;
+  font-size: 0.9375rem;
+}
+
+.load-error {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.load-error p {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--red);
+}
+
+.load-error code {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* Profile header ------------------------------------------------ */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--disp);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  background: linear-gradient(135deg, var(--green), var(--green-dim));
+  flex-shrink: 0;
+}
+
+.head-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.head-name {
+  font-family: var(--disp);
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.head-meta {
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  margin: 2px 0 0;
+}
+
+.head-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Card body spacing --------------------------------------------- */
+.ps-card-body {
+  padding: 18px 22px 22px;
+}
+
+/* Grid (form + info) ------------------------------------------- */
+.ps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+@media (max-width: 720px) {
+  .ps-grid {
+    grid-template-columns: 1fr;
+  }
+  .profile-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .head-actions {
+    margin-left: 0;
+  }
+}
+
+/* Fields -------------------------------------------------------- */
+.ps-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-field-span {
+  grid-column: 1 / -1;
+}
+
+.ps-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.req {
+  color: var(--green);
+}
+
+.ps-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.ps-input::placeholder {
+  color: var(--text-faint);
+}
+
+.ps-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0, 133, 66, 0.25);
+}
+
+/* Read-only info grid ------------------------------------------ */
+.ps-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+}
+
+@media (max-width: 720px) {
+  .ps-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ps-info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-info-span {
+  grid-column: 1 / -1;
+}
+
+.ps-info-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.ps-info-value {
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+/* Buttons ------------------------------------------------------- */
+.ps-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+
+.ps-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ps-btn-primary {
+  background: var(--green);
+  color: var(--text);
+}
+
+.ps-btn-primary:hover:not(:disabled) {
+  background: var(--green-dim);
+}
+
+.ps-btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+}
+
+.ps-btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ps-btn-secondary {
+  background: transparent;
+  color: var(--blue);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+
+.ps-btn-secondary:hover {
+  background: rgba(76, 141, 189, 0.12);
+}
+
+.ps-btn-inline {
+  margin-top: 16px;
+}
+
+/* Status messages ---------------------------------------------- */
+.ps-error-text {
+  margin: 10px 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--red);
+}
+
+.ps-success-text {
+  margin: 10px 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--green);
+}

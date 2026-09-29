@@ -1,0 +1,109 @@
+<template>
+  <div class="auth-shell">
+    <c-custom-brand-panel variant="renewable"></c-custom-brand-panel>
+
+    <main class="auth-main">
+      <div class="auth-card check-card">
+        <!-- Success icon with pulse -->
+        <div class="success-icon-wrap">
+          <span class="ps-pulse"></span>
+          <span class="success-icon-inner">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="success-svg"
+            >
+              <path
+                d="M22 13a6 6 0 0 1-7.1 5.91 6 6 0 0 0-8.8-8.8A6 6 0 0 1 13 1.88"
+              />
+              <path d="m21.64 3.64-9.2 9.2-1.4-3.9-1.4 3.9-9.2-9.2" />
+              <path d="M13.32 12.84 9.8 13.4l.56-3.52" />
+            </svg>
+          </span>
+        </div>
+
+        <h2 class="ps-title">Check your email</h2>
+        <span class="accent-line"><span class="accent-line-fill"></span></span>
+        <p class="ps-desc">
+          <template lwc:if={email}>
+            We've sent a password reset link to <strong>{email}</strong>. Click
+            the link in the message to choose a new password.
+          </template>
+          <template lwc:else>
+            We've sent a password reset link to your registered work email
+            address. Click the link in the message to choose a new password.
+          </template>
+        </p>
+
+        <!-- Tips card -->
+        <div class="tips-card">
+          <div class="tips-head">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="tips-icon"
+            >
+              <path d="M22 12h-6l-2 3h-4l-2-3H2" />
+              <path
+                d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+              />
+            </svg>
+            <div>
+              <p class="tips-title">Didn't get the email?</p>
+              <ul class="tips-list">
+                <li>Check your spam or junk folder.</li>
+                <li>Verify you used your registered work email.</li>
+                <li>
+                  Wait a few minutes — delivery can occasionally be delayed.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Server error -->
+        <p class="ps-error-text" role="alert">
+          <template lwc:if={error}>{error}</template>
+        </p>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button
+            class="ps-btn ps-btn-secondary"
+            onclick={resend}
+            disabled={isDisableResend}
+          >
+            <template lwc:if={resending}>
+              <span class="spinner-dark"></span>
+              Resending…
+            </template>
+            <template lwc:else>Resend reset link</template>
+          </button>
+          <button class="ps-btn ps-btn-ghost" onclick={goBack}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="back-svg"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+            Back to sign in
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+</template>

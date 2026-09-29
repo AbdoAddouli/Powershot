@@ -1,0 +1,291 @@
+<template>
+  <template lwc:if={isLoading}>
+    <div class="slds-grid slds-grid_align-center slds-p-top_large">
+      <lightning-spinner alternative-text="Loading requests…" size="medium"></lightning-spinner>
+    </div>
+  </template>
+
+  <template lwc:if={accessDenied}>
+    <div class="slds-illustration slds-illustration_small slds-p-top_large">
+      <svg class="slds-illustration__svg" viewBox="0 0 454 272" aria-hidden="true">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <path d="M50,226 C50,226 80,206 120,206 C160,206 180,226 180,226" stroke="#1B365D" stroke-width="2" fill="#eef3f9"/>
+          <circle cx="120" cy="120" r="60" stroke="#d6e2f0" stroke-width="2" fill="#fff"/>
+          <path d="M120,80 L120,120 L150,140" stroke="#008542" stroke-width="3" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <div class="slds-text-heading_medium slds-m-top_medium">Access Restricted</div>
+      <div class="slds-text-body_regular slds-text-color_weak">
+        You need administrator privileges to view this page.
+      </div>
+    </div>
+  </template>
+
+  <template lwc:if={showContent}>
+    <div class="slds-page-header request-page-header" role="banner">
+      <div class="slds-page-header__row-title">
+        <div class="slds-media">
+          <div class="slds-media__figure">
+            <span class="slds-icon_container slds-icon-standard-record">
+              <svg class="slds-icon slds-icon_small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </span>
+          </div>
+          <div class="slds-media__body">
+            <h1 class="slds-page-header__title slds-truncate">
+              Portal Access Requests
+            </h1>
+            <p class="slds-page-header__name-meta">PowerShot Partner Portal · Admin</p>
+          </div>
+        </div>
+      </div>
+      <div class="slds-page-header__row-action-gap slds-page-header__row-action">
+        <div class="slds-page-header__subheading">
+          <span class="slds-badge slds-badge_lightest slds-m-right_x-small">
+            {totalCount} Total
+          </span>
+          <span class="slds-badge slds-theme_warning">
+            {newCount} New
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="slds-tabs_default request-filter-tabs">
+      <ul class="slds-tabs_default__nav" role="tablist">
+        <template for:each={statusFilters} for:item="filter">
+          <li key={filter.value} class="slds-tabs_default__item {filter.active ? 'slds-is-active' : ''}" role="presentation">
+            <a class="slds-tabs_default__link" role="tab" tabindex="0"
+               data-filter={filter.value} onclick={handleFilterClick}
+               aria-selected={filter.active}>
+              {filter.label}
+              <template lwc:if={filter.count}>
+                <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{filter.count}</span>
+              </template>
+            </a>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <!-- Data table -->
+    <div class="slds-card request-card">
+      <template lwc:if={filteredRequests.length}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_resizable-cols">
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th class="slds-cell-buffer_left" scope="col">
+                <div class="slds-truncate" title="Request #">Request #</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" title="Applicant">Applicant</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" title="Company">Company</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" title="Requested Profile">Requested Profile</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" title="Status">Status</div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" title="Submitted">Submitted</div>
+              </th>
+              <th scope="col" class="slds-cell-action">
+                <div class="slds-truncate" title="Actions">Actions</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={filteredRequests} for:item="req">
+              <tr key={req.id} class="slds-hint-parent request-row">
+                <td class="slds-cell-buffer_left" data-label="Request #">
+                  <div class="slds-truncate" title={req.name}>
+                    <a class="slds-text-link" onclick={handleRowClick} data-id={req.id}>{req.name}</a>
+                  </div>
+                </td>
+                <td data-label="Applicant">
+                  <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-spread">
+                    <div class="slds-truncate">
+                      <div class="slds-truncate slds-text-body_small" title={req.firstName}>{req.firstName} {req.lastName}</div>
+                      <div class="slds-truncate slds-text-color_weak slds-text-body_x-small" title={req.email}>{req.email}</div>
+                    </div>
+                  </div>
+                </td>
+                <td data-label="Company">
+                  <div class="slds-truncate" title={req.company}>{req.company}</div>
+                </td>
+                <td data-label="Requested Profile">
+                  <div class="slds-truncate" title={req.requestedProfile}>{req.requestedProfile}</div>
+                </td>
+                <td data-label="Status">
+                  <span class="{getStatusClass(req.status)}">
+                    <span class="status-dot"></span>
+                    {req.status}
+                  </span>
+                </td>
+                <td data-label="Submitted">
+                  <div class="slds-truncate slds-text-body_small slds-text-color_weak" title={req.formattedDate}>
+                    {req.formattedDate}
+                  </div>
+                </td>
+                <td data-label="Actions" class="slds-cell-action">
+                  <div class="slds-grid slds-grid_vertical-align-center slds-p-horizontal_small">
+                    <template lwc:if={req.canView}>
+                      <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-right_xxx-small"
+                              onclick={handleRowClick} data-id={req.id} title="View details">
+                        <svg class="slds-button__icon slds-icon-text-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      </button>
+                    </template>
+                    <template lwc:if={req.canApprove}>
+                      <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-right_xxx-small"
+                              onclick={handleApprove} data-id={req.id} title="Approve">
+                        <svg class="slds-button__icon slds-icon-text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </button>
+                    </template>
+                    <template lwc:if={req.canReview}>
+                      <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-right_xxx-small"
+                              onclick={handleReview} data-id={req.id} title="Start Review">
+                        <svg class="slds-button__icon slds-icon-text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                      </button>
+                    </template>
+                    <template lwc:if={req.canReject}>
+                      <button class="slds-button slds-button_icon slds-button_icon-border-filled slds-m-right_xxx-small"
+                              onclick={handleReject} data-id={req.id} title="Reject">
+                        <svg class="slds-button__icon slds-icon-text-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    </template>
+                    <button class="slds-button slds-button_icon slds-button_icon-border-filled"
+                            onclick={handleDelete} data-id={req.id} title="Delete">
+                      <svg class="slds-button__icon slds-icon-text-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+
+      <template lwc:if={noResults}>
+        <div class="slds-illustration slds-illustration_small slds-p-top_large slds-p-bottom_large">
+          <div class="slds-text-heading_small">No requests found</div>
+          <div class="slds-text-body_regular slds-text-color_weak">
+            There are no portal access requests matching this filter.
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Detail modal -->
+    <template lwc:if={showDetailModal}>
+      <section class="slds-modal slds-fade-in-open slds-modal_large" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                    onclick={closeDetailModal} title="Close">
+              <svg class="slds-button__icon slds-button__icon_large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <h2 id="modal-title" class="slds-modal__title slds-hyphenate">
+              {selectedRequest.name}
+            </h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_large">
+            <div class="slds-grid slds-wrap slds-gutters">
+              <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium slds-p-bottom_medium">
+                <span class="slds-form-element__label">Applicant</span>
+                <div class="slds-form-element__static slds-text-body Strong">{selectedRequest.firstName} {selectedRequest.lastName}</div>
+              </div>
+              <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium slds-p-bottom_medium">
+                <span class="slds-form-element__label">Email</span>
+                <div class="slds-form-element__static">{selectedRequest.email}</div>
+              </div>
+              <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium slds-p-bottom_medium">
+                <span class="slds-form-element__label">Company</span>
+                <div class="slds-form-element__static">{selectedRequest.company}</div>
+              </div>
+              <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium slds-p-bottom_medium">
+                <span class="slds-form-element__label">Requested Profile</span>
+                <div class="slds-form-element__static">{selectedRequest.requestedProfile}</div>
+              </div>
+              <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium slds-p-bottom_medium">
+                <span class="slds-form-element__label">Status</span>
+                <div class="slds-form-element__static">
+                  <span class="{getStatusClass(selectedRequest.status)}">
+                    <span class="status-dot"></span>
+                    {selectedRequest.status}
+                  </span>
+                </div>
+              </div>
+              <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium slds-p-bottom_medium">
+                <span class="slds-form-element__label">Submitted</span>
+                <div class="slds-form-element__static">{selectedRequest.formattedDate}</div>
+              </div>
+              <div class="slds-col slds-size_1-of-1 slds-p-horizontal_medium">
+                <span class="slds-form-element__label">Comments</span>
+                <textarea class="slds-textarea" rows="3"
+                          value={selectedRequest.commentDraft}
+                          onchange={handleCommentChange}
+                          placeholder="Add an internal comment for this request"></textarea>
+                <div class="slds-m-top_medium">
+                  <button class="slds-button slds-button_neutral" onclick={handleSaveComment}>
+                    Save Comment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <footer class="slds-modal__footer">
+            <template lwc:if={selectedRequest.canApprove}>
+              <button class="slds-button slds-button_success slds-m-right_small" onclick={handleApproveFromModal}>
+                Approve Request
+              </button>
+            </template>
+            <template lwc:if={selectedRequest.canReject}>
+              <button class="slds-button slds-button_destructive slds-m-right_small" onclick={handleRejectFromModal}>
+                Reject Request
+              </button>
+            </template>
+            <button class="slds-button slds-button_neutral" onclick={closeDetailModal}>Close</button>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- Toast notification -->
+    <template lwc:if={toast.show}>
+      <div class="slds-notify_container toast-container">
+        <div class={toastClass} role="alert">
+          <span class="slds-assistive-text">{toast.variant}</span>
+          <span class="slds-icon_container slds-icon-utility-{toastIcon} slds-m-right_small toast-icon">
+            <svg class="slds-icon slds-icon_x-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <template lwc:if={toast.isSuccess}>
+                <polyline points="20 6 9 17 4 12"/>
+              </template>
+              <template lwc:if={toast.isError}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </template>
+            </svg>
+          </span>
+          <h2 class="slds-text-heading_small">{toast.message}</h2>
+        </div>
+      </div>
+    </template>
+  </template>
+</template>

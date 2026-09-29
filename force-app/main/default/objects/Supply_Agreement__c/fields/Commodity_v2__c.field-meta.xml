@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Commodity_v2__c</fullName>
+    <description>Type of commodity (Crude, Gas, Refined, NGL, Diesel, Jet Fuel, Heating Oil)</description>
+    <label>Commodity</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Crude</fullName>
+                <default>false</default>
+                <label>Crude</label>
+            </value>
+            <value>
+                <fullName>Gas</fullName>
+                <default>false</default>
+                <label>Gas</label>
+            </value>
+            <value>
+                <fullName>NGL</fullName>
+                <default>false</default>
+                <label>NGL</label>
+            </value>
+            <value>
+                <fullName>Refined</fullName>
+                <default>false</default>
+                <label>Refined</label>
+            </value>
+            <value>
+                <fullName>Diesel</fullName>
+                <default>false</default>
+                <label>Diesel</label>
+            </value>
+            <value>
+                <fullName>Jet Fuel</fullName>
+                <default>false</default>
+                <label>Jet Fuel</label>
+            </value>
+            <value>
+                <fullName>Heating Oil</fullName>
+                <default>false</default>
+                <label>Heating Oil</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

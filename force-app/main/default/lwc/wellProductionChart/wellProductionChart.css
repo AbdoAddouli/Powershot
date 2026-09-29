@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+lightning-card {
+  --slds-c-card-color-background: #162c4b;
+  --slds-c-card-color-border: #24405e;
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: #ffffff;
+}
+
+.card-title {
+  color: #ffffff;
+  margin: 0;
+}
+
+lightning-datatable {
+  --slds-c-table-color-background: #162c4b;
+  --slds-c-table-color-background-header: #1b365d;
+  --slds-c-table-color-text-header: #7d97b8;
+  --slds-c-table-color-text-default: #adc5e1;
+  --slds-c-table-color-border: #24405e;
+  --slds-c-table-color-border-header: #24405e;
+  --slds-c-table-color-background-row-hover: rgba(255, 255, 255, 0.02);
+  --slds-c-table-color-text-strong: #ffffff;
+  --slds-c-table-radius-border: 8px;
+  --slds-c-table-header-font-size: 10px;
+  --slds-c-table-header-text-transform: uppercase;
+  --slds-c-table-header-letter-spacing: 0.06em;
+  --lwc-colorBackgroundAlt: #162c4b;
+  --lwc-colorBackgroundRowHover: rgba(255, 255, 255, 0.02);
+  --lwc-colorBackgroundRowSelected: #1b365d;
+  --lwc-colorTextDefault: #adc5e1;
+  --lwc-colorTextActionLabelActive: #7d97b8;
+  --lwc-colorBorderSeparator: #24405e;
+  overflow-x: auto;
+}
+
+.slds-theme_success,
+.slds-theme_info,
+.slds-theme_inverse {
+  border-radius: 8px;
+}
+
+.slds-box.slds-theme_error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  border-radius: 8px;
+}
+
+.slds-illustration__header,
+.slds-illustration__body {
+  color: #adc5e1;
+}
+
+.gauge-track {
+  background: #1b365d;
+  border-radius: 4px;
+  height: 12px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.gauge-fill-oil {
+  background: linear-gradient(90deg, #008542, #2aa061);
+}
+
+.gauge-fill-gas {
+  background: linear-gradient(90deg, #4c8dbd, #7ab0d8);
+}
+
+.gauge-fill-water {
+  background: linear-gradient(90deg, #24405e, #4c8dbd);
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+                name="variant"
+                type="String"
+                datasource="oil,renewable"
+                default="oil"
+                label="Hero imagery"
+            />
+            <property
+                name="startUrl"
+                type="String"
+                default=""
+                label="Start URL after login (optional)"
+            />
+            <property
+                name="homePageName"
+                type="String"
+                default="Home"
+                label="Home page name"
+            />
+            <property
+                name="forgotPageName"
+                type="String"
+                default="Forgot_Password"
+                label="Forgot password page name"
+            />
+            <property
+                name="registerPageName"
+                type="String"
+                default="Register"
+                label="Register page name"
+            />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -1,0 +1,30 @@
+lightning-card {
+  --slds-c-card-color-background: #162c4b;
+  --slds-c-card-color-border: #24405e;
+  --slds-c-card-radius-border: 8px;
+  --slds-c-card-header-text-color: #ffffff;
+  --slds-c-card-body-spacing-block-start: 0;
+  --slds-c-card-body-spacing-block-end: 0;
+  margin: 0;
+}
+
+.card-title {
+  color: #ffffff;
+  margin: 0;
+}
+
+.board-column {
+  background: rgb(243, 242, 242);
+  min-height: 200px;
+}
+
+.board-card {
+  background: white;
+  border: 1px solid rgb(216, 214, 212);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.board-card:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

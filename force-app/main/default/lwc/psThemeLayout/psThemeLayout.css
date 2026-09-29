@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #0f1d33;
+}
+
+.ps-shell {
+  min-height: 100dvh;
+  background: #0f1d33;
+}
+
+.ps-body {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100dvh;
+  background: #0f1d33;
+}
+
+.ps-sidebar-region {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 29, 51, 0.97),
+    rgba(22, 44, 75, 0.95) 60%,
+    rgba(27, 54, 93, 0.93)
+  );
+}
+
+.ps-main-region {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0f1d33;
+}
+
+.ps-main-region::slotted(*) {
+  min-height: 100%;
+}

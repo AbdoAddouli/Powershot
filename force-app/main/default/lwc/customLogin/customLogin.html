@@ -1,0 +1,196 @@
+<template>
+  <div class="auth-shell">
+    <c-custom-brand-panel variant={variant}></c-custom-brand-panel>
+
+    <template lwc:if={checking}>
+      <div class="auth-checking" role="status">
+        <span class="spinner"></span>
+        <span class="checking-text">Signing you in…</span>
+      </div>
+    </template>
+
+    <template lwc:else>
+      <main class="auth-main">
+      <div class="auth-card">
+        <!-- Badge -->
+        <div class="header-section">
+          <span class="ps-badge">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="badge-icon"
+            >
+              <path
+                d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1 1 1 0 0 0 .93-.56A3.5 3.5 0 0 1 12 2a3.5 3.5 0 0 1 6.07 2.44A1 1 0 0 0 19 5a1 1 0 0 1 1 1z"
+              />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            Secure Sign-In
+          </span>
+          <h2 class="ps-title">Welcome back</h2>
+          <p class="ps-subtitle">
+            Sign in to your PowerShot partner account to continue.
+          </p>
+        </div>
+
+        <form onsubmit={handleSubmit} novalidate>
+          <!-- Username -->
+          <div class="ps-field">
+            <label class="ps-label" for="username">
+              Username <span class="req">*</span>
+            </label>
+            <div class="input-wrap">
+              <span class="leading-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                placeholder="your.username"
+                class="ps-input pl-10"
+                value={username}
+                oninput={handleInput}
+                data-field="username"
+                aria-required="true"
+                aria-invalid={errorInvalid}
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="ps-field">
+            <label class="ps-label" for="password">
+              Password <span class="req">*</span>
+            </label>
+            <div class="input-wrap">
+              <span class="leading-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
+              <input
+                id="password"
+                name="password"
+                type={passwordType}
+                autocomplete="current-password"
+                placeholder="••••••••"
+                class="ps-input pl-10 pr-11"
+                value={password}
+                oninput={handleInput}
+                data-field="password"
+                aria-required="true"
+                aria-invalid={errorInvalid}
+              />
+              <button
+                type="button"
+                class="pw-toggle"
+                onclick={togglePassword}
+                aria-label={showPasswordLabel}
+              >
+                <template lwc:if={showPassword}>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                    <path
+                      d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"
+                    />
+                    <path
+                      d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"
+                    />
+                    <line x1="2" x2="22" y1="2" y2="22" />
+                  </svg>
+                </template>
+                <template lwc:else>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </template>
+              </button>
+            </div>
+          </div>
+
+          <!-- Inline error -->
+          <template lwc:if={error}>
+            <div class="ps-alert" role="alert">
+              <span class="alert-icon">!</span>
+              <span>{error}</span>
+            </div>
+          </template>
+
+          <!-- Forgot link -->
+          <div class="ps-forgot-row">
+            <a class="ps-link" href={forgotUrl} onclick={goForgot}>
+              Forgot password?
+            </a>
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="ps-btn ps-btn-primary"
+            disabled={loading}
+          >
+            <template lwc:if={loading}>
+              <span class="spinner"></span>
+              Signing in…
+            </template>
+            <template lwc:else>Sign In</template>
+          </button>
+
+          <!-- Divider -->
+          <div class="ps-divider"><span>or</span></div>
+
+          <!-- Register CTA -->
+          <p class="ps-foot">
+            New partner?
+            <a class="ps-link-strong" href={registerUrl} onclick={goRegister}>
+              Request access
+            </a>
+          </p>
+          <p class="ps-foot-note">
+            Protected by PowerShot Security · ISO 27001 aligned
+          </p>
+        </form>
+      </div>
+      </main>
+    </template>
+  </div>
+</template>

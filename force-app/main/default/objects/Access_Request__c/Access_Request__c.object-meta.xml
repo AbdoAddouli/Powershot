@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Demande d&apos;accès au portail partenaire PowerShot, soumise par un partenaire et traitée par les administrateurs.</description>
+    <enableActivities>true</enableActivities>
+    <enableFeeds>true</enableFeeds>
+    <enableHistory>true</enableHistory>
+    <enableReports>true</enableReports>
+    <label>Access Request</label>
+    <nameField>
+        <displayFormat>AR-{0000}</displayFormat>
+        <label>Access Request Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Access Requests</pluralLabel>
+    <sharingModel>Private</sharingModel>
+    <visibility>Public</visibility>
+</CustomObject>

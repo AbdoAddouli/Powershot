@@ -1,0 +1,182 @@
+<template>
+  <header class="ps-header">
+    <div class="ps-header-grid"></div>
+    <div class="ps-header-glow"></div>
+
+    <div class="ps-header-inner">
+      <!-- Left: Logo -->
+      <div
+        class="ps-logo-block"
+        onclick={goHome}
+        role="button"
+        tabindex="0"
+        onkeydown={handleLogoKey}
+        aria-label="PowerShot – Home"
+      >
+        <div class="ps-logo" aria-hidden="true">
+          <svg
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="24" cy="24" r="22" fill="#1B365D"></circle>
+            <circle
+              cx="24"
+              cy="24"
+              r="22"
+              stroke="#2d5a91"
+              stroke-width="1"
+            ></circle>
+            <path
+              d="M27.5 9 14 26.5h8.2L20 39l13.5-17.5h-8.2L27.5 9Z"
+              fill="#008542"
+            ></path>
+            <path
+              d="M27.5 9 14 26.5h8.2L20 39l13.5-17.5h-8.2L27.5 9Z"
+              stroke="#FFFFFF"
+              stroke-opacity="0.25"
+              stroke-width="0.75"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </div>
+        <div class="ps-logo-name">
+          <p class="ps-wordmark">Power<b class="ps-green">Shot</b></p>
+          <p class="ps-tagline">Partner Portal</p>
+        </div>
+      </div>
+
+      <!-- Desktop Nav -->
+      <nav class="ps-nav-desktop" aria-label="Main navigation">
+        <template for:each={decoratedNavItems} for:item="item">
+          <button
+            key={item.key}
+            class={item.className}
+            data-page={item.pageName}
+            onclick={handleNavClick}
+            aria-current={item.ariaCurrent}
+          >
+            <span class="ps-nav-label">{item.label}</span>
+            <span class="ps-nav-indicator"></span>
+          </button>
+        </template>
+      </nav>
+
+      <!-- Right: Profile -->
+      <div class="ps-profile-block">
+        <button
+          class="ps-profile-trigger"
+          onclick={toggleProfileMenu}
+          aria-expanded={profileOpen}
+          aria-haspopup="true"
+        >
+          <div class="ps-avatar">
+            <span class="ps-avatar-initial">{userInitial}</span>
+          </div>
+          <span class="ps-profile-name">{displayName}</span>
+          <span class={chevronClass}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </span>
+        </button>
+
+        <template lwc:if={profileOpen}>
+          <div class="ps-profile-menu" role="menu" aria-label="User profile">
+            <div class="ps-profile-header">
+              <div class="ps-avatar ps-avatar-lg">
+                <span class="ps-avatar-initial">{userInitial}</span>
+              </div>
+              <div class="ps-profile-info">
+                <p class="ps-profile-displayname">{displayName}</p>
+                <p class="ps-profile-email">{displayEmail}</p>
+              </div>
+            </div>
+            <div class="ps-profile-divider"></div>
+            <button class="ps-profile-item" role="menuitem" onclick={goProfile}>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="ps-item-icon"
+              >
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              My Profile
+            </button>
+            <button
+              class="ps-profile-item ps-profile-danger"
+              role="menuitem"
+              onclick={handleLogout}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="ps-item-icon"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Log out
+            </button>
+          </div>
+        </template>
+      </div>
+
+      <!-- Hamburger (mobile) -->
+      <button
+        class="ps-hamburger"
+        onclick={toggleMobileMenu}
+        aria-expanded={mobileOpen}
+        aria-label={mobileMenuLabel}
+      >
+        <span class={burgerLine1}></span>
+        <span class={burgerLine2}></span>
+        <span class={burgerLine3}></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <template lwc:if={mobileOpen}>
+      <nav class="ps-mobile-menu" aria-label="Mobile navigation">
+        <template for:each={decoratedNavItems} for:item="item">
+          <button
+            key={item.key}
+            class={item.mobileClassName}
+            data-page={item.pageName}
+            onclick={handleMobileNavClick}
+          >
+            <span class="ps-nav-label">{item.label}</span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ps-mobile-arrow"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </template>
+      </nav>
+    </template>
+  </header>
+</template>
