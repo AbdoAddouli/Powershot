@@ -1,0 +1,37 @@
+{
+    "properties": {
+        "inventoryId": {
+            "title": "Inventory Id",
+            "description": "The inventory record ID.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "success": {
+            "title": "Success",
+            "description": "Whether the movement was recorded.",
+            "lightning:type": "lightning__booleanType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "newVolume": {
+            "title": "New Volume",
+            "description": "The resulting tracked inventory volume.",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "message": {
+            "title": "Message",
+            "description": "Result message or error detail.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

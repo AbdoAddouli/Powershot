@@ -1,0 +1,13 @@
+{
+    "required": ["pipelineId"],
+    "properties": {
+        "pipelineId": {
+            "title": "Pipeline Id",
+            "description": "The Pipeline__c record to check integrity for.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

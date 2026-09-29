@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_API_Number_For_Prod_Well</fullName>
+    <active>true</active>
+    <description>Producing wells must have an API Number registered with the state.</description>
+    <errorConditionFormula>ISPICKVAL(Status__c, &apos;Producing&apos;) &amp;&amp; ISBLANK(API_Number__c)</errorConditionFormula>
+    <errorMessage>API Number is required for producing wells.</errorMessage>
+</ValidationRule>

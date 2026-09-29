@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>O_G_HSE_Advisor</members>
+        <members>O_G_Compliance_Analyst</members>
+        <members>O_G_Production_Engineer</members>
+        <members>O_G_Terminal_Operator</members>
+        <members>O_G_Field_Technician</members>
+        <members>O_G_All_Access</members>
+        <name>PermissionSet</name>
+    </types>
+    <version>67.0</version>
+</Package>

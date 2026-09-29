@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <canEscalate>false</canEscalate>
+    <description>Invocable actions for the Production domain: production history, well status transitions, and royalty calculations.</description>
+    <developerName>O_G_Production_Actions</developerName>
+    <genAiPluginInstructions>
+        <description>Use Get Production History to report a well's production volumes/allocations (default look-back 12 months). Use Calculate Royalty to compute royalty and revenue shares for a lease. The Transition Well Status is a WRITE action: always confirm the proposed status change with the user before executing, and only after confirming.</description>
+        <developerName>instruction_og_production_actions</developerName>
+        <language>en_US</language>
+        <masterLabel>O&amp;G Production Actions Instructions</masterLabel>
+        <sortOrder>1</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>O_G_Production_Actions</localDeveloperName>
+    <masterLabel>O&amp;G Production Actions</masterLabel>
+    <pluginType>Topic</pluginType>
+</GenAiPlugin>

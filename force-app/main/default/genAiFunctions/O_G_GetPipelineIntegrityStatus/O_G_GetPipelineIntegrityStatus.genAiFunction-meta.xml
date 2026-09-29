@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Retrieve pipeline integrity/compliance status for a given pipeline, including compliance status, whether it is compliant, last and next inspection dates, and the required inspection interval. Use when the user asks whether a pipeline is compliant or is due for inspection.</description>
+    <invocationTarget>PipelineIntegrityStatusWrapper</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Get Pipeline Integrity Status</masterLabel>
+</GenAiFunction>

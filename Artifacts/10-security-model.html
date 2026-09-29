@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Security Model (Sharing &amp; Visibility)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Security Layers */
+        .security-layers { display: flex; flex-direction: column; gap: 16px; margin: 24px 0; }
+        .sec-layer { border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .sec-layer-header { padding: 14px 20px; color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .sec-layer-header .layer-badge { background: rgba(255,255,255,0.25); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .sec-layer-body { background: #fff; padding: 20px; }
+
+        .sec-l1 .sec-layer-header { background: linear-gradient(135deg, #2d3436, #636e72); }
+        .sec-l2 .sec-layer-header { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+        .sec-l3 .sec-layer-header { background: linear-gradient(135deg, #0984e3, #74b9ff); }
+        .sec-l4 .sec-layer-header { background: linear-gradient(135deg, #00b894, #55efc4); }
+        .sec-l5 .sec-layer-header { background: linear-gradient(135deg, #e17055, #fab1a0); }
+        .sec-l6 .sec-layer-header { background: linear-gradient(135deg, #d63031, #ff7675); }
+
+        /* OWD Table */
+        .owd-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .owd-table th { background: #f8f9fa; padding: 8px 12px; text-align: left; font-weight: 600; color: #636e72; border-bottom: 2px solid #dfe6e9; }
+        .owd-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; }
+        .owd-table tr:hover { background: #f8f9fa; }
+        .owd-private { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .owd-rw { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .owd-controlled { background: #fff3e0; color: #e65100; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+        /* Sharing Set */
+        .sharing-card { background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 12px 0; border-left: 4px solid #6c5ce7; }
+        .sharing-card .sh-name { font-size: 14px; font-weight: 700; color: #6c5ce7; }
+        .sharing-card .sh-desc { font-size: 12px; color: #636e72; margin-top: 4px; }
+        .sharing-card .sh-objects { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .sh-obj { background: #fff; border: 1px solid #dfe6e9; border-radius: 6px; padding: 4px 10px; font-size: 11px; }
+
+        /* Full Access Matrix */
+        .full-matrix { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 11px; margin: 16px 0; }
+        .full-matrix th { background: #0c2461; color: #fff; padding: 8px 6px; text-align: center; font-size: 10px; }
+        .full-matrix th:first-child { text-align: left; min-width: 140px; }
+        .full-matrix td { padding: 6px; border-bottom: 1px solid #f1f2f6; text-align: center; }
+        .full-matrix td:first-child { text-align: left; font-weight: 600; font-size: 11px; }
+        .full-matrix tr:hover { background: #f8f9fa; }
+        .fm-full { background: #e3f2fd; color: #1565c0; padding: 2px 4px; border-radius: 3px; font-weight: 600; font-size: 9px; }
+        .fm-crud { background: #e8f5e9; color: #2e7d32; padding: 2px 4px; border-radius: 3px; font-weight: 600; font-size: 9px; }
+        .fm-read { background: #fff3e0; color: #e65100; padding: 2px 4px; border-radius: 3px; font-weight: 600; font-size: 9px; }
+        .fm-none { background: #f5f5f5; color: #9e9e9e; padding: 2px 4px; border-radius: 3px; font-size: 9px; }
+
+        /* Portal Security */
+        .portal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 12px 0; }
+        .portal-card { background: #f8f9fa; border-radius: 8px; padding: 14px; border-left: 4px solid #e17055; }
+        .portal-card .pc-name { font-size: 13px; font-weight: 700; }
+        .portal-card .pc-desc { font-size: 11px; color: #636e72; margin-top: 4px; }
+        .portal-card .pc-objects { margin-top: 6px; font-size: 11px; }
+
+        .legend { display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap; font-size: 11px; }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; }
+        .note strong { color: #856404; }
+
+        .note-danger { background: #ffebee; border-left: 4px solid #d63031; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; }
+        .note-danger strong { color: #c62828; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media (max-width: 800px) { .portal-grid { grid-template-columns: 1fr; } }
+        @media print { .nav { display: none; } .sec-layer { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Security Model — Sharing &amp; Visibility</div>
+        </div>
+        <div class="badge">6 Security Layers &bull; 9 Private Objects</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a class="active" href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Salesforce Security Layers</h2>
+            <p>PowerShot implements a defense-in-depth security model with 6 layers. Each layer progressively narrows or broadens access. The combination of all layers determines what a user can see and do.</p>
+        </div>
+
+        <div class="security-layers">
+            <!-- Layer 1: OWD -->
+            <div class="sec-layer sec-l1">
+                <div class="sec-layer-header">
+                    <div class="layer-badge">1</div>
+                    Layer 1 — Org-Wide Defaults (OWD) — Baseline Sharing
+                </div>
+                <div class="sec-layer-body">
+                    <p style="font-size:13px; color:#636e72; margin-bottom:12px;">OWD defines the <strong>most restrictive</strong> default access level for each object. All records are private to the owner unless overridden by higher layers.</p>
+                    <table class="owd-table">
+                        <thead><tr><th>Object</th><th>OWD</th><th>Impact</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Well__c</strong></td><td><span class="owd-private">Private</span></td><td>Only record owner + users above in role hierarchy can see</td></tr>
+                            <tr><td><strong>Well_Operation__c</strong></td><td><span class="owd-controlled">ControlledByParent</span></td><td>Inherits Well__c sharing (Master-Detail)</td></tr>
+                            <tr><td><strong>HSE_Incident__c</strong></td><td><span class="owd-private">Private</span></td><td>Sensitive safety data — restricted visibility</td></tr>
+                            <tr><td><strong>Production_Allocation__c</strong></td><td><span class="owd-private">Private</span></td><td>Confidential production volumes and revenue data</td></tr>
+                            <tr><td><strong>Regulatory_Permit__c</strong></td><td><span class="owd-private">Private</span></td><td>Government permits — restricted to responsible parties</td></tr>
+                            <tr><td><strong>Compliance_Report__c</strong></td><td><span class="owd-private">Private</span></td><td>Regulatory compliance reports — restricted</td></tr>
+                            <tr><td><strong>Invoice__c</strong></td><td><span class="owd-private">Private</span></td><td>Financial data — restricted to billing team + hierarchy</td></tr>
+                            <tr><td><strong>Joint_Venture__c</strong></td><td><span class="owd-private">Private</span></td><td>Partnership agreements — confidential</td></tr>
+                            <tr><td><strong>Lease__c</strong></td><td><span class="owd-private">Private</span></td><td>Land lease terms — confidential</td></tr>
+                            <tr><td><strong>Pipeline__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>All internal users can see all pipeline records</td></tr>
+                            <tr><td><strong>Pipeline_Station__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for field coordination</td></tr>
+                            <tr><td><strong>Measurement__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for measurement data</td></tr>
+                            <tr><td><strong>Terminal__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for terminal operations</td></tr>
+                            <tr><td><strong>Refinery__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for refinery data</td></tr>
+                            <tr><td><strong>Retail_Outlet__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for retail locations</td></tr>
+                            <tr><td><strong>Fuel_Inventory__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for inventory levels</td></tr>
+                            <tr><td><strong>Inventory_Transaction__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for transaction audit trail</td></tr>
+                            <tr><td><strong>Inspection__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for field inspections</td></tr>
+                            <tr><td><strong>Permit_to_Work__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for safety work permits</td></tr>
+                            <tr><td><strong>Supply_Agreement__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for supply terms</td></tr>
+                            <tr><td><strong>Service_Contract__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for vendor contracts</td></tr>
+                            <tr><td><strong>HSE_Observation__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for safety observations</td></tr>
+                            <tr><td><strong>Land_Parcel__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for land data</td></tr>
+                            <tr><td><strong>Transportation_Nomination__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for nominations</td></tr>
+                            <tr><td><strong>Store__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for store records</td></tr>
+                            <tr><td><strong>WhatsApp_Message__c</strong></td><td><span class="owd-rw">ReadWrite</span></td><td>Open visibility for messages</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Layer 2: Role Hierarchy -->
+            <div class="sec-layer sec-l2">
+                <div class="sec-layer-header">
+                    <div class="layer-badge">2</div>
+                    Layer 2 — Role Hierarchy — Upward Visibility
+                </div>
+                <div class="sec-layer-body">
+                    <p style="font-size:13px; color:#636e72;">For all <strong>Private</strong> OWD objects, the role hierarchy grants upward visibility: users higher in the hierarchy can view (and potentially edit) records owned by users below them. See <a href="03-role-hierarchy.html" style="color:#6c5ce7;">Diagram 03 — Role Hierarchy</a> for the complete hierarchy tree.</p>
+                    <div class="legend">
+                        <div class="legend-item"><span class="owd-private" style="font-size:10px;">Private OWD</span> Records restricted to owner</div>
+                        <div class="legend-item">→ Role hierarchy opens visibility upward</div>
+                        <div class="legend-item"><span class="owd-rw" style="font-size:10px;">ReadWrite OWD</span> All internal users see all records</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 3: Sharing Rules -->
+            <div class="sec-layer sec-l3">
+                <div class="sec-layer-header">
+                    <div class="layer-badge">3</div>
+                    Layer 3 — Sharing Rules — Lateral Sharing
+                </div>
+                <div class="sec-layer-body">
+                    <p style="font-size:13px; color:#636e72; margin-bottom:12px;">Sharing rules extend access beyond the role hierarchy, allowing specific groups to see records they don't own. PowerShot has 10 sharing rule files — all are currently <strong>empty stubs</strong>.</p>
+                    <table class="owd-table">
+                        <thead><tr><th>Object</th><th>Sharing Rule File</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td>Well__c</td><td>Well__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>HSE_Incident__c</td><td>HSE_Incident__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Production_Allocation__c</td><td>Production_Allocation__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Regulatory_Permit__c</td><td>Regulatory_Permit__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Compliance_Report__c</td><td>Compliance_Report__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Invoice__c</td><td>Invoice__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Joint_Venture__c</td><td>Joint_Venture__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Lease__c</td><td>Lease__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Pipeline__c</td><td>Pipeline__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                            <tr><td>Supply_Agreement__c</td><td>Supply_Agreement__c.sharingRules-meta.xml</td><td><span class="owd-private">Empty Stub</span></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="note-danger">
+                        <strong>Critical Gap:</strong> All 10 sharing rules are empty. This means lateral sharing between roles (e.g., sharing Well records between Drilling Engineer and Production Engineer) is not implemented. This must be addressed before production deployment.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 4: Sharing Sets (Portal) -->
+            <div class="sec-layer sec-l4">
+                <div class="sec-layer-header">
+                    <div class="layer-badge">4</div>
+                    Layer 4 — Sharing Sets — Portal/Community Sharing
+                </div>
+                <div class="sec-layer-body">
+                    <p style="font-size:13px; color:#636e72; margin-bottom:12px;">Sharing sets grant external portal users access to records based on field matching. The <strong>JV_Partner_Sharing</strong> set matches the user's Account to the record's Account__c field, granting Read access.</p>
+
+                    <div class="sharing-card">
+                        <div class="sh-name">JV_Partner_Sharing</div>
+                        <div class="sh-desc">Account-matched sharing set — provides Read access to JV partner users for records where the user's Account matches the record's Account__c field.</div>
+                        <div class="sh-objects">
+                            <div class="sh-obj"><strong>Well__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>Invoice__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>Production_Allocation__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>HSE_Incident__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>Compliance_Report__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>Regulatory_Permit__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>Lease__c</strong> — Account__c match</div>
+                            <div class="sh-obj"><strong>Joint_Venture__c</strong> — Account__c match</div>
+                        </div>
+                    </div>
+
+                    <div class="portal-grid">
+                        <div class="portal-card">
+                            <div class="pc-name">JV Partner Portal Users</div>
+                            <div class="pc-desc">Customer Community Plus license — read-only access via JV_Partner_Sharing set</div>
+                            <div class="pc-objects"><strong>Access:</strong> Read-only on 8 objects (Account-matched)</div>
+                        </div>
+                        <div class="portal-card">
+                            <div class="pc-name">Field Portal Workers</div>
+                            <div class="pc-desc">Customer Community Plus license — limited CRUD via O_G_Field_Portal_Access permission set</div>
+                            <div class="pc-objects"><strong>Access:</strong> CRUD on Inspection__c, Permit_to_Work__c, HSE_Incident__c; Read on Pipeline__c, Well__c</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layer 5: Permission Sets -->
+            <div class="sec-layer sec-l5">
+                <div class="sec-layer-header">
+                    <div class="layer-badge">5</div>
+                    Layer 5 — Permission Sets — Object &amp; Field-Level Access
+                </div>
+                <div class="sec-layer-body">
+                    <p style="font-size:13px; color:#636e72; margin-bottom:12px;">20 permission sets define what each role can do with the records they can see. Permission sets override OWD — a user with a permission set granting CRUD on an object can perform those operations on any record they have visibility to.</p>
+
+                    <div class="legend">
+                        <div class="legend-item"><span class="fm-full">Full+Mod</span> Full CRUD + ViewAll + ModifyAll</div>
+                        <div class="legend-item"><span class="fm-crud">CRUD</span> Create, Read, Update, Delete</div>
+                        <div class="legend-item"><span class="fm-read">Read</span> Read Only</div>
+                        <div class="legend-item"><span class="fm-none">—</span> No Access</div>
+                    </div>
+
+                    <table class="full-matrix">
+                        <thead>
+                            <tr>
+                                <th>Permission Set</th>
+                                <th>Well</th>
+                                <th>Pipeline</th>
+                                <th>HSE_Inc</th>
+                                <th>Prod_All</th>
+                                <th>Reg_Perm</th>
+                                <th>Invoice</th>
+                                <th>Fuel_Inv</th>
+                                <th>Inspect</th>
+                                <th>PTW</th>
+                                <th>Lease</th>
+                                <th>Terminal</th>
+                                <th>Refinery</th>
+                                <th>Retail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>O_G_All_Access</td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td><td><span class="fm-full">Full+Mod</span></td></tr>
+                            <tr><td>O_G_Executive</td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td></tr>
+                            <tr><td>O_G_Drilling_Eng</td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Production_Eng</td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Pipeline_Eng</td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_HSE_Advisor</td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Compliance</td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Field_Tech</td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Landman</td><td><span class="fm-read">Read</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Refinery_Mgr</td><td><span class="fm-none">—</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Retail_Mgr</td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td></tr>
+                            <tr><td>O_G_Terminal_Op</td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Supply_Chain</td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                            <tr><td>O_G_Portal_Access</td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td></tr>
+                            <tr><td>O_G_Field_Portal</td><td><span class="fm-read">Read</span></td><td><span class="fm-read">Read</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-crud">CRUD</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td><td><span class="fm-none">—</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Layer 6: Apex Class Access -->
+            <div class="sec-layer sec-l6">
+                <div class="sec-layer-header">
+                    <div class="layer-badge">6</div>
+                    Layer 6 — Apex Class Access &amp; External Credential Access
+                </div>
+                <div class="sec-layer-body">
+                    <p style="font-size:13px; color:#636e72; margin-bottom:12px;">Permission sets also control which Apex classes a user can execute and which external credentials they can access. This prevents unauthorized API calls and business logic execution.</p>
+
+                    <table class="owd-table">
+                        <thead><tr><th>Permission Set</th><th>Apex Classes Granted</th><th>External Credentials Granted</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>O_G_All_Access</strong></td><td>HSEIncidentService, ComplianceDueDateService, PermitToWorkValidationService, WellStatusService, InventoryBalanceService</td><td>CommodityPricing, EIA_API, Slack_HSE_Webhook</td></tr>
+                            <tr><td><strong>O_G_Compliance_Analyst</strong></td><td>ComplianceDueDateService</td><td>—</td></tr>
+                            <tr><td><strong>O_G_HSE_Advisor</strong></td><td>HSEIncidentService, PermitToWorkValidationService</td><td>—</td></tr>
+                            <tr><td><strong>O_G_Production_Engineer</strong></td><td>WellStatusService</td><td>—</td></tr>
+                            <tr><td><strong>O_G_Portal_Access</strong></td><td>PortalDashboardController, PortalWellStatusController, PortalIncidentController, PortalInvoiceController, PortalComplianceController</td><td>—</td></tr>
+                            <tr><td><strong>O_G_Field_Portal_Access</strong></td><td>PortalIncidentController</td><td>—</td></tr>
+                            <tr><td><strong>O_G_Terminal_Operator</strong></td><td>InventoryBalanceService</td><td>—</td></tr>
+                            <tr><td><strong>O_G_Field_Technician</strong></td><td>PermitToWorkValidationService</td><td>—</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note" style="margin-top:16px;">
+                        <strong>Security Principle:</strong> Only the System Admin (O_G_All_Access) has access to external credentials for API integrations. All other roles execute business logic via permission-set-granted Apex classes, which internally use Named Credentials for authenticated API calls. This ensures no user can make unauthorized external API calls.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Summary -->
+        <div class="title-bar">
+            <h2>Security Summary</h2>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin:16px 0;">
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#d63031;">9</div>
+                <div style="font-size:12px; color:#636e72;">Private OWD Objects</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#e17055;">10</div>
+                <div style="font-size:12px; color:#636e72;">Sharing Rules (Empty)</div>
+            </div>
+            <div style="background:#fff; border-radius:8px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#6c5ce7;">1</div>
+                <div style="font-size:12px; color:#636e72;">Sharing Set (Active)</div>
+            </div>
+        </div>
+
+        <div class="note-danger">
+            <strong>Key Gaps to Address Before Production:</strong><br>
+            1. All 10 sharing rules are empty stubs — lateral sharing between roles is not implemented.<br>
+            2. 17 manual post-deployment steps must be completed (see Diagram 09).<br>
+            3. Apex test coverage is ~39% (75% required).<br>
+            4. Page layout to profile assignments are not implemented.<br>
+            5. HSE_Incident_Escalation flow deploys as Draft and must be activated manually.
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>

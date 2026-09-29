@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Create restock tasks when fuel inventory is below minimum threshold</description>
+    <label>Retail Inventory Alert</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <decisions>
+        <name>Check_Low_Inventory</name>
+        <label>Check Low Inventory</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <defaultConnectorLabel>OK</defaultConnectorLabel>
+        <rules>
+            <name>Low_Inventory</name>
+            <conditionLogic>AND</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Current_Volume__c</leftValueReference>
+                <operator>LessThan</operator>
+                <rightValue>
+                    <elementReference>$Record.Minimum_Threshold__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Restock_Task</targetReference>
+            </connector>
+            <label>Inventory Below Threshold</label>
+        </rules>
+    </decisions>
+    <recordCreates>
+        <name>Create_Restock_Task</name>
+        <label>Create Restock Task</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Restock tank below minimum threshold</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Low_Inventory</targetReference>
+        </connector>
+        <object>Fuel_Inventory__c</object>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2026-06-07</startDate>
+            <startTime>05:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

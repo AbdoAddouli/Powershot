@@ -1,0 +1,27 @@
+{
+    "required": ["inventoryId"],
+    "properties": {
+        "inventoryId": {
+            "title": "Inventory Id",
+            "description": "The inventory record to adjust.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "volumeChange": {
+            "title": "Volume Change",
+            "description": "Signed volume change to apply (negative for consumption).",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "movementType": {
+            "title": "Movement Type",
+            "description": "Movement category, e.g. Consumption or Restock.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

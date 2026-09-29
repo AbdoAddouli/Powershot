@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <canEscalate>false</canEscalate>
+    <description>Invocable actions for the Compliance Analyst domain: permit renewals and overdue compliance reports.</description>
+    <developerName>O_G_Compliance_Actions</developerName>
+    <genAiPluginInstructions>
+        <description>Use the Get Compliance Overview function to surface regulatory permits nearing renewal and any overdue compliance reports. Ask the user for or default the days-ahead look-ahead window (e.g., 45 days). Present upcoming renewals prominently and flag overdue reports with a clear recommendation to act.</description>
+        <developerName>instruction_og_compliance_actions</developerName>
+        <language>en_US</language>
+        <masterLabel>O&amp;G Compliance Actions Instructions</masterLabel>
+        <sortOrder>1</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>O_G_Compliance_Actions</localDeveloperName>
+    <masterLabel>O&amp;G Compliance Actions</masterLabel>
+    <pluginType>Topic</pluginType>
+</GenAiPlugin>

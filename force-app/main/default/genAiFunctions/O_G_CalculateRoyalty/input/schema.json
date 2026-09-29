@@ -1,0 +1,27 @@
+{
+    "required": ["leaseId"],
+    "properties": {
+        "leaseId": {
+            "title": "Lease Id",
+            "description": "The Lease__c record to compute royalty for.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "periodStart": {
+            "title": "Period Start",
+            "description": "Start of the royalty period. Defaults to start of month.",
+            "lightning:type": "lightning__dateType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        },
+        "periodEnd": {
+            "title": "Period End",
+            "description": "End of the royalty period. Defaults to today.",
+            "lightning:type": "lightning__dateType",
+            "lightning:isPII": false,
+            "copilotAction:isUserInput": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

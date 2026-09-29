@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Retrieve production history (production allocations) for a given well over a configurable look-back window in months. Use when the user asks for well production history, production volumes, allocation percentages, or working-interest data for a specific well.</description>
+    <invocationTarget>ProductionHistoryWrapper</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Get Production History</masterLabel>
+</GenAiFunction>

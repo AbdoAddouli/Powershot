@@ -1,0 +1,61 @@
+{
+    "properties": {
+        "leaseId": {
+            "title": "Lease Id",
+            "description": "The lease record ID.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "leaseName": {
+            "title": "Lease Name",
+            "description": "The lease record name.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "totalRoyalty": {
+            "title": "Total Royalty",
+            "description": "The calculated total royalty amount.",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "totalAllocatedRevenue": {
+            "title": "Total Allocated Revenue",
+            "description": "The total allocated revenue used for the calculation.",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "royaltyRatePercent": {
+            "title": "Royalty Rate Percent",
+            "description": "The applied royalty rate percentage.",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "success": {
+            "title": "Success",
+            "description": "Whether the calculation succeeded.",
+            "lightning:type": "lightning__booleanType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "message": {
+            "title": "Message",
+            "description": "Result message or error detail.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

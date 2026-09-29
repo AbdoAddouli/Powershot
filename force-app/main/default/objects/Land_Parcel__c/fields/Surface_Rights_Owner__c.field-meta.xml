@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Surface_Rights_Owner__c</fullName>
+    <label>Surface Rights Owner</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Surface Rights Land Parcels</relationshipLabel>
+    <relationshipName>Surface_Rights_Land_Parcels</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

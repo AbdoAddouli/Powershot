@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Spill_Volume_Required_When_Spill</fullName>
+    <active>true</active>
+    <description>Spill volume must be provided for spill incidents.</description>
+    <errorConditionFormula>ISPICKVAL(Incident_Type__c, &apos;Spill&apos;) &amp;&amp; ISBLANK(Spill_Volume__c)</errorConditionFormula>
+    <errorMessage>Spill Volume is required for spill-type incidents.</errorMessage>
+</ValidationRule>

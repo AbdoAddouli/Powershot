@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Transition a well to a new status using the validated transition rules (e.g., Producing, Shut-In, Plugged). WRITE action - only execute after the user explicitly confirms the proposed transition.</description>
+    <invocationTarget>WellStatusService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>true</isConfirmationRequired>
+    <masterLabel>Transition Well Status</masterLabel>
+</GenAiFunction>

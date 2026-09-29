@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Incident_Date</fullName>
+    <active>true</active>
+    <description>Incident Date is required when creating or updating an incident.</description>
+    <errorConditionFormula>ISBLANK(Incident_Date__c)</errorConditionFormula>
+    <errorMessage>Incident Date is required.</errorMessage>
+</ValidationRule>

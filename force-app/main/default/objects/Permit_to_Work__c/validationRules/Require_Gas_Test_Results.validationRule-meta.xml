@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Gas_Test_Results</fullName>
+    <active>true</active>
+    <description>Gas test results must be provided when gas test is required and completed.</description>
+    <errorConditionFormula>Gas_Test_Required__c &amp;&amp; Gas_Test_Completed__c &amp;&amp; NOT(ISPICKVAL(Gas_Test_Result__c, 'Pass')) &amp;&amp; NOT(ISPICKVAL(Gas_Test_Result__c, 'Fail')) &amp;&amp; NOT(ISPICKVAL(Gas_Test_Result__c, 'Not Required'))</errorConditionFormula>
+    <errorMessage>Gas Test Result (Pass/Fail) is required when gas test has been completed.</errorMessage>
+</ValidationRule>

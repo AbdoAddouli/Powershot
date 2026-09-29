@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Station_Type__c</fullName>
+    <label>Station Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pump</fullName>
+                <default>false</default>
+                <label>Pump</label>
+            </value>
+            <value>
+                <fullName>Compressor</fullName>
+                <default>false</default>
+                <label>Compressor</label>
+            </value>
+            <value>
+                <fullName>Valve</fullName>
+                <default>false</default>
+                <label>Valve</label>
+            </value>
+            <value>
+                <fullName>Meter</fullName>
+                <default>false</default>
+                <label>Meter</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

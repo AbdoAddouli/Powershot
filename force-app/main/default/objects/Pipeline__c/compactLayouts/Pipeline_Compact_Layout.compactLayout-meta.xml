@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pipeline_Compact_Layout</fullName>
+    <label>Pipeline Compact Layout</label>
+    <fields>Name</fields>
+    <fields>Status__c</fields>
+    <fields>Commodity__c</fields>
+    <fields>Capacity_bpd__c</fields>
+    <fields>Diameter_inches__c</fields>
+    <fields>Compliance_Status__c</fields>
+    <fields>Last_Inspection_Date__c</fields>
+</CompactLayout>

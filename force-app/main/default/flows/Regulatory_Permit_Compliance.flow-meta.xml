@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Flag regulatory permits near expiration</description>
+    <label>Regulatory Permit Compliance</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <formulas>
+        <name>Expiration_Threshold</name>
+        <dataType>Date</dataType>
+        <expression>$Flow.CurrentDate + 90</expression>
+    </formulas>
+    <decisions>
+        <name>Check_Expiration</name>
+        <label>Check Expiration</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <defaultConnectorLabel>Not Expiring</defaultConnectorLabel>
+        <rules>
+            <name>Near_Expiration</name>
+            <conditionLogic>AND</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Expiration_Date__c</leftValueReference>
+                <operator>LessThanOrEqualTo</operator>
+                <rightValue>
+                    <elementReference>Expiration_Threshold</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Report</targetReference>
+            </connector>
+            <label>Near Expiration</label>
+        </rules>
+    </decisions>
+    <recordCreates>
+        <name>Create_Report</name>
+        <label>Create Report</label>
+        <locationX>400</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Report_Type__c</field>
+            <value>
+                <stringValue>Regulatory Compliance</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value>
+                <stringValue>Pending</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Notes__c</field>
+            <value>
+                <stringValue>Permit near expiration</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Regulatory_Permit__c</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Compliance_Report__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Expiration</targetReference>
+        </connector>
+        <object>Regulatory_Permit__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

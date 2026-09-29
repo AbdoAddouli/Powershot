@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <canEscalate>false</canEscalate>
+    <description>Invocable actions for the HSE Advisor domain: classify HSE incidents.</description>
+    <developerName>O_G_HSE_Actions</developerName>
+    <genAiPluginInstructions>
+        <description>Use the Classify Incident Severity function to assess the severity (CRITICAL, HIGH, MEDIUM, LOW) and regulatory reportability of an HSE incident. Invoke it whenever the user asks to classify, triage, or determine whether an HSE incident is reportable. Report the severity to the user alongside any reportability guidance.</description>
+        <developerName>instruction_og_hse_actions</developerName>
+        <language>en_US</language>
+        <masterLabel>O&amp;G HSE Actions Instructions</masterLabel>
+        <sortOrder>1</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>O_G_HSE_Actions</localDeveloperName>
+    <masterLabel>O&amp;G HSE Actions</masterLabel>
+    <pluginType>Topic</pluginType>
+</GenAiPlugin>

@@ -1,0 +1,37 @@
+{
+    "properties": {
+        "incidentId": {
+            "title": "Incident Id",
+            "description": "The incident record ID.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "success": {
+            "title": "Success",
+            "description": "Whether classification succeeded.",
+            "lightning:type": "lightning__booleanType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "severity": {
+            "title": "Severity",
+            "description": "The classified severity: CRITICAL, HIGH, MEDIUM, or LOW.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "message": {
+            "title": "Message",
+            "description": "Result message or error detail.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

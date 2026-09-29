@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Compliance_Report__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>HSE_Incident__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Invoice__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Joint_Venture__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Lease__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Production_Allocation__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Regulatory_Permit__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <accessMappings>
+        <accessLevel>Read</accessLevel>
+        <object>Well__c</object>
+        <objectField>Account__c</objectField>
+        <userField>Account</userField>
+    </accessMappings>
+    <name>JV_Partner_Sharing</name>
+    <profiles>customer community plus login user</profiles>
+    <profiles>customer community plus user</profiles>
+    <profiles>customer community user</profiles>
+    <profiles>partner community login user</profiles>
+    <profiles>partner community user</profiles>
+</SharingSet>

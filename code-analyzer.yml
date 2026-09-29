@@ -1,0 +1,36 @@
+# Salesforce Code Analyzer configuration (PowerShot / Energy project).
+#
+# Run with:
+#   sf code-analyzer run --config-file code-analyzer.yml
+#
+# Engines included by default (Recommended): retire-js, regex, eslint, pmd,
+# cpd, sfge, flow.
+#
+# NOTE: The project ships an eslint.config.js that extends
+# @salesforce/eslint-config-lwc, but eslint is NOT installed under node_modules
+# (npm install has not been run). Referencing it here would crash the eslint
+# engine with "Cannot find module 'eslint/config'". To use the project's own
+# LWC/Aura lint rules with Code Analyzer, first run `npm install`, then uncomment
+# the `eslint_config_file` line below.
+
+engines:
+  # eslint:
+  #   eslint_config_file: "eslint.config.js"
+
+# Paths (relative to this config file) to exclude from analysis scans.
+ignores:
+  files:
+    - "**/temp/**"
+    - "**/node_modules/**"
+    - "**/.svn/**"
+    - "**/.git/**"
+    - "**/force-app/main/default/scripts/**"
+    - "**/jsconfig.json"
+    - "**/.forceignore"
+
+# Justified suppressions. Keep these minimal and tied to specific files/rules
+# that are intentionally mitigated at runtime.
+suppressions:
+  - rule: "ApexFlsViolation"
+    file: "force-app/main/default/classes/MarketDataController.cls"
+    reason: "FLS is enforced at runtime by wrapping every SOQL in Security.stripInaccessible(AccessType.READABLE); the static rule flags the inline query by design."

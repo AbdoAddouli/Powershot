@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <description>Create Inspection records for overdue recurring inspections weekly</description>
+    <label>Inspection Due</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <decisions>
+        <name>Check_Overdue</name>
+        <label>Check Overdue</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <defaultConnectorLabel>Not Overdue</defaultConnectorLabel>
+        <rules>
+            <name>Overdue</name>
+            <conditionLogic>AND</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Next_Due_Date__c</leftValueReference>
+                <operator>LessThanOrEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Flow.CurrentDate</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_New_Inspection</targetReference>
+            </connector>
+            <label>Inspection Overdue</label>
+        </rules>
+    </decisions>
+    <recordCreates>
+        <name>Create_New_Inspection</name>
+        <label>Create New Inspection</label>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <inputAssignments>
+            <field>Inspection_Type__c</field>
+            <value>
+                <elementReference>$Record.Inspection_Type__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status__c</field>
+            <value>
+                <stringValue>Scheduled</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Well__c</field>
+            <value>
+                <elementReference>$Record.Well__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Pipeline__c</field>
+            <value>
+                <elementReference>$Record.Pipeline__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Account__c</field>
+            <value>
+                <elementReference>$Record.Account__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Parent_Inspection__c</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Inspection__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Overdue</targetReference>
+        </connector>
+        <object>Inspection__c</object>
+        <schedule>
+            <frequency>Weekly</frequency>
+            <startDate>2026-06-08</startDate>
+            <startTime>07:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

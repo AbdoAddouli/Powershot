@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contract_Type__c</fullName>
+    <label>Contract Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Drilling</fullName>
+                <default>false</default>
+                <label>Drilling</label>
+            </value>
+            <value>
+                <fullName>Workover</fullName>
+                <default>false</default>
+                <label>Workover</label>
+            </value>
+            <value>
+                <fullName>Well Service</fullName>
+                <default>false</default>
+                <label>Well Service</label>
+            </value>
+            <value>
+                <fullName>Inspection</fullName>
+                <default>false</default>
+                <label>Inspection</label>
+            </value>
+            <value>
+                <fullName>Cleaning</fullName>
+                <default>false</default>
+                <label>Cleaning</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

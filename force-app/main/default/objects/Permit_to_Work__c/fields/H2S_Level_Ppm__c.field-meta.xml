@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>H2S_Level_Ppm__c</fullName>
+    <label>H2S Level (ppm)</label>
+    <required>false</required>
+    <type>Number</type>
+    <precision>6</precision>
+    <scale>0</scale>
+</CustomField>

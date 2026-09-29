@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Depth_Fields</fullName>
+    <active>true</active>
+    <description>Total Depth must be greater than True Vertical Depth when both are provided.</description>
+    <errorConditionFormula>NOT(ISBLANK(Total_Depth__c)) &amp;&amp; NOT(ISBLANK(True_Vertical_Depth__c)) &amp;&amp; True_Vertical_Depth__c &gt; Total_Depth__c</errorConditionFormula>
+    <errorMessage>True Vertical Depth cannot exceed Total Depth.</errorMessage>
+</ValidationRule>

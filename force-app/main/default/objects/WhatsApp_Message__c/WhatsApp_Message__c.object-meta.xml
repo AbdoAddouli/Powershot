@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <enableActivities>true</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>true</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableLicensing>false</enableLicensing>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>WhatsApp Message</label>
+    <description>Stores inbound and outbound WhatsApp messages received via Meta WhatsApp Cloud API webhook, matched to Contacts by phone number.</description>
+    <nameField>
+        <label>WhatsApp Message Name</label>
+        <type>AutoNumber</type>
+        <displayFormat>WA-{00000}</displayFormat>
+    </nameField>
+    <pluralLabel>WhatsApp Messages</pluralLabel>
+    <searchLayouts>
+        <searchResultsAdditionalFields>NAME</searchResultsAdditionalFields>
+    </searchLayouts>
+    <sharingModel>ReadWrite</sharingModel>
+    <visibility>Public</visibility>
+</CustomObject>

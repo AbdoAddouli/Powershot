@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Update a Permit to Work (Permit_To_Work__c) status after validating it passes the required safety-check guardrails. WRITE action - only execute after the user explicitly confirms the status change.</description>
+    <invocationTarget>PermitToWorkValidationService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>true</isConfirmationRequired>
+    <masterLabel>Update Permit Status</masterLabel>
+</GenAiFunction>

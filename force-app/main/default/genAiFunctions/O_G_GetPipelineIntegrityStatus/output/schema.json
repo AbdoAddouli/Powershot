@@ -1,0 +1,77 @@
+{
+    "properties": {
+        "pipelineId": {
+            "title": "Pipeline Id",
+            "description": "The pipeline record ID.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "pipelineName": {
+            "title": "Pipeline Name",
+            "description": "The pipeline record name.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "complianceStatus": {
+            "title": "Compliance Status",
+            "description": "The derived compliance status of the pipeline.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "isCompliant": {
+            "title": "Is Compliant",
+            "description": "Whether the pipeline currently meets inspection requirements.",
+            "lightning:type": "lightning__booleanType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "lastInspectionDate": {
+            "title": "Last Inspection Date",
+            "description": "Date of the last pipeline inspection.",
+            "lightning:type": "lightning__dateType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "nextInspectionDueDate": {
+            "title": "Next Inspection Due Date",
+            "description": "Date the next inspection is due.",
+            "lightning:type": "lightning__dateType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "requiredIntervalMonths": {
+            "title": "Required Interval Months",
+            "description": "The required inspection interval in months.",
+            "lightning:type": "lightning__numberType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "success": {
+            "title": "Success",
+            "description": "Whether the status query succeeded.",
+            "lightning:type": "lightning__booleanType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        },
+        "message": {
+            "title": "Message",
+            "description": "Result message or error detail.",
+            "lightning:type": "lightning__textType",
+            "lightning:isPII": false,
+            "copilotAction:isDisplayable": true,
+            "copilotAction:isUsedByPlanner": true
+        }
+    },
+    "lightning:type": "lightning__objectType"
+}

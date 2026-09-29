@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+	<types>
+		<members>GA4AdminService</members>
+		<members>GAEventsController</members>
+		<members>ProvisioningQueueable</members>
+		<members>ProvisioningService</members>
+		<members>StoreController</members>
+		<name>ApexClass</name>
+	</types>
+	<types>
+		<members>Shopify_Settings__c.Store_URL__c</members>
+		<members>Store__c.Active__c</members>
+		<members>Store__c.GA4_Property_ID__c</members>
+		<members>Store__c.GTM_Container_ID__c</members>
+		<members>Store__c.GTM_Numeric_ID__c</members>
+		<members>Store__c.Measurement_ID__c</members>
+		<members>Store__c.Provisioning_Completed__c</members>
+		<members>Store__c.Provisioning_Result__c</members>
+		<members>Store__c.Provisioning_Status__c</members>
+		<members>Store__c.Store_Type__c</members>
+		<members>Store__c.Website_URL__c</members>
+		<name>CustomField</name>
+	</types>
+	<types>
+		<members>storeManager</members>
+		<members>storeProvisioning</members>
+		<name>LightningComponentBundle</name>
+	</types>
+	<version>66.0</version>
+</Package>

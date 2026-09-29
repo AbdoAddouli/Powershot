@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShot — Data Migration Strategy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; color: #2d3436; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #0c2461 100%); color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .header .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; }
+        .nav { background: #fff; border-bottom: 1px solid #dfe6e9; padding: 10px 40px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #636e72; font-size: 12px; padding: 5px 10px; border-radius: 4px; transition: all 0.2s; }
+        .nav a:hover, .nav a.active { background: #0c2461; color: #fff; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .title-bar { background: #fff; border-radius: 8px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .title-bar h2 { font-size: 20px; color: #2d3436; }
+        .title-bar p { color: #636e72; margin-top: 6px; font-size: 14px; }
+
+        /* Timeline */
+        .timeline { position: relative; padding: 20px 0; }
+        .timeline::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #0984e3, #00b894, #e17055, #6c5ce7, #d63031); border-radius: 2px; }
+        .phase { position: relative; margin-left: 56px; margin-bottom: 24px; }
+        .phase-dot { position: absolute; left: -42px; top: 12px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #0984e3; }
+        .phase-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .phase-num { font-size: 12px; font-weight: 700; color: #fff; padding: 3px 10px; border-radius: 12px; }
+        .phase-duration { font-size: 11px; color: #636e72; }
+        .phase-title { font-size: 16px; font-weight: 700; color: #2d3436; margin-bottom: 6px; }
+        .phase-desc { font-size: 13px; color: #636e72; margin-bottom: 12px; }
+        .phase-objects { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .obj-chip { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .obj-std { background: #f1f2f6; color: #636e72; }
+        .obj-custom { background: #e3f2fd; color: #1565c0; }
+        .obj-portal { background: #ede7f6; color: #4527a0; }
+
+        .p1 .phase-dot { background: #0984e3; box-shadow: 0 0 0 2px #0984e3; }
+        .p1 .phase-num { background: #0984e3; }
+        .p2 .phase-dot { background: #00b894; box-shadow: 0 0 0 2px #00b894; }
+        .p2 .phase-num { background: #00b894; }
+        .p3 .phase-dot { background: #e17055; box-shadow: 0 0 0 2px #e17055; }
+        .p3 .phase-num { background: #e17055; }
+        .p4 .phase-dot { background: #6c5ce7; box-shadow: 0 0 0 2px #6c5ce7; }
+        .p4 .phase-num { background: #6c5ce7; }
+        .p5 .phase-dot { background: #d63031; box-shadow: 0 0 0 2px #d63031; }
+        .p5 .phase-num { background: #d63031; }
+
+        /* Volume Table */
+        .vol-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); font-size: 12px; margin: 24px 0; }
+        .vol-table th { background: #0c2461; color: #fff; padding: 10px 12px; text-align: left; }
+        .vol-table td { padding: 8px 12px; border-bottom: 1px solid #f1f2f6; }
+        .vol-table tr:hover { background: #f8f9fa; }
+        .vol-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: 600; }
+        .vol-high { background: #ffebee; color: #c62828; }
+        .vol-med { background: #fff3e0; color: #e65100; }
+        .vol-low { background: #e8f5e9; color: #2e7d32; }
+
+        /* Tools */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 24px 0; }
+        .tool-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); text-align: center; }
+        .tool-card .tool-icon { font-size: 28px; margin-bottom: 6px; }
+        .tool-card .tool-name { font-size: 13px; font-weight: 700; }
+        .tool-card .tool-desc { font-size: 11px; color: #636e72; margin-top: 4px; }
+
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; }
+        .note strong { color: #856404; }
+
+        .footer { text-align: center; padding: 30px; color: #b2bec3; font-size: 12px; }
+        @media (max-width: 800px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media print { .nav { display: none; } .phase { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PowerShot — Oil &amp; Gas Salesforce Solution</h1>
+            <div class="subtitle">Data Migration Strategy</div>
+        </div>
+        <div class="badge">5 Phases &bull; 30 Objects &bull; 17 Manual Steps</div>
+    </div>
+
+    <div class="nav">
+        <a href="01-company-overview.html">01 Overview</a>
+        <a href="02-actors-licenses.html">02 Actors &amp; Licenses</a>
+        <a href="03-role-hierarchy.html">03 Role Hierarchy</a>
+        <a href="04-system-landscape.html">04 System Landscape</a>
+        <a href="05-data-model-erd.html">05 Data Model</a>
+        <a href="06-integration-architecture.html">06 Integrations</a>
+        <a class="active" href="07-data-migration-strategy.html">07 Data Migration</a>
+        <a href="08-governance-model.html">08 Governance</a>
+        <a href="09-dev-deployment-strategy.html">09 Dev &amp; Deployment</a>
+        <a href="10-security-model.html">10 Security Model</a>
+    </div>
+
+    <div class="container">
+        <div class="title-bar">
+            <h2>Phased Deployment &amp; Migration Approach</h2>
+            <p>PowerShot follows a dependency-ordered deployment sequence. Each phase must complete successfully before the next begins. The order is: <strong>Objects → Classes → Flows → UI → Security → Integrations → Agentforce → Experience Cloud</strong>.</p>
+        </div>
+
+        <!-- Migration Timeline -->
+        <div class="timeline">
+            <!-- Phase 1 -->
+            <div class="phase p1">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-num">PHASE 1</span>
+                        <span class="phase-duration">Week 1-2</span>
+                    </div>
+                    <div class="phase-title">Foundation — Data Model &amp; Core Objects</div>
+                    <div class="phase-desc">Deploy all 30 custom objects, custom settings, platform events, page layouts, tabs, and custom app. This establishes the data foundation that all subsequent phases depend on.</div>
+                    <div class="phase-objects">
+                        <span class="obj-chip obj-std">Account</span>
+                        <span class="obj-chip obj-std">Contact</span>
+                        <span class="obj-chip obj-std">Asset</span>
+                        <span class="obj-chip obj-std">Opportunity</span>
+                        <span class="obj-chip obj-std">Case</span>
+                        <span class="obj-chip obj-std">WorkOrder</span>
+                        <span class="obj-chip obj-custom">Well__c</span>
+                        <span class="obj-chip obj-custom">Well_Operation__c</span>
+                        <span class="obj-chip obj-custom">Pipeline__c</span>
+                        <span class="obj-chip obj-custom">Pipeline_Station__c</span>
+                        <span class="obj-chip obj-custom">Measurement__c</span>
+                        <span class="obj-chip obj-custom">HSE_Incident__c</span>
+                        <span class="obj-chip obj-custom">Regulatory_Permit__c</span>
+                        <span class="obj-chip obj-custom">Lease__c</span>
+                        <span class="obj-chip obj-custom">+ 16 more objects</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase p2">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-num">PHASE 2</span>
+                        <span class="phase-duration">Week 3-4</span>
+                    </div>
+                    <div class="phase-title">Business Logic — Apex Classes &amp; Triggers</div>
+                    <div class="phase-desc">Deploy all 60 Apex classes (services, controllers, batch, queueable, test) and 9 triggers. Run Apex tests to verify business logic. Target: 75% code coverage for production deployment.</div>
+                    <div class="phase-objects">
+                        <span class="obj-custom">WellStatusService</span>
+                        <span class="obj-custom">HSEIncidentService</span>
+                        <span class="obj-custom">ComplianceDueDateService</span>
+                        <span class="obj-custom">InspectionService</span>
+                        <span class="obj-custom">InventoryBalanceService</span>
+                        <span class="obj-custom">ProductionAllocationService</span>
+                        <span class="obj-custom">RoyaltyCalculationService</span>
+                        <span class="obj-custom">PermitToWorkValidationService</span>
+                        <span class="obj-custom">PipelineIntegrityService</span>
+                        <span class="obj-custom">+ 9 triggers + 51 more classes</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase p3">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-num">PHASE 3</span>
+                        <span class="phase-duration">Week 5</span>
+                    </div>
+                    <div class="phase-title">Automation — Flows &amp; Scheduled Jobs</div>
+                    <div class="phase-desc">Deploy all 11 flows (7 scheduled + 4 record-triggered). Verify flow execution and scheduled job activation. This phase activates the time-based automation layer.</div>
+                    <div class="phase-objects">
+                        <span class="obj-custom">Compliance_Calendar</span>
+                        <span class="obj-custom">Inspection_Due</span>
+                        <span class="obj-custom">Joint_Venture_Billing</span>
+                        <span class="obj-custom">Land_Lease_Expiration</span>
+                        <span class="obj-custom">Production_Reconciliation</span>
+                        <span class="obj-custom">Retail_Inventory_Alert</span>
+                        <span class="obj-custom">HSE_Critical_Slack_Alert</span>
+                        <span class="obj-custom">Field_Service_Dispatch</span>
+                        <span class="obj-custom">HSE_Incident_Escalation</span>
+                        <span class="obj-custom">Permit_to_Work_Approval</span>
+                        <span class="obj-custom">Regulatory_Permit_Compliance</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="phase p4">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-num">PHASE 4</span>
+                        <span class="phase-duration">Week 6</span>
+                    </div>
+                    <div class="phase-title">User Interface — LWC, FlexiPages &amp; App</div>
+                    <div class="phase-desc">Deploy 15 LWC components, 8 FlexiPages, the PowerShot custom app, 25 tabs, and 25 page layouts. This phase makes the solution visible and usable by end users.</div>
+                    <div class="phase-objects">
+                        <span class="obj-portal">complianceCalendar</span>
+                        <span class="obj-portal">fieldServiceChecklist</span>
+                        <span class="obj-portal">hseIncidentMap</span>
+                        <span class="obj-portal">inventoryTankGauge</span>
+                        <span class="obj-portal">marketDataHome</span>
+                        <span class="obj-portal">permitToWorkBoard</span>
+                        <span class="obj-portal">productionAllocationReport</span>
+                        <span class="obj-portal">wellProductionChart</span>
+                        <span class="obj-portal">+ 7 portal/store LWCs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 5 -->
+            <div class="phase p5">
+                <div class="phase-dot"></div>
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <span class="phase-num">PHASE 5</span>
+                        <span class="phase-duration">Week 7-8</span>
+                    </div>
+                    <div class="phase-title">Security, Integrations &amp; Agentforce</div>
+                    <div class="phase-desc">Deploy 20 permission sets, sharing rules, sharing sets, named credentials, external credentials, remote sites, auth providers, Agentforce bot (1 bot, 8 GenAI functions, 12 plugins), and Experience Cloud portal. Configure post-deployment secrets.</div>
+                    <div class="phase-objects">
+                        <span class="obj-portal">20 Permission Sets</span>
+                        <span class="obj-custom">10 Sharing Rules (stubs)</span>
+                        <span class="obj-custom">JV_Partner_Sharing Set</span>
+                        <span class="obj-custom">9 Named Credentials</span>
+                        <span class="obj-custom">7 External Credentials</span>
+                        <span class="obj-custom">6 Auth Providers</span>
+                        <span class="obj-portal">O&amp;G Operations Assistant Bot</span>
+                        <span class="obj-portal">Experience Cloud Portal</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Volume Table -->
+        <div class="title-bar">
+            <h2>Expected Data Volumes</h2>
+        </div>
+
+        <table class="vol-table">
+            <thead>
+                <tr>
+                    <th>Object</th>
+                    <th>Business Domain</th>
+                    <th>Expected Records</th>
+                    <th>Growth Rate</th>
+                    <th>Migration Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Well__c</strong></td><td>Upstream</td><td>Thousands</td><td>Low — new wells added quarterly</td><td><span class="vol-badge vol-high">Critical</span></td></tr>
+                <tr><td><strong>Well_Operation__c</strong></td><td>Upstream</td><td>Millions</td><td>High — per-well operations accumulate</td><td><span class="vol-badge vol-high">Critical</span></td></tr>
+                <tr><td><strong>Production_Allocation__c</strong></td><td>Upstream</td><td>Millions</td><td>High — monthly per-well entries</td><td><span class="vol-badge vol-high">Critical</span></td></tr>
+                <tr><td><strong>Measurement__c</strong></td><td>Midstream</td><td>Millions</td><td>High — real-time SCADA telemetry</td><td><span class="vol-badge vol-high">Critical</span></td></tr>
+                <tr><td><strong>Inventory_Transaction__c</strong></td><td>Downstream</td><td>Millions</td><td>High — per-transaction audit trail</td><td><span class="vol-badge vol-med">Medium</span></td></tr>
+                <tr><td><strong>HSE_Incident__c</strong></td><td>Corporate</td><td>Thousands</td><td>Medium — incident reporting</td><td><span class="vol-badge vol-high">Critical</span></td></tr>
+                <tr><td><strong>Regulatory_Permit__c</strong></td><td>Corporate</td><td>Thousands</td><td>Low — regulatory permits</td><td><span class="vol-badge vol-high">Critical</span></td></tr>
+                <tr><td><strong>Pipeline__c</strong></td><td>Midstream</td><td>Hundreds</td><td>Low — infrastructure assets</td><td><span class="vol-badge vol-med">Medium</span></td></tr>
+                <tr><td><strong>Lease__c</strong></td><td>Upstream</td><td>Hundreds</td><td>Low — land agreements</td><td><span class="vol-badge vol-med">Medium</span></td></tr>
+                <tr><td><strong>Invoice__c</strong></td><td>Corporate</td><td>Thousands</td><td>Medium — monthly billing</td><td><span class="vol-badge vol-med">Medium</span></td></tr>
+                <tr><td><strong>Fuel_Inventory__c</strong></td><td>Downstream</td><td>Thousands</td><td>Low — per-tank records</td><td><span class="vol-badge vol-low">Low</span></td></tr>
+                <tr><td><strong>Inspection__c</strong></td><td>Corporate</td><td>Thousands</td><td>Medium — scheduled inspections</td><td><span class="vol-badge vol-low">Low</span></td></tr>
+                <tr><td><strong>Store__c</strong></td><td>Retail</td><td>Tens</td><td>Low — retail locations</td><td><span class="vol-badge vol-low">Low</span></td></tr>
+                <tr><td><strong>WhatsApp_Message__c</strong></td><td>Integration</td><td>Thousands</td><td>High — messaging volume</td><td><span class="vol-badge vol-low">Low</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- Migration Tools -->
+        <div class="title-bar">
+            <h2>Migration Tools</h2>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card">
+                <div class="tool-icon">🔧</div>
+                <div class="tool-name">Salesforce CLI</div>
+                <div class="tool-desc">sf project deploy start for source deployment. Primary tool for metadata deployment.</div>
+            </div>
+            <div class="tool-card">
+                <div class="tool-icon">📊</div>
+                <div class="tool-name">Data Loader</div>
+                <div class="tool-desc">Bulk insert/update of record data. Used for migrating historical data from legacy systems.</div>
+            </div>
+            <div class="tool-card">
+                <div class="tool-icon">📋</div>
+                <div class="tool-name">Package Manifests</div>
+                <div class="tool-desc">12 XML manifests in manifest/ directory for phased deployments. Deploy specific components per phase.</div>
+            </div>
+            <div class="tool-card">
+                <div class="tool-icon">🧪</div>
+                <div class="tool-name">Apex Tests</div>
+                <div class="tool-desc">14 test classes covering all business domains. Run after each phase to verify integrity.</div>
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>Important:</strong> All 10 sharing rules are currently <strong>empty stubs</strong> — they must be populated before production deployment. Additionally, 17 manual post-deployment steps are documented in DEPLOYMENT_PLAN.md including Secret configuration (Slack, WhatsApp, GTM/GA4), flow activation, and Agentforce Builder UI wiring.
+        </div>
+    </div>
+
+    <div class="footer">PowerShot — Oil &amp; Gas Salesforce Solution &bull; Confidential &bull; September 2026</div>
+</body>
+</html>
